@@ -28,9 +28,9 @@ header{display:flex;align-items:center;gap:14px;padding:6px 2px 18px}
 h1{font-size:20px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
 header p{margin:2px 0 0;font-size:13px;color:var(--sub)}
 .rules{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-bottom:14px}
-.rules div{background:var(--card);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);border-radius:20px;padding:12px 14px}
+.rules div{background:rgba(13,148,136,.08);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(13,148,136,.18);border-radius:20px;padding:12px 14px}
 .rules small{display:block;font-size:12px;color:var(--sub)}
-.rules b{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.01em}
+.rules b{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.01em;color:var(--brand)}
 section.card{background:var(--card);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-radius:28px;padding:20px;border:1px solid var(--line);margin-bottom:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 32px -16px rgba(10,54,51,.15)}
 h2{font-size:17px;margin:0 0 16px;font-weight:700;letter-spacing:-.01em}
 label,.lbl{display:block;font-size:14px;font-weight:600;margin:0 0 8px;color:var(--sub)}
@@ -343,7 +343,7 @@ function live(){
  var h=num($("hum").value),hs=humStat(h);
  $("hum").parentNode.dataset.st=hs||"";
  badge($("humBadge"),hs,"ความชื้น"+msg[hs]);
- var need=st===bad||hs==="bad";
+ var need=st==="bad"||hs==="bad";
  $("noteHint").textContent=need?"(จำเป็น เพราะค่านอกเกณฑ์)":"(ไม่บังคับ)";
 }
 ["fridge","hum","room"].forEach(function(i){$(i).addEventListener("input",function(){live();$(i+"Err").classList.remove("show")})});
