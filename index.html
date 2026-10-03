@@ -12,8 +12,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -89,7 +87,7 @@
                     <!-- Location Selector -->
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">สถานที่ / จุดตรวจ</label>
-                        <select id="fridgeName" onchange="updateSessions(); loadTableAndChart();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <select id="fridgeName" onchange="updateSessions(); loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
                             <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
                             <option value="คลังยา">คลังยา</option>
@@ -139,17 +137,6 @@
             </form>
         </div>
 
-        <!-- Chart Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <h2 class="text-base font-bold text-blue-900 mb-4 flex items-center space-x-2">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>กราฟแสดงแนวโน้มอุณหภูมิและความชื้น</span>
-            </h2>
-            <div class="relative h-72 w-full">
-                <canvas id="tempChart"></canvas>
-            </div>
-        </div>
-
         <!-- History Table Section -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <div class="flex justify-between items-center mb-4">
@@ -197,7 +184,7 @@
             try {
                 const response = await fetch(WEB_APP_URL);
                 const data = await response.json();
-                return data; // returns array of objects from Google Sheets
+                return data;
             } catch (error) {
                 console.error('Error fetching data:', error);
                 return [];
@@ -219,7 +206,6 @@
             const humidity = parseInt(document.getElementById('humidity').value);
             const recorder = document.getElementById('recorderName').value;
 
-            // Check range (2.0 - 8.0)
             let status = 'ปกติ';
             if (fridgeTemp < 2.0 || fridgeTemp > 8.0) {
                 status = 'ผิดปกติ (นอกเกณฑ์)';
@@ -247,7 +233,7 @@
                 alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
                 document.getElementById('tempForm').reset();
                 document.getElementById('recordDate').valueAsDate = new Date();
-                loadTableAndChart();
+                setTimeout(loadTable, 1000); // หน่วงเวลาเล็กน้อยเพื่อให้ชีทอัปเดต
             } catch (error) {
                 console.error('Error saving data:', error);
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
@@ -272,13 +258,11 @@
             a.click();
         }
 
-        // Render Table & Chart
-        let myChart = null;
-        async function loadTableAndChart() {
+        // Render Table
+        async function loadTable() {
             const selectedLocation = document.getElementById('fridgeName').value;
             const allLogs = await getLogs();
             
-            // Filter logs by selected location
             const logs = allLogs.filter(item => item.location === selectedLocation);
 
             const tbody = document.getElementById('logTableBody');
@@ -286,6 +270,7 @@
 
             if (logs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400">ยังไม่มีข้อมูลในสถานที่นี้</td></tr>`;
+                return;
             }
 
             logs.forEach(item => {
@@ -294,10 +279,13 @@
                 const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
                 const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
 
+                // จัดการแสดงผลวันที่ให้สะอาดตา (ตัดข้อความเวลาสากลออก)
+                let cleanDate = item.date ? String(item.date).split('T')[0] : '';
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
-                    <td class="py-3 pr-4 font-medium text-slate-700">${item.date}<br><span class="text-xs text-slate-400">${item.round}</span></td>
+                    <td class="py-3 pr-4 font-medium text-slate-700">${cleanDate}<br><span class="text-xs text-slate-400">${item.round}</span></td>
                     <td class="py-3 pr-4 text-slate-600 text-xs">${item.location}</td>
                     <td class="py-3 pr-4 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.fridgeTemp} °C</td>
                     <td class="py-3 pr-4 text-slate-600">${item.roomTemp} °C</td>
@@ -306,48 +294,6 @@
                     <td class="py-3 pr-4 text-slate-500 text-xs">${item.recorder}</td>
                 `;
                 tbody.appendChild(tr);
-            });
-
-            // Update Chart (Reverse to show chronological order)
-            const chartLogs = [...logs].reverse();
-            const labels = chartLogs.map(l => `${l.date} (${l.round.includes('เช้า') ? 'เช้า' : 'บ่าย'})`);
-            const temps = chartLogs.map(l => parseFloat(l.fridgeTemp));
-
-            const ctx = document.getElementById('tempChart').getContext('2d');
-            if (myChart) myChart.destroy();
-
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'อุณหภูมิตู้เย็น (°C)',
-                        data: temps,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true,
-                        pointBackgroundColor: temps.map(t => (t >= 2 && t <= 8) ? '#2563eb' : '#e11d48')
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            min: 0,
-                            max: 15,
-                            grid: { color: '#f1f5f9' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
             });
         }
 
@@ -378,7 +324,7 @@
 
         // Init load
         updateSessions();
-        loadTableAndChart();
+        loadTable();
     </script>
 </body>
 </html>
