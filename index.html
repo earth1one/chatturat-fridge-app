@@ -77,7 +77,6 @@
                     <div class="grid grid-cols-2 gap-2" id="zoneButtonsContainer">
                         <!-- Rendered by JS -->
                     </div>
-                    <!-- Hidden input to hold selected zone value -->
                     <input type="hidden" id="zoneCategory" required>
                 </div>
 
@@ -109,46 +108,37 @@
                 <!-- อุณหภูมิตู้เย็น -->
                 <div>
                     <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิตู้เย็น (°C)</label>
-                    <select id="temperatureSelect" onchange="checkFridgeTempOther()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium" required>
-                        <option value="" disabled selected>-- เลือกอุณหภูมิตู้เย็น (2-8 °C) --</option>
-                        <option value="2">2 °C</option>
-                        <option value="3">3 °C</option>
-                        <option value="4">4 °C</option>
-                        <option value="5">5 °C</option>
-                        <option value="6">6 °C</option>
-                        <option value="7">7 °C</option>
-                        <option value="8">8 °C</option>
-                        <option value="other">อื่นๆ (นอกเหนือจาก 2-8)</option>
-                    </select>
-                    <input type="number" step="0.1" id="customFridgeTemp" placeholder="ระบุอุณหภูมิ เช่น 2.5 หรือ 8.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
+                    <div class="relative">
+                        <input type="number" step="0.1" id="temperature" placeholder="เช่น 5.2" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
+                        <span class="absolute right-3 top-2.5 text-slate-400 text-sm">°C</span>
+                    </div>
+                    <!-- แถบเกณฑ์มาตรฐาน -->
+                    <div class="mt-2 bg-slate-100 h-2 rounded-full overflow-hidden relative">
+                        <div class="absolute left-[16.66%] right-[33.33%] top-0 bottom-0 bg-emerald-400 opacity-75"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-0.5 px-0.5">
+                        <span>0</span>
+                        <span>2</span>
+                        <span>8</span>
+                        <span>12</span>
+                    </div>
                 </div>
 
                 <!-- อุณหภูมิห้องยา & ความชื้น -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิห้องยา (°C)</label>
-                        <select id="roomTempSelect" onchange="checkRoomTempOther()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium" required>
-                            <option value="" disabled selected>-- เลือก (23-35) --</option>
-                            <option value="23">23 °C</option>
-                            <option value="24">24 °C</option>
-                            <option value="25">25 °C</option>
-                            <option value="26">26 °C</option>
-                            <option value="27">27 °C</option>
-                            <option value="28">28 °C</option>
-                            <option value="29">29 °C</option>
-                            <option value="30">30 °C</option>
-                            <option value="31">31 °C</option>
-                            <option value="32">32 °C</option>
-                            <option value="33">33 °C</option>
-                            <option value="34">34 °C</option>
-                            <option value="35">35 °C</option>
-                            <option value="other">อื่นๆ</option>
-                        </select>
-                        <input type="number" step="0.1" id="customRoomTemp" placeholder="ระบุอุณหภูมิ" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
+                        <div class="relative">
+                            <input type="number" step="0.1" id="roomTemp" placeholder="เช่น 25.0" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
+                            <span class="absolute right-3 top-2.5 text-slate-400 text-sm">°C</span>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-slate-600 text-xs font-semibold mb-1">ความชื้น (% RH)</label>
-                        <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+                        <div class="relative">
+                            <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
+                            <span class="absolute right-3 top-2.5 text-slate-400 text-sm">%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -239,7 +229,7 @@
             const container = document.getElementById('sessionButtonsContainer');
             container.innerHTML = '';
             if (!sessions.includes(selectedSession)) {
-                selectedSession = sessions[0]; // เลือกค่าแรกเป็นค่าเริ่มต้น
+                selectedSession = sessions[0];
             }
             sessions.forEach(s => {
                 const btn = document.createElement('button');
@@ -264,34 +254,6 @@
             } catch (error) {
                 console.error('Error fetching data:', error);
                 return [];
-            }
-        }
-
-        function checkFridgeTempOther() {
-            const val = document.getElementById('temperatureSelect').value;
-            const customInput = document.getElementById('customFridgeTemp');
-            if (val === 'other') {
-                customInput.classList.remove('hidden');
-                customInput.setAttribute('required', 'required');
-                customInput.focus();
-            } else {
-                customInput.classList.add('hidden');
-                customInput.removeAttribute('required');
-                customInput.value = '';
-            }
-        }
-
-        function checkRoomTempOther() {
-            const val = document.getElementById('roomTempSelect').value;
-            const customInput = document.getElementById('customRoomTemp');
-            if (val === 'other') {
-                customInput.classList.remove('hidden');
-                customInput.setAttribute('required', 'required');
-                customInput.focus();
-            } else {
-                customInput.classList.add('hidden');
-                customInput.removeAttribute('required');
-                customInput.value = '';
             }
         }
 
@@ -324,7 +286,7 @@
 
             if (selectedZone === 'ห้องยาตึกใหม่') {
                 recorderContainer.innerHTML = `
-                    <select id="recorderName" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium">
+                    <select id="recorderName" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                         <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
                         <option value="ภัทราภรณ์">ภัทราภรณ์</option>
                         <option value="ณัชชา">ณัชชา</option>
@@ -333,7 +295,7 @@
                 `;
             } else {
                 recorderContainer.innerHTML = `
-                    <input type="text" id="recorderName" placeholder="เช่น ชื่อ-นามสกุล / ตำแหน่ง" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+                    <input type="text" id="recorderName" placeholder="เช่น ชื่อ-นามสกุล / ตำแหน่ง" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
                 `;
             }
 
@@ -363,19 +325,14 @@
             let finalLocation = selectedZone.includes('ห้องผลิต') ? subLocation : selectedZone;
 
             const round = document.getElementById('recordSession').value;
-
-            const fridgeSel = document.getElementById('temperatureSelect').value;
-            const fridgeTemp = parseFloat(fridgeSel === 'other' ? document.getElementById('customFridgeTemp').value : fridgeSel);
-
-            const roomSel = document.getElementById('roomTempSelect').value;
-            const roomTemp = parseFloat(roomSel === 'other' ? document.getElementById('customRoomTemp').value : roomSel);
-
+            const fridgeTemp = parseFloat(document.getElementById('temperature').value);
+            const roomTemp = parseFloat(document.getElementById('roomTemp').value);
             const humidity = parseInt(document.getElementById('humidity').value);
             const recorder = document.getElementById('recorderName').value;
 
             let status = 'ปกติ';
             if (fridgeTemp < 2.0 || fridgeTemp > 8.0) {
-                status = 'ผิดปกติ (นอกเกณฑ์)';
+                status = 'ผิดปกติ';
             }
 
             const payload = {
@@ -401,8 +358,6 @@
                 alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
                 document.getElementById('tempForm').reset();
                 document.getElementById('recordDate').valueAsDate = new Date();
-                document.getElementById('customFridgeTemp').classList.add('hidden');
-                document.getElementById('customRoomTemp').classList.add('hidden');
                 selectedZone = 'ห้องยาตึกเก่า';
                 renderZoneButtons();
                 updateSubLocations();
