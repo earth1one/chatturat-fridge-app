@@ -87,20 +87,20 @@
                     
                     <!-- Area Category -->
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">โซนพื้นที่หลัก</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">สถานที่ / โซนพื้นที่</label>
                         <select id="zoneCategory" onchange="updateSubLocations(); loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
+                            <option value="ห้องยาเก่า">ห้องยาเก่า</option>
                             <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
                             <option value="คลังยา">คลังยา</option>
-                            <option value="ห้องผลิต (ชั้นบน)">ห้องผลิต (ชั้นบน - 6 ห้อง)</option>
-                            <option value="ห้องผลิต (ชั้นล่าง)">ห้องผลิต (ชั้นล่าง - 3 ห้อง)</option>
+                            <option value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</option>
+                            <option value="ห้องผลิตชั้นล่าง">ห้องผลิตชั้นล่าง</option>
                         </select>
                     </div>
 
-                    <!-- Specific Room -->
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">ห้อง / จุดตรวจเจาะจง (บันทึกลง Tab ห้องผลิต)</label>
-                        <select id="fridgeName" onchange="loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <!-- Specific Room (Shown only for production) -->
+                    <div id="subLocationContainer" class="hidden">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">ระบุหมายเลขห้อง</label>
+                        <select id="fridgeName" onchange="loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <!-- Will be injected by JS -->
                         </select>
                     </div>
@@ -199,27 +199,38 @@
             }
         }
 
-        // จัดการรายการห้องย่อย และบังคับให้บันทึกลง Tab "ห้องผลิต" เสมอสำหรับห้องย่อย
         function updateSubLocations() {
             const zone = document.getElementById('zoneCategory').value;
+            const container = document.getElementById('subLocationContainer');
             const fridgeSelect = document.getElementById('fridgeName');
+            
             fridgeSelect.innerHTML = '';
 
-            let rooms = [];
-            if (zone === 'ห้องผลิต (ชั้นบน)') {
-                rooms = ['ห้องผลิตบน 1', 'ห้องผลิตบน 2', 'ห้องผลิตบน 3', 'ห้องผลิตบน 4', 'ห้องผลิตบน 5', 'ห้องผลิตบน 6'];
-            } else if (zone === 'ห้องผลิต (ชั้นล่าง)') {
-                rooms = ['ห้องผลิตล่าง 1', 'ห้องผลิตล่าง 2', 'ห้องผลิตล่าง 3'];
-            } else {
-                rooms = [zone];
-            }
+            if (zone.includes('ห้องผลิต')) {
+                container.classList.remove('hidden');
+                fridgeSelect.setAttribute('required', 'required');
 
-            rooms.forEach(r => {
+                let rooms = [];
+                if (zone === 'ห้องผลิตชั้นบน') {
+                    rooms = ['1', '2', '3', '4', '5', '6'];
+                } else if (zone === 'ห้องผลิตชั้นล่าง') {
+                    rooms = ['1', '2', '3'];
+                }
+
+                rooms.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = `${zone} ห้องที่ ${r}`;
+                    opt.textContent = r;
+                    fridgeSelect.appendChild(opt);
+                });
+            } else {
+                container.classList.add('hidden');
+                fridgeSelect.removeAttribute('required');
                 const opt = document.createElement('option');
-                opt.value = r;
-                opt.textContent = r;
+                opt.value = zone;
+                opt.textContent = zone;
                 fridgeSelect.appendChild(opt);
-            });
+            }
 
             updateSessions();
         }
@@ -231,11 +242,11 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>กำลังบันทึก...</span>';
 
             const date = document.getElementById('recordDate').value;
-            const subLocation = document.getElementById('fridgeName').value; // ชื่อห้องย่อย
             const zone = document.getElementById('zoneCategory').value;
+            const subLocation = document.getElementById('fridgeName').value;
             
-            // ถือว่าถ้าเป็นห้องผลิตชั้นบน/ล่าง ให้ไปลง Tab "ห้องผลิต" ส่วนตึกเก่า ตึกใหม่ คลังยา ลง Tab ตามชื่อนั้นๆ
             let targetSheetTab = zone.includes('ห้องผลิต') ? 'ห้องผลิต' : zone;
+            let finalLocation = zone.includes('ห้องผลิต') ? subLocation : zone;
 
             const round = document.getElementById('recordSession').value;
             const fridgeTemp = parseFloat(document.getElementById('temperature').value);
@@ -250,8 +261,8 @@
 
             const payload = {
                 date,
-                location: targetSheetTab, // ส่งชื่อ Tab ปลายทางให้ Apps Script ทราบ
-                subLocation: subLocation, // บันทึกชื่อห้องย่อยจริงลงคอลัมน์ location
+                location: targetSheetTab,
+                subLocation: finalLocation,
                 round,
                 fridgeTemp,
                 roomTemp,
@@ -297,11 +308,12 @@
         }
 
         async function loadTable() {
-            const selectedLocation = document.getElementById('fridgeName').value;
+            const zone = document.getElementById('zoneCategory').value;
+            const subLocation = document.getElementById('fridgeName').value;
+            const targetCheck = zone.includes('ห้องผลิต') ? subLocation : zone;
+
             const allLogs = await getLogs();
-            
-            // กรองดูประวัติเฉพาะห้องที่เลือก
-            const logs = allLogs.filter(item => item.location === selectedLocation || item.subLocation === selectedLocation);
+            const logs = allLogs.filter(item => item.location === targetCheck || item.subLocation === targetCheck);
 
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
@@ -330,7 +342,6 @@
                     }
                 }
 
-                // แสดงผลชื่อห้องให้ชัดเจน
                 let displayLocation = item.subLocation || item.location;
 
                 const tr = document.createElement('tr');
