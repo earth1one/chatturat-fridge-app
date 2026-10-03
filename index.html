@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกอุณหภูมิตู้เย็น - รพ.จัตุรัส</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-blue-900 p-2 rounded-xl shadow">
+                    <i class="fa-solid fa-hospital text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">โรงพยาบาลจัตุรัส</h1>
+                    <p class="text-xs text-blue-200">ระบบบันทึกอุณหภูมิและความชื้นตู้แช่ยาและวัคซีน</p>
+                </div>
+            </div>
+            <button onclick="shareToLine()" class="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1 transition shadow">
+                <i class="fa-brands fa-line text-base"></i>
+                <span>แชร์ LINE</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+
+        <!-- Status Card / Quick Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-temperature-low text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500">เกณฑ์มาตรฐาน (Safe Range)</p>
+                    <p class="text-lg font-bold text-slate-800">2.0°C - 8.0°C</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-droplet text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500">ความชื้นที่เหมาะสม</p>
+                    <p class="text-lg font-bold text-slate-800">30% - 70% RH</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-clock text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-500">รอบการบันทึกมาตรฐาน</p>
+                    <p class="text-sm font-bold text-slate-800">เช้า (09:00) / บ่าย (14:30)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-base font-bold text-blue-900 mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>บันทึกข้อมูลอุณหภูมิและความชื้น</span>
+            </h2>
+
+            <form id="tempForm" onsubmit="handleSubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Date -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">วันที่บันทึก</label>
+                        <input type="date" id="recordDate" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+                    <!-- Time Session -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">รอบเวลาบันทึก</label>
+                        <select id="recordSession" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                            <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                            <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Fridge Name -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ/รหัสตู้เย็น</label>
+                        <input type="text" id="fridgeName" value="ตู้แช่วัคซีน (คลังยา รพ.จัตุรัส)" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+                    <!-- Temperature -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">อุณหภูมิ (°C)</label>
+                        <input type="number" step="0.1" id="temperature" placeholder="เช่น 5.2" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+                    <!-- Humidity -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ความชื้น (% RH)</label>
+                        <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ผู้บันทึกข้อมูล (ชื่อ-นามสกุล / ตำแหน่ง)</label>
+                    <input type="text" id="recorderName" placeholder="เช่น นพ.สมชาย / เภสัชกร" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>บันทึกข้อมูล</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-base font-bold text-blue-900 mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>กราฟแสดงแนวโน้มอุณหภูมิและความชื้น</span>
+            </h2>
+            <div class="relative h-72 w-full">
+                <canvas id="tempChart"></canvas>
+            </div>
+        </div>
+
+        <!-- History Table Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-base font-bold text-blue-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>ประวัติการบันทึกย้อนหลัง</span>
+                </h2>
+                <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition font-medium">
+                    <i class="fa-solid fa-download mr-1"></i> Export CSV
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-100 text-slate-400 text-xs uppercase">
+                            <th class="pb-3 font-semibold">วันที่ / เวลา</th>
+                            <th class="pb-3 font-semibold">รอบ</th>
+                            <th class="pb-3 font-semibold">อุณหภูมิ</th>
+                            <th class="pb-3 font-semibold">ความชื้น</th>
+                            <th class="pb-3 font-semibold">สถานะ</th>
+                            <th class="pb-3 font-semibold">ผู้บันทึก</th>
+                            <th class="pb-3 font-semibold text-right">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody" class="divide-y divide-slate-50">
+                        <!-- Data will injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script Application Logic -->
+    <script>
+        // Set default date to today
+        document.getElementById('recordDate').valueAsDate = new Date();
+
+        // Local Storage Key
+        const STORAGE_KEY = 'chatturat_fridge_logs';
+
+        // Load mock/real logs
+        function getLogs() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                const initial = [
+                    { id: 1, date: '2026-10-03', session: 'รอบเช้า (09:00 น.)', fridge: 'ตู้แช่วัคซีน', temp: 5.1, humi: 52, status: 'ปกติ', recorder: 'ภพ. สม 09:00' },
+                    { id: 2, date: '2026-10-02', session: 'รอบบ่าย (14:30 น.)', fridge: 'ตู้แช่วัคซีน', temp: 5.8, humi: 55, status: 'ปกติ', recorder: 'ภพ. สม 14:30' }
+                ];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+                return initial;
+            }
+            return JSON.parse(data);
+        }
+
+        function saveLogs(logs) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+        }
+
+        // Handle Form Submit
+        function handleSubmit(e) {
+            e.preventDefault();
+            const date = document.getElementById('recordDate').value;
+            const session = document.getElementById('recordSession').value;
+            const fridge = document.getElementById('fridgeName').value;
+            const temp = parseFloat(document.getElementById('temperature').value);
+            const humi = parseInt(document.getElementById('humidity').value);
+            const recorder = document.getElementById('recorderName').value;
+
+            // Check range (2.0 - 8.0)
+            let status = 'ปกติ';
+            let statusClass = 'text-emerald-600 bg-emerald-50';
+            if (temp < 2.0 || temp > 8.0) {
+                status = 'ผิดปกติ (นอกเกณฑ์)';
+                statusClass = 'text-rose-600 bg-rose-50';
+            }
+
+            const newLog = {
+                id: Date.now(),
+                date,
+                session,
+                fridge,
+                temp,
+                humi,
+                status,
+                statusClass,
+                recorder
+            };
+
+            const logs = getLogs();
+            logs.unshift(newLog);
+            saveLogs(logs);
+
+            document.getElementById('tempForm').reset();
+            document.getElementById('recordDate').valueAsDate = new Date();
+            loadTableAndChart();
+            alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
+        }
+
+        // Delete Log
+        function deleteLog(id) {
+            if (confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) {
+                let logs = getLogs();
+                logs = logs.filter(item => item.id !== id);
+                saveLogs(logs);
+                loadTableAndChart();
+            }
+        }
+
+        // Share to LINE
+        function shareToLine() {
+            const logs = getLogs();
+            const latest = logs[0] || { temp: '-', humi: '-', date: '-', session: '-' };
+            const text = `📊 รายงานอุณหภูมิตู้เย็น รพ.จัตุรัส\n📅 วันที่: ${latest.date} (${latest.session})\n🌡️ อุณหภูมิ: ${latest.temp}°C\n💧 ความชื้น: ${latest.humi}%\n📌 สถานะ: ${latest.temp >= 2 && latest.temp <= 8 ? 'ปกติ ✅' : 'ผิดปกติ ⚠️'}\nผู้บันทึก: ${latest.recorder || '-'}`;
+            window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Export CSV
+        function exportCSV() {
+            const logs = getLogs();
+            let csv = 'ID,Date,Session,Fridge,Temperature,Humidity,Status,Recorder\n';
+            logs.forEach(l => {
+                csv += `${l.id},${l.date},${l.session},${l.fridge},${l.temp},${l.humi},${l.status},${l.recorder}\n`;
+            });
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chatturat_fridge_report_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        // Render Table & Chart
+        let myChart = null;
+        function loadTableAndChart() {
+            const logs = getLogs();
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+
+            logs.forEach(item => {
+                const isAbnormal = item.temp < 2.0 || item.temp > 8.0;
+                const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
+                const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="py-3 pr-4 font-medium text-slate-700">${item.date}</td>
+                    <td class="py-3 pr-4 text-slate-500 text-xs">${item.session}</td>
+                    <td class="py-3 pr-4 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.temp} °C</td>
+                    <td class="py-3 pr-4 text-slate-600">${item.humi} %</td>
+                    <td class="py-3 pr-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${statusText}</span></td>
+                    <td class="py-3 pr-4 text-slate-500 text-xs">${item.recorder}</td>
+                    <td class="py-3 text-right">
+                        <button onclick="deleteLog(${item.id})" class="text-slate-400 hover:text-rose-600 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Chart (Reverse to show chronological order)
+            const chartLogs = [...logs].reverse();
+            const labels = chartLogs.map(l => `${l.date} (${l.session.includes('เช้า') ? 'เช้า' : 'บ่าย'})`);
+            const temps = chartLogs.map(l => l.temp);
+
+            const ctx = document.getElementById('tempChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'อุณหภูมิตู้เย็น (°C)',
+                        data: temps,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: temps.map(t => (t >= 2 && t <= 8) ? '#2563eb' : '#e11d48')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 15,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Init load
+        loadTableAndChart();
+    </script>
+</body>
+</html>
