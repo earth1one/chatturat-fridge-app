@@ -223,16 +223,20 @@
             };
 
             try {
+                // ใช้ mode: 'no-cors' เพื่อให้กดปุ๊บสำเร็จปั๊บแบบไม่หน่วง
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
                 alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
                 document.getElementById('tempForm').reset();
                 document.getElementById('recordDate').valueAsDate = new Date();
-                loadTable();
+                
+                // หน่วงเวลาเล็กน้อยแล้วโหลดตารางใหม่เพื่อให้ข้อมูลอัปเดต
+                setTimeout(loadTable, 1500);
             } catch (error) {
                 console.error('Error saving data:', error);
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
