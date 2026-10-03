@@ -92,11 +92,33 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Fridge Name -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ/รหัสตู้เย็น</label>
-                        <input type="text" id="fridgeName" value="ตู้แช่วัคซีน (คลังยา รพ.จัตุรัส)" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                    </div>
+                    <script>
+  function updateSessions() {
+    const location = document.getElementById('fridgeName').value;
+    const sessionSelect = document.getElementById('recordSession');
+    
+    sessionSelect.innerHTML = '';
+    
+    if (location === 'ห้องยาตึกใหม่') {
+      sessionSelect.innerHTML = `
+        <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+        <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+        <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
+      `;
+    } else {
+      sessionSelect.innerHTML = `
+        <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+        <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+      `;
+    }
+  }
+
+  window.onload = function() {
+    if (document.getElementById('fridgeName')) {
+      updateSessions();
+    }
+  };
+</script>
                     <!-- Temperature -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">อุณหภูมิ (°C)</label>
