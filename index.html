@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>บันทึกอุณหภูมิตู้เย็นยาและวัคซีน</title>
-<!-- ตั้งค่าไอคอนสำหรับมือถือ (PWA / Apple Touch Icon) -->
 <link rel="apple-touch-icon" href="pharmaTemp.jpg">
 <link rel="icon" type="image/jpeg" href="pharmaTemp.jpg">
 <meta name="apple-mobile-web-app-title" content="PharmaTemp">
@@ -13,7 +12,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap">
-<!-- FontAwesome สำหรับไอคอนโรงพยาบาลและปรอท -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
@@ -97,7 +95,6 @@ textarea{border-radius:18px}
 <body>
 <div class="wrap">
   <header>
-    <!-- โลโก้รพ. + ปรอทวัดอุณหภูมิ ดีไซน์เข้ากับธีมสีเขียวมิ้นต์ -->
     <div class="logo" aria-hidden="true">
       <i class="fa-solid fa-hospital"></i>
     </div>
@@ -277,6 +274,26 @@ function updateWhoField(){
         <option value="ภัทราภรณ์">ภัทราภรณ์</option>
         <option value="ณัชชา">ณัชชา</option>
         <option value="เพ็ญลักษณ์">เพ็ญลักษณ์</option>
+      </select>
+    `;
+  } else if(S.zone==="ห้องยาตึกเก่า"){
+    c.innerHTML=`
+      <label for="who">ผู้บันทึก</label>
+      <select id="who" required>
+        <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
+        <option value="ระพีพรรณ">ระพีพรรณ</option>
+        <option value="รณชัย">รณชัย</option>
+        <option value="ปริยฉัตร">ปริยฉัตร</option>
+        <option value="ดาราณี">ดาราณี</option>
+      </select>
+    `;
+  } else if(S.zone==="คลังยา"){
+    c.innerHTML=`
+      <label for="who">ผู้บันทึก</label>
+      <select id="who" required>
+        <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
+        <option value="พงศ์พันธ์">พงศ์พันธ์</option>
+        <option value="นาวิน">นาวิน</option>
       </select>
     `;
   } else {
