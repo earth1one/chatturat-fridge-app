@@ -278,7 +278,19 @@
                 const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
                 const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
 
-                let cleanDate = item.date ? String(item.date).split('T')[0] : '';
+                // แปลงวันที่ให้อยู่ในรูปปี พ.ศ. ย่อแบบสั้น (เช่น 69-10-03)
+                let cleanDate = '';
+                if (item.date) {
+                    let d = String(item.date).split('T')[0];
+                    let parts = d.split('-');
+                    if (parts.length === 3) {
+                        let thaiYear = parseInt(parts[0]) + 543;
+                        let shortThaiYear = String(thaiYear).slice(2);
+                        cleanDate = `${shortThaiYear}-${parts[1]}-${parts[2]}`;
+                    } else {
+                        cleanDate = d;
+                    }
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
