@@ -93,6 +93,7 @@
     <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
     <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
     <option value="คลังยา">คลังยา</option>
+    <option value="ห้องผลิต">ห้องผลิต</option>
   </select>
 </div>
                     <!-- Time Session -->
@@ -356,17 +357,22 @@ function updateSessions() {
   sessionSelect.innerHTML = '';
   
   if (location === 'ห้องยาตึกใหม่') {
-    sessionSelect.innerHTML = `
-      <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-      <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-      <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
-    `;
-  } else {
-    sessionSelect.innerHTML = `
-      <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-      <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-    `;
-  }
+            sessionSelect.innerHTML = `
+                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+                <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
+            `;
+        } else if (location === 'ห้องผลิต') {
+            sessionSelect.innerHTML = `
+                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                <option value="รอบบ่าย (16:00 น.)">รอบบ่าย (16:00 น.)</option>
+            `;
+        } else {
+            sessionSelect.innerHTML = `
+                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+            `;
+        }
 }
         // Init load
         loadTableAndChart();
