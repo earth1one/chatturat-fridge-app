@@ -225,15 +225,14 @@
             try {
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
 
                 alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
                 document.getElementById('tempForm').reset();
                 document.getElementById('recordDate').valueAsDate = new Date();
-                setTimeout(loadTable, 1000); // หน่วงเวลาเล็กน้อยเพื่อให้ชีทอัปเดต
+                loadTable();
             } catch (error) {
                 console.error('Error saving data:', error);
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
@@ -279,7 +278,6 @@
                 const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
                 const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
 
-                // จัดการแสดงผลวันที่ให้สะอาดตา (ตัดข้อความเวลาสากลออก)
                 let cleanDate = item.date ? String(item.date).split('T')[0] : '';
 
                 const tr = document.createElement('tr');
