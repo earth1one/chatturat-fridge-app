@@ -173,7 +173,7 @@ textarea{border-radius:18px}
 
 <script>
 (function(){
-var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyl4LhBzFHdE8SsNu70iJnJDQfH7QDIbLzFyXqJJSdFj1bfagMEmf0nJwRZcruVagVhVA/exec";
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwo43dY-e7OeZndg6p0ZhFwViGaK7TrDWJUWINT8OuyhO1GhrtgaBJMVc4FdPeMmXph5g/exec";
 var ZONES=["ห้องยาตึกใหม่","ห้องยาตึกเก่า","คลังยา","ห้องผลิตชั้นบน","ห้องผลิตชั้นล่าง"];
 var ROUNDS_DEFAULT=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."}];
 var ROUNDS_NEW=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."},{id:"eve",n:"เวรบ่าย",t:"20:30 น."}];
@@ -341,7 +341,6 @@ function drawLog(){
     li.querySelector("b").textContent = displayLoc;
     li.querySelector("span:not(.dot)").textContent = cleanDate + " · " + (m.round || "");
     
-    // แสดงตัวเลขที่บันทึก (ตู้เย็น, ห้องยา, ความชื้น) และชื่อผู้บันทึก
     li.querySelector(".v").innerHTML = 
       parseFloat(m.fridgeTemp).toFixed(1) + "°C | " + parseFloat(m.roomTemp).toFixed(1) + "°C | " + m.humidity + "%" +
       "<span>ผู้บันทึก: " + (m.recorder || "-") + "</span>";
