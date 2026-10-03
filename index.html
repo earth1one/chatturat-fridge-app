@@ -17,128 +17,118 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', sans-serif; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+<body class="text-slate-800 min-h-screen pb-16">
 
     <!-- Header -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <div class="bg-white text-blue-900 p-2 rounded-xl shadow">
                     <i class="fa-solid fa-hospital text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">โรงพยาบาลจัตุรัส</h1>
-                    <p class="text-xs text-blue-200">ระบบบันทึกอุณหภูมิและความชื้นตู้แช่ยาและวัคซีน</p>
+                    <h1 class="font-bold text-base leading-tight">โรงพยาบาลจัตุรัส</h1>
+                    <p class="text-xs text-blue-200">ระบบบันทึกอุณหภูมิและความชื้น</p>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+    <main class="max-w-xl mx-auto px-4 mt-4 space-y-4">
 
-        <!-- Status Card / Quick Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
-                    <i class="fa-solid fa-temperature-low text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500">เกณฑ์มาตรฐาน (Safe Range)</p>
-                    <p class="text-lg font-bold text-slate-800">2.0°C - 8.0°C</p>
-                </div>
+        <!-- Top Info Cards -->
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400">ตู้เย็น</p>
+                <p class="font-bold text-slate-700 mt-0.5">2.0-8.0 °C</p>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
-                    <i class="fa-solid fa-droplet text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500">ความชื้นที่เหมาะสม</p>
-                    <p class="text-lg font-bold text-slate-800">30% - 70% RH</p>
-                </div>
+            <div class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400">ความชื้น</p>
+                <p class="font-bold text-slate-700 mt-0.5">30-70 %RH</p>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
-                    <i class="fa-solid fa-clock text-2xl"></i>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-500">รอบการบันทึกมาตรฐาน</p>
-                    <p class="text-sm font-bold text-slate-800">เช้า (09:00) / บ่าย (14:30)</p>
-                </div>
+            <div class="bg-white p-2.5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400">รอบบันทึก</p>
+                <p class="font-bold text-slate-700 mt-0.5">09:00 / 14:30</p>
             </div>
         </div>
 
         <!-- Form Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <h2 class="text-base font-bold text-blue-900 mb-4 flex items-center space-x-2">
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span>บันทึกข้อมูลอุณหภูมิและความชื้น</span>
-            </h2>
+        <form id="tempForm" onsubmit="handleSubmit(event)" class="space-y-4">
+            
+            <!-- Card 1: ข้อมูลการบันทึก -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-4">
+                <h2 class="font-bold text-blue-900 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>ข้อมูลการบันทึก</span>
+                </h2>
 
-            <form id="tempForm" onsubmit="handleSubmit(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Date -->
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">วันที่บันทึก</label>
-                        <input type="date" id="recordDate" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                    </div>
-                    
-                    <!-- Area Category -->
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">สถานที่ / โซนพื้นที่</label>
-                        <select id="zoneCategory" onchange="updateSubLocations(); loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="ห้องยาเก่า">ห้องยาเก่า</option>
-                            <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
-                            <option value="คลังยา">คลังยา</option>
-                            <option value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</option>
-                            <option value="ห้องผลิตชั้นล่าง">ห้องผลิตชั้นล่าง</option>
-                        </select>
-                    </div>
-
-                    <!-- Specific Room (Shown only for production) -->
-                    <div id="subLocationContainer" class="hidden">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">ระบุหมายเลขห้อง</label>
-                        <select id="fridgeName" onchange="loadTable();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <!-- Will be injected by JS -->
-                        </select>
-                    </div>
-
-                    <!-- Time Session -->
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">รอบเวลาบันทึก</label>
-                        <select id="recordSession" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-                            <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                            <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-                            <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
-                        </select>
-                    </div>
+                <!-- วันที่บันทึก -->
+                <div>
+                    <label class="block text-slate-600 text-xs font-semibold mb-1">วันที่บันทึก</label>
+                    <input type="date" id="recordDate" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Temperature (Select 2-8 or Other) -->
-                    <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">อุณหภูมิตู้เย็น (°C)</label>
-                        <select id="temperatureSelect" onchange="checkFridgeTempOther()" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-                            <option value="" disabled selected>-- เลือกอุณหภูมิตู้เย็น --</option>
-                            <option value="2">2 °C</option>
-                            <option value="3">3 °C</option>
-                            <option value="4">4 °C</option>
-                            <option value="5">5 °C</option>
-                            <option value="6">6 °C</option>
-                            <option value="7">7 °C</option>
-                            <option value="8">8 °C</option>
-                            <option value="other">อื่นๆ (นอกเหนือจาก 2-8)</option>
-                        </select>
-                        <input type="number" step="0.1" id="customFridgeTemp" placeholder="ระบุอุณหภูมิ เช่น 2.5 หรือ 8.5" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
+                <!-- สถานที่ / โซนพื้นที่ (Interactive Buttons) -->
+                <div>
+                    <label class="block text-slate-600 text-xs font-semibold mb-1.5">สถานที่ / โซนพื้นที่</label>
+                    <div class="grid grid-cols-2 gap-2" id="zoneButtonsContainer">
+                        <!-- Rendered by JS -->
                     </div>
+                    <!-- Hidden input to hold selected zone value -->
+                    <input type="hidden" id="zoneCategory" required>
+                </div>
 
-                    <!-- Room Temp (Select 23-35 or Other) -->
+                <!-- ระบุห้องผลิตย่อย (แสดงเฉพาะตอนเลือกห้องผลิต) -->
+                <div id="subLocationContainer" class="hidden">
+                    <label class="block text-slate-600 text-xs font-semibold mb-1">ระบุหมายเลขห้องผลิต</label>
+                    <select id="fridgeName" onchange="loadTable()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+                        <!-- Injected by JS -->
+                    </select>
+                </div>
+
+                <!-- รอบเวลา (Interactive Buttons) -->
+                <div>
+                    <label class="block text-slate-600 text-xs font-semibold mb-1.5">รอบเวลา</label>
+                    <div class="grid grid-cols-2 gap-2" id="sessionButtonsContainer">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <input type="hidden" id="recordSession" required>
+                </div>
+            </div>
+
+            <!-- Card 2: ค่าที่วัดได้ -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-4">
+                <h2 class="font-bold text-blue-900 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-gauge"></i>
+                    <span>ค่าที่วัดได้</span>
+                </h2>
+
+                <!-- อุณหภูมิตู้เย็น -->
+                <div>
+                    <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิตู้เย็น (°C)</label>
+                    <select id="temperatureSelect" onchange="checkFridgeTempOther()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium" required>
+                        <option value="" disabled selected>-- เลือกอุณหภูมิตู้เย็น (2-8 °C) --</option>
+                        <option value="2">2 °C</option>
+                        <option value="3">3 °C</option>
+                        <option value="4">4 °C</option>
+                        <option value="5">5 °C</option>
+                        <option value="6">6 °C</option>
+                        <option value="7">7 °C</option>
+                        <option value="8">8 °C</option>
+                        <option value="other">อื่นๆ (นอกเหนือจาก 2-8)</option>
+                    </select>
+                    <input type="number" step="0.1" id="customFridgeTemp" placeholder="ระบุอุณหภูมิ เช่น 2.5 หรือ 8.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
+                </div>
+
+                <!-- อุณหภูมิห้องยา & ความชื้น -->
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="roomTemp">อุณหภูมิห้องยา (°C)</label>
-                        <select id="roomTempSelect" onchange="checkRoomTempOther()" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" required>
-                            <option value="" disabled selected>-- เลือกอุณหภูมิห้องยา --</option>
+                        <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิห้องยา (°C)</label>
+                        <select id="roomTempSelect" onchange="checkRoomTempOther()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium" required>
+                            <option value="" disabled selected>-- เลือก (23-35) --</option>
                             <option value="23">23 °C</option>
                             <option value="24">24 °C</option>
                             <option value="25">25 °C</option>
@@ -152,61 +142,62 @@
                             <option value="33">33 °C</option>
                             <option value="34">34 °C</option>
                             <option value="35">35 °C</option>
-                            <option value="other">อื่นๆ (นอกเหนือจาก 23-35)</option>
+                            <option value="other">อื่นๆ</option>
                         </select>
-                        <input type="number" step="0.1" id="customRoomTemp" placeholder="ระบุอุณหภูมิ เช่น 22.5 หรือ 36" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
+                        <input type="number" step="0.1" id="customRoomTemp" placeholder="ระบุอุณหภูมิ" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm mt-2 hidden">
                     </div>
-
-                    <!-- Humidity -->
                     <div>
-                        <label class="block text-gray-700 text-sm font-bold mb-2">ความชื้น (% RH)</label>
-                        <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        <label class="block text-slate-600 text-xs font-semibold mb-1">ความชื้น (% RH)</label>
+                        <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">ผู้บันทึกข้อมูล (ชื่อ-นามสกุล / ตำแหน่ง)</label>
-                    <div id="recorderContainer">
-                        <!-- Will be dynamic: input or select -->
-                    </div>
+            <!-- Card 3: ผู้บันทึกข้อมูล -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
+                <h2 class="font-bold text-blue-900 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span>ผู้บันทึกข้อมูล</span>
+                </h2>
+                <div id="recorderContainer">
+                    <!-- Dynamic: Input or Select -->
                 </div>
+            </div>
 
-                <div class="flex justify-end pt-2">
-                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-2">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>บันทึกข้อมูล</span>
-                    </button>
-                </div>
-            </form>
-        </div>
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl shadow transition text-base flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>บันทึกข้อมูล</span>
+            </button>
+        </form>
 
         <!-- History Table Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-base font-bold text-blue-900 flex items-center space-x-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-bold text-blue-900 text-sm flex items-center space-x-2">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>ประวัติการบันทึกย้อนหลัง</span>
                 </h2>
-                <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition font-medium">
-                    <i class="fa-solid fa-download mr-1"></i> Export CSV
+                <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg transition font-medium">
+                    <i class="fa-solid fa-download mr-1"></i> Export
                 </button>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+                <table class="w-full text-left text-xs">
                     <thead>
-                        <tr class="border-b border-slate-100 text-slate-400 text-xs uppercase">
-                            <th class="pb-3 font-semibold">วันที่ / รอบ</th>
-                            <th class="pb-3 font-semibold">สถานที่</th>
-                            <th class="pb-3 font-semibold">ตู้เย็น</th>
-                            <th class="pb-3 font-semibold">ห้องยา</th>
-                            <th class="pb-3 font-semibold">ความชื้น</th>
-                            <th class="pb-3 font-semibold">สถานะ</th>
-                            <th class="pb-3 font-semibold">ผู้บันทึก</th>
+                        <tr class="border-b border-slate-100 text-slate-400 uppercase">
+                            <th class="pb-2 font-semibold">วันที่ / รอบ</th>
+                            <th class="pb-2 font-semibold">สถานที่</th>
+                            <th class="pb-2 font-semibold">ตู้เย็น</th>
+                            <th class="pb-2 font-semibold">ห้องยา</th>
+                            <th class="pb-2 font-semibold">ความชื้น</th>
+                            <th class="pb-2 font-semibold">สถานะ</th>
+                            <th class="pb-2 font-semibold">ผู้บันทึก</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody" class="divide-y divide-slate-50">
-                        <!-- Data will injected by JS -->
+                        <!-- Injected by JS -->
                     </tbody>
                 </table>
             </div>
@@ -219,6 +210,51 @@
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyl4LhBzFHdE8SsNu70iJnJDQfH7QDIbLzFyXqJJSdFj1bfagMEmf0nJwRZcruVagVhVA/exec";
 
         document.getElementById('recordDate').valueAsDate = new Date();
+
+        const zones = ['ห้องยาเก่า', 'ห้องยาตึกใหม่', 'คลังยา', 'ห้องผลิตชั้นบน', 'ห้องผลิตชั้นล่าง'];
+        let selectedZone = 'ห้องยาเก่า';
+        let selectedSession = '';
+
+        function renderZoneButtons() {
+            const container = document.getElementById('zoneButtonsContainer');
+            container.innerHTML = '';
+            zones.forEach(z => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `py-2.5 px-3 rounded-xl text-xs font-semibold border transition text-center truncate ${selectedZone === z ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`;
+                btn.textContent = z;
+                btn.onclick = () => {
+                    selectedZone = z;
+                    document.getElementById('zoneCategory').value = z;
+                    renderZoneButtons();
+                    updateSubLocations();
+                    loadTable();
+                };
+                container.appendChild(btn);
+            });
+            document.getElementById('zoneCategory').value = selectedZone;
+        }
+
+        function renderSessionButtons(sessions) {
+            const container = document.getElementById('sessionButtonsContainer');
+            container.innerHTML = '';
+            if (!sessions.includes(selectedSession)) {
+                selectedSession = sessions[0]; // เลือกค่าแรกเป็นค่าเริ่มต้น
+            }
+            sessions.forEach(s => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `py-2.5 px-3 rounded-xl text-xs font-semibold border transition text-center ${selectedSession === s ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`;
+                btn.textContent = s;
+                btn.onclick = () => {
+                    selectedSession = s;
+                    document.getElementById('recordSession').value = s;
+                    renderSessionButtons(sessions);
+                };
+                container.appendChild(btn);
+            });
+            document.getElementById('recordSession').value = selectedSession;
+        }
 
         async function getLogs() {
             try {
@@ -260,42 +296,35 @@
         }
 
         function updateSubLocations() {
-            const zone = document.getElementById('zoneCategory').value;
             const container = document.getElementById('subLocationContainer');
             const fridgeSelect = document.getElementById('fridgeName');
             const recorderContainer = document.getElementById('recorderContainer');
             
             fridgeSelect.innerHTML = '';
 
-            if (zone.includes('ห้องผลิต')) {
+            if (selectedZone.includes('ห้องผลิต')) {
                 container.classList.remove('hidden');
                 fridgeSelect.setAttribute('required', 'required');
 
-                let rooms = [];
-                if (zone === 'ห้องผลิตชั้นบน') {
-                    rooms = ['1', '2', '3', '4', '5', '6'];
-                } else if (zone === 'ห้องผลิตชั้นล่าง') {
-                    rooms = ['1', '2', '3'];
-                }
-
+                let rooms = selectedZone === 'ห้องผลิตชั้นบน' ? ['1', '2', '3', '4', '5', '6'] : ['1', '2', '3'];
                 rooms.forEach(r => {
                     const opt = document.createElement('option');
-                    opt.value = `${zone} ห้องที่ ${r}`;
-                    opt.textContent = r;
+                    opt.value = `${selectedZone} ห้องที่ ${r}`;
+                    opt.textContent = `ห้องที่ ${r}`;
                     fridgeSelect.appendChild(opt);
                 });
             } else {
                 container.classList.add('hidden');
                 fridgeSelect.removeAttribute('required');
                 const opt = document.createElement('option');
-                opt.value = zone;
-                opt.textContent = zone;
+                opt.value = selectedZone;
+                opt.textContent = selectedZone;
                 fridgeSelect.appendChild(opt);
             }
 
-            if (zone === 'ห้องยาตึกใหม่') {
+            if (selectedZone === 'ห้องยาตึกใหม่') {
                 recorderContainer.innerHTML = `
-                    <select id="recorderName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="recorderName" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium">
                         <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
                         <option value="ภัทราภรณ์">ภัทราภรณ์</option>
                         <option value="ณัชชา">ณัชชา</option>
@@ -304,11 +333,21 @@
                 `;
             } else {
                 recorderContainer.innerHTML = `
-                    <input type="text" id="recorderName" placeholder="เช่น จพง / พนง" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    <input type="text" id="recorderName" placeholder="เช่น ชื่อ-นามสกุล / ตำแหน่ง" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
                 `;
             }
 
             updateSessions();
+        }
+
+        function updateSessions() {
+            let sessions = ['รอบเช้า (09:00 น.)', 'รอบบ่าย (14:30 น.)'];
+            if (selectedZone === 'ห้องยาตึกใหม่') {
+                sessions = ['รอบเช้า (09:00 น.)', 'รอบบ่าย (14:30 น.)', 'เวรบ่าย (20:30 น.)'];
+            } else if (selectedZone.includes('ห้องผลิต')) {
+                sessions = ['รอบเช้า (09:00 น.)', 'รอบบ่าย (16:00 น.)'];
+            }
+            renderSessionButtons(sessions);
         }
 
         async function handleSubmit(e) {
@@ -318,19 +357,16 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>กำลังบันทึก...</span>';
 
             const date = document.getElementById('recordDate').value;
-            const zone = document.getElementById('zoneCategory').value;
             const subLocation = document.getElementById('fridgeName').value;
             
-            let targetSheetTab = zone.includes('ห้องผลิต') ? 'ห้องผลิต' : zone;
-            let finalLocation = zone.includes('ห้องผลิต') ? subLocation : zone;
+            let targetSheetTab = selectedZone.includes('ห้องผลิต') ? 'ห้องผลิต' : selectedZone;
+            let finalLocation = selectedZone.includes('ห้องผลิต') ? subLocation : selectedZone;
 
             const round = document.getElementById('recordSession').value;
 
-            // ดึงค่าอุณหภูมิตู้เย็น (ถ้าเลือก other ให้เอาจากช่อง custom)
             const fridgeSel = document.getElementById('temperatureSelect').value;
             const fridgeTemp = parseFloat(fridgeSel === 'other' ? document.getElementById('customFridgeTemp').value : fridgeSel);
 
-            // ดึงค่าอุณหภูมิห้องยา (ถ้าเลือก other ให้เอาจากช่อง custom)
             const roomSel = document.getElementById('roomTempSelect').value;
             const roomTemp = parseFloat(roomSel === 'other' ? document.getElementById('customRoomTemp').value : roomSel);
 
@@ -367,6 +403,8 @@
                 document.getElementById('recordDate').valueAsDate = new Date();
                 document.getElementById('customFridgeTemp').classList.add('hidden');
                 document.getElementById('customRoomTemp').classList.add('hidden');
+                selectedZone = 'ห้องยาตึกเก่า';
+                renderZoneButtons();
                 updateSubLocations();
                 setTimeout(loadTable, 1500);
             } catch (error) {
@@ -393,9 +431,8 @@
         }
 
         async function loadTable() {
-            const zone = document.getElementById('zoneCategory').value;
             const subLocation = document.getElementById('fridgeName').value;
-            const targetCheck = zone.includes('ห้องผลิต') ? subLocation : zone;
+            const targetCheck = selectedZone.includes('ห้องผลิต') ? subLocation : selectedZone;
 
             const allLogs = await getLogs();
             const logs = allLogs.filter(item => item.location === targetCheck || item.subLocation === targetCheck);
@@ -404,7 +441,7 @@
             tbody.innerHTML = '';
 
             if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400">ยังไม่มีข้อมูลในห้องนี้</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400">ยังไม่มีข้อมูลในสถานที่นี้</td></tr>`;
                 return;
             }
 
@@ -412,7 +449,7 @@
                 const tempVal = parseFloat(item.fridgeTemp);
                 const isAbnormal = tempVal < 2.0 || tempVal > 8.0;
                 const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
-                const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
+                const statusText = isAbnormal ? 'ผิดปกติ' : 'ปกติ';
 
                 let cleanDate = '';
                 if (item.date) {
@@ -432,44 +469,20 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
-                    <td class="py-3 pr-4 font-medium text-slate-700">${cleanDate}<br><span class="text-xs text-slate-400">${item.round}</span></td>
-                    <td class="py-3 pr-4 text-slate-600 text-xs">${displayLocation}</td>
-                    <td class="py-3 pr-4 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.fridgeTemp} °C</td>
-                    <td class="py-3 pr-4 text-slate-600">${item.roomTemp} °C</td>
-                    <td class="py-3 pr-4 text-slate-600">${item.humidity} %</td>
-                    <td class="py-3 pr-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${statusText}</span></td>
-                    <td class="py-3 pr-4 text-slate-500 text-xs">${item.recorder}</td>
+                    <td class="py-2.5 pr-2 font-medium text-slate-700">${cleanDate}<br><span class="text-[10px] text-slate-400">${item.round}</span></td>
+                    <td class="py-2.5 pr-2 text-slate-600">${displayLocation}</td>
+                    <td class="py-2.5 pr-2 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.fridgeTemp}°C</td>
+                    <td class="py-2.5 pr-2 text-slate-600">${item.roomTemp}°C</td>
+                    <td class="py-2.5 pr-2 text-slate-600">${item.humidity}%</td>
+                    <td class="py-2.5 pr-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${badgeClass}">${statusText}</span></td>
+                    <td class="py-2.5 pr-2 text-slate-500">${item.recorder}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function updateSessions() {
-            const zone = document.getElementById('zoneCategory').value;
-            const sessionSelect = document.getElementById('recordSession');
-            
-            sessionSelect.innerHTML = '';
-            
-            if (zone === 'ห้องยาตึกใหม่') {
-                sessionSelect.innerHTML = `
-                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                    <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-                    <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
-                `;
-            } else if (zone.includes('ห้องผลิต')) {
-                sessionSelect.innerHTML = `
-                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                    <option value="รอบบ่าย (16:00 น.)">รอบบ่าย (16:00 น.)</option>
-                `;
-            } else {
-                sessionSelect.innerHTML = `
-                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                    <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-                `;
-            }
-        }
-
         // Init load
+        renderZoneButtons();
         updateSubLocations();
     </script>
 </body>
