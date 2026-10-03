@@ -76,7 +76,8 @@ textarea{border-radius:18px}
 .dot{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:0 0 0 4px transparent}
 .dot.ok{background:var(--ok);box-shadow:0 0 0 4px var(--ok-bg)}.dot.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-bg)}.dot.bad{background:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}
 .log .t{flex:1;min-width:0}.log .t b{display:block;font-size:15px}.log .t span{font-size:13px;color:var(--sub)}
-.log .v{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.log .v{text-align:right;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;line-height:1.3}
+.log .v span{display:block;font-size:12px;font-weight:400;color:var(--sub)}
 .empty{color:var(--sub);font-size:14px;margin:0}
 .toast{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));max-width:528px;margin:0 auto;background:var(--ink);color:var(--bg);padding:14px 18px;border-radius:999px;font-weight:600;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;text-align:center;z-index:50}
 .toast.show{opacity:1;transform:none}
@@ -178,7 +179,6 @@ var ROUNDS_DEFAULT=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",
 var ROUNDS_NEW=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."},{id:"eve",n:"เวรบ่าย",t:"20:30 น."}];
 var ROUNDS_PROD=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"16:00 น."}];
 
-var KEY="templog.v1";
 var S={zone:ZONES[0],round:"am"};
 var $=function(i){return document.getElementById(i)};
 function loadRemoteLogs(){
@@ -191,10 +191,25 @@ function loadRemoteLogs(){
   }).catch(function(e){console.error(e);});
 }
 function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
-function thDate(s){var p=s.split("-");var d=new Date(+p[0],+p[1]-1,+p[2]);
- try{return d.toLocaleDateString("th-TH-u-ca-buddhist",{day:"numeric",month:"short",year:"numeric",weekday:"short"})}catch(e){return s}}
+function thDateShort(s){
+  var p=s.split("-");
+  if(p.length===3){
+    var y = parseInt(p[0]) + 543;
+    var shortY = String(y).slice(2);
+    return shortY + "-" + p[1] + "-" + p[2];
+  }
+  return s;
+}
 $("date").value=iso(new Date());$("date").max=iso(new Date());
-function showDate(){$("dateShown").textContent=thDate($("date").value)}
+function showDate(){
+  var p = $("date").value.split("-");
+  if(p.length===3){
+    var y = parseInt(p[0]) + 543;
+    $("dateShown").textContent = (String(y).slice(2)) + "-" + p[1] + "-" + p[2];
+  } else {
+    $("dateShown").textContent = $("date").value;
+  }
+}
 $("date").addEventListener("change",function(){showDate();drawRounds()});showDate();
 
 function getActiveRounds(){
@@ -320,21 +335,17 @@ function drawLog(){
     var worst = (st==="bad" || hs==="bad") ? "bad" : "ok";
     
     var displayLoc = m.subLocation || m.location;
-    var cleanDate = m.date;
-    if (m.date) {
-      let d = String(m.date).split('T')[0];
-      let parts = d.split('-');
-      if (parts.length === 3) {
-        let thaiYear = parseInt(parts[0]) + 543;
-        let shortThaiYear = String(thaiYear).slice(2);
-        cleanDate = `${shortThaiYear}-${parts[1]}-${parts[2]}`;
-      }
-    }
+    var cleanDate = m.date ? thDateShort(String(m.date).split('T')[0]) : "";
 
     li.innerHTML='<span class="dot '+worst+'"></span><div class="t"><b></b><span></span></div><div class="v"></div>';
     li.querySelector("b").textContent = displayLoc;
-    li.querySelector("span:not(.dot)").textContent = (cleanDate ? thDate(cleanDate) : "") + " · " + (m.round || "");
-    li.querySelector(".v").textContent = parseFloat(m.fridgeTemp).toFixed(1) + " °C";
+    li.querySelector("span:not(.dot)").textContent = cleanDate + " · " + (m.round || "");
+    
+    // แสดงตัวเลขที่บันทึก (ตู้เย็น, ห้องยา, ความชื้น) และชื่อผู้บันทึก
+    li.querySelector(".v").innerHTML = 
+      parseFloat(m.fridgeTemp).toFixed(1) + "°C | " + parseFloat(m.roomTemp).toFixed(1) + "°C | " + m.humidity + "%" +
+      "<span>ผู้บันทึก: " + (m.recorder || "-") + "</span>";
+    
     ul.appendChild(li);
   });
 }
