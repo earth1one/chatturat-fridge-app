@@ -410,30 +410,26 @@ $("save").addEventListener("click",function(){
    note: $("note").value.trim()
  };
 
- var btn = $("save");
- btn.disabled = true;
- btn.textContent = "กำลังบันทึก...";
+ // เด้งตอบสนองทันทีแบบรวดเร็ว (Optimistic UI) ไม่ต้องรอหน่วง
+ toast((fs==="bad"||hs==="bad")?"บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า":"บันทึกข้อมูลแล้ว");
+ ["fridge","room","hum","note"].forEach(function(i){$(i).value=""});
+ if($("who").tagName==="INPUT") $("who").value="";
+ live();
+ window.scrollTo({top:0,behavior:"smooth"});
+ drawRounds();
 
+ // ส่งข้อมูลไปบันทึกที่ Google Sheets เบื้องหลังแบบเงียบๆ
  fetch(WEB_APP_URL, {
    method: "POST",
    mode: "no-cors",
    headers: { "Content-Type": "application/json" },
    body: JSON.stringify(payload)
  }).then(function(){
-   toast((fs==="bad"||hs==="bad")?"บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า":"บันทึกข้อมูลแล้ว");
-   ["fridge","room","hum","note"].forEach(function(i){$(i).value=""});
-   if($("who").tagName==="INPUT") $("who").value="";
-   live();
    setTimeout(function(){
      loadRemoteLogs();
-   }, 1500);
+   }, 1200);
  }).catch(function(err){
    console.error(err);
-   alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่");
- }).finally(function(){
-   btn.disabled = false;
-   btn.textContent = "บันทึกข้อมูล";
-   window.scrollTo({top:0,behavior:"smooth"});
  });
 });
 })();
