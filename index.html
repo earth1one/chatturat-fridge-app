@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pharmaTemp</title>
     <!-- ไอคอนและชื่อแอปบนมือถือ -->
-<link rel="apple-touch-icon" href="pharmaTemp.jpg">
-<link rel="icon" type="image/jpeg" href="pharmaTemp.jpg">
-<meta name="apple-mobile-web-app-title" content="PharmaTemp">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="pharmaTemp.jpg">
+    <link rel="icon" type="image/jpeg" href="pharmaTemp.jpg">
+    <meta name="apple-mobile-web-app-title" content="PharmaTemp">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -36,7 +36,7 @@
                     <p class="text-xs text-blue-200">ระบบบันทึกอุณหภูมิและความชื้นตู้แช่ยาและวัคซีน</p>
                 </div>
             </div>
-           
+        </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-4 mt-6 space-y-6">
@@ -86,16 +86,16 @@
                         <label class="block text-gray-700 text-sm font-bold mb-2">วันที่บันทึก</label>
                         <input type="date" id="recordDate" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                     </div>
-                     <!-- Location Selector -->
-<div>
-  <label class="block text-gray-700 text-sm font-bold mb-2">สถานที่ / จุดตรวจ</label>
-  <select id="fridgeName" onchange="updateSessions(); loadTableAndChart();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-    <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
-    <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
-    <option value="คลังยา">คลังยา</option>
-    <option value="ห้องผลิต">ห้องผลิต</option>
-  </select>
-</div>
+                    <!-- Location Selector -->
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">สถานที่ / จุดตรวจ</label>
+                        <select id="fridgeName" onchange="updateSessions(); loadTableAndChart();" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
+                            <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
+                            <option value="คลังยา">คลังยา</option>
+                            <option value="ห้องผลิต">ห้องผลิต</option>
+                        </select>
+                    </div>
                     <!-- Time Session -->
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">รอบเวลาบันทึก</label>
@@ -108,19 +108,16 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                   
                     <!-- Temperature -->
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">อุณหภูมิตู้เย็น (°C)</label>
                         <input type="number" step="0.1" id="temperature" placeholder="เช่น 5.2" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
                     </div>
-                    <!-- ช่องกรอกอุณหภูมิห้องยา -->
-<div class="mb-4">
-  <label class="block text-gray-700 text-sm font-bold mb-2" for="roomTemp">
-    อุณหภูมิห้องยา (°C)
-  </label>
-  <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="roomTemp" name="room_temperature" type="number" step="0.1" placeholder="เช่น 25.0" required>
-</div>
+                    <!-- Room Temp -->
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="roomTemp">อุณหภูมิห้องยา (°C)</label>
+                        <input type="number" step="0.1" id="roomTemp" placeholder="เช่น 25.0" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                    </div>
                     <!-- Humidity -->
                     <div>
                         <label class="block text-gray-700 text-sm font-bold mb-2">ความชื้น (% RH)</label>
@@ -134,7 +131,7 @@
                 </div>
 
                 <div class="flex justify-end pt-2">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-2">
+                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-2">
                         <i class="fa-solid fa-floppy-disk"></i>
                         <span>บันทึกข้อมูล</span>
                     </button>
@@ -169,13 +166,13 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-slate-100 text-slate-400 text-xs uppercase">
-                            <th class="pb-3 font-semibold">วันที่ / เวลา</th>
-                            <th class="pb-3 font-semibold">รอบ</th>
-                            <th class="pb-3 font-semibold">อุณหภูมิ</th>
+                            <th class="pb-3 font-semibold">วันที่ / รอบ</th>
+                            <th class="pb-3 font-semibold">สถานที่</th>
+                            <th class="pb-3 font-semibold">ตู้เย็น</th>
+                            <th class="pb-3 font-semibold">ห้องยา</th>
                             <th class="pb-3 font-semibold">ความชื้น</th>
                             <th class="pb-3 font-semibold">สถานะ</th>
                             <th class="pb-3 font-semibold">ผู้บันทึก</th>
-                            <th class="pb-3 font-semibold text-right">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody" class="divide-y divide-slate-50">
@@ -189,88 +186,83 @@
 
     <!-- Script Application Logic -->
     <script>
+        // Google Apps Script Web App URL
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyl4LhBzFHdE8SsNu70iJnJDQfH7QDIbLzFyXqJJSdFj1bfagMEmf0nJwRZcruVagVhVA/exec";
+
         // Set default date to today
         document.getElementById('recordDate').valueAsDate = new Date();
 
-        // Local Storage Key
-        const STORAGE_KEY = 'chatturat_fridge_logs';
-
-        // Load mock/real logs
-        function getLogs() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            if (!data) {
-                const initial = [
-                    { id: 1, date: '2026-10-03', session: 'รอบเช้า (09:00 น.)', fridge: 'ตู้แช่วัคซีน', temp: 5.1, humi: 52, status: 'ปกติ', recorder: 'ภพ. สม 09:00' },
-                    { id: 2, date: '2026-10-02', session: 'รอบบ่าย (14:30 น.)', fridge: 'ตู้แช่วัคซีน', temp: 5.8, humi: 55, status: 'ปกติ', recorder: 'ภพ. สม 14:30' }
-                ];
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-                return initial;
+        // Fetch logs from Google Sheets
+        async function getLogs() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                return data; // returns array of objects from Google Sheets
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return [];
             }
-            return JSON.parse(data);
-        }
-
-        function saveLogs(logs) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
         }
 
         // Handle Form Submit
-        function handleSubmit(e) {
+        async function handleSubmit(e) {
             e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>กำลังบันทึก...</span>';
+
             const date = document.getElementById('recordDate').value;
-            const session = document.getElementById('recordSession').value;
-            const fridge = document.getElementById('fridgeName').value;
-            const temp = parseFloat(document.getElementById('temperature').value);
-            const humi = parseInt(document.getElementById('humidity').value);
+            const location = document.getElementById('fridgeName').value;
+            const round = document.getElementById('recordSession').value;
+            const fridgeTemp = parseFloat(document.getElementById('temperature').value);
+            const roomTemp = parseFloat(document.getElementById('roomTemp').value);
+            const humidity = parseInt(document.getElementById('humidity').value);
             const recorder = document.getElementById('recorderName').value;
 
             // Check range (2.0 - 8.0)
             let status = 'ปกติ';
-            let statusClass = 'text-emerald-600 bg-emerald-50';
-            if (temp < 2.0 || temp > 8.0) {
+            if (fridgeTemp < 2.0 || fridgeTemp > 8.0) {
                 status = 'ผิดปกติ (นอกเกณฑ์)';
-                statusClass = 'text-rose-600 bg-rose-50';
             }
 
-            const newLog = {
-                id: Date.now(),
+            const payload = {
                 date,
-                session,
-                fridge,
-                temp,
-                humi,
+                location,
+                round,
+                fridgeTemp,
+                roomTemp,
+                humidity,
                 status,
-                statusClass,
                 recorder
             };
 
-            const logs = getLogs();
-            logs.unshift(newLog);
-            saveLogs(logs);
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            document.getElementById('tempForm').reset();
-            document.getElementById('recordDate').valueAsDate = new Date();
-            loadTableAndChart();
-            alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
-        }
-
-        // Delete Log
-        function deleteLog(id) {
-            if (confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) {
-                let logs = getLogs();
-                logs = logs.filter(item => item.id !== id);
-                saveLogs(logs);
+                alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
+                document.getElementById('tempForm').reset();
+                document.getElementById('recordDate').valueAsDate = new Date();
                 loadTableAndChart();
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>บันทึกข้อมูล</span>';
             }
         }
 
-        
-
         // Export CSV
-        function exportCSV() {
-            const logs = getLogs();
-            let csv = 'ID,Date,Session,Fridge,Temperature,Humidity,Status,Recorder\n';
+        async function exportCSV() {
+            const logs = await getLogs();
+            let csv = 'Date,Location,Round,FridgeTemp,RoomTemp,Humidity,Status,Recorder\n';
             logs.forEach(l => {
-                csv += `${l.id},${l.date},${l.session},${l.fridge},${l.temp},${l.humi},${l.status},${l.recorder}\n`;
+                csv += `${l.date},${l.location},${l.round},${l.fridgeTemp},${l.roomTemp},${l.humidity},${l.status},${l.recorder}\n`;
             });
             const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -282,36 +274,44 @@
 
         // Render Table & Chart
         let myChart = null;
-        function loadTableAndChart() {
-            const logs = getLogs();
+        async function loadTableAndChart() {
+            const selectedLocation = document.getElementById('fridgeName').value;
+            const allLogs = await getLogs();
+            
+            // Filter logs by selected location
+            const logs = allLogs.filter(item => item.location === selectedLocation);
+
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
 
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400">ยังไม่มีข้อมูลในสถานที่นี้</td></tr>`;
+            }
+
             logs.forEach(item => {
-                const isAbnormal = item.temp < 2.0 || item.temp > 8.0;
+                const tempVal = parseFloat(item.fridgeTemp);
+                const isAbnormal = tempVal < 2.0 || tempVal > 8.0;
                 const badgeClass = isAbnormal ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200';
                 const statusText = isAbnormal ? 'ผิดปกติ (นอกเกณฑ์)' : 'ปกติ';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 transition';
                 tr.innerHTML = `
-                    <td class="py-3 pr-4 font-medium text-slate-700">${item.date}</td>
-                    <td class="py-3 pr-4 text-slate-500 text-xs">${item.session}</td>
-                    <td class="py-3 pr-4 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.temp} °C</td>
-                    <td class="py-3 pr-4 text-slate-600">${item.humi} %</td>
+                    <td class="py-3 pr-4 font-medium text-slate-700">${item.date}<br><span class="text-xs text-slate-400">${item.round}</span></td>
+                    <td class="py-3 pr-4 text-slate-600 text-xs">${item.location}</td>
+                    <td class="py-3 pr-4 font-bold ${isAbnormal ? 'text-rose-600' : 'text-slate-800'}">${item.fridgeTemp} °C</td>
+                    <td class="py-3 pr-4 text-slate-600">${item.roomTemp} °C</td>
+                    <td class="py-3 pr-4 text-slate-600">${item.humidity} %</td>
                     <td class="py-3 pr-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${statusText}</span></td>
                     <td class="py-3 pr-4 text-slate-500 text-xs">${item.recorder}</td>
-                    <td class="py-3 text-right">
-                        <button onclick="deleteLog(${item.id})" class="text-slate-400 hover:text-rose-600 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
                 `;
                 tbody.appendChild(tr);
             });
 
             // Update Chart (Reverse to show chronological order)
             const chartLogs = [...logs].reverse();
-            const labels = chartLogs.map(l => `${l.date} (${l.session.includes('เช้า') ? 'เช้า' : 'บ่าย'})`);
-            const temps = chartLogs.map(l => l.temp);
+            const labels = chartLogs.map(l => `${l.date} (${l.round.includes('เช้า') ? 'เช้า' : 'บ่าย'})`);
+            const temps = chartLogs.map(l => parseFloat(l.fridgeTemp));
 
             const ctx = document.getElementById('tempChart').getContext('2d');
             if (myChart) myChart.destroy();
@@ -350,34 +350,35 @@
                 }
             });
         }
-function updateSessions() {
-  const location = document.getElementById('fridgeName').value;
-  const sessionSelect = document.getElementById('recordSession');
-  
-  sessionSelect.innerHTML = '';
-  
-  if (location === 'ห้องยาตึกใหม่') {
-            sessionSelect.innerHTML = `
-                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-                <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
-            `;
-        } else if (location === 'ห้องผลิต') {
-            sessionSelect.innerHTML = `
-                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                <option value="รอบบ่าย (16:00 น.)">รอบบ่าย (16:00 น.)</option>
-            `;
-        } else {
-            sessionSelect.innerHTML = `
-                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-            `;
+
+        function updateSessions() {
+            const location = document.getElementById('fridgeName').value;
+            const sessionSelect = document.getElementById('recordSession');
+            
+            sessionSelect.innerHTML = '';
+            
+            if (location === 'ห้องยาตึกใหม่') {
+                sessionSelect.innerHTML = `
+                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                    <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+                    <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
+                `;
+            } else if (location === 'ห้องผลิต') {
+                sessionSelect.innerHTML = `
+                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                    <option value="รอบบ่าย (16:00 น.)">รอบบ่าย (16:00 น.)</option>
+                `;
+            } else {
+                sessionSelect.innerHTML = `
+                    <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+                    <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+                `;
+            }
         }
-}
+
         // Init load
-       const selectedFridge = document.getElementById('fridgeName').value;
-        loadTableAndChart(selectedFridge);
         updateSessions();
+        loadTableAndChart();
     </script>
 </body>
 </html>
