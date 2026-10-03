@@ -247,13 +247,7 @@
             }
         }
 
-        // Share to LINE
-        function shareToLine() {
-            const logs = getLogs();
-            const latest = logs[0] || { temp: '-', humi: '-', date: '-', session: '-' };
-            const text = `📊 รายงานอุณหภูมิตู้เย็น รพ.จัตุรัส\n📅 วันที่: ${latest.date} (${latest.session})\n🌡️ อุณหภูมิ: ${latest.temp}°C\n💧 ความชื้น: ${latest.humi}%\n📌 สถานะ: ${latest.temp >= 2 && latest.temp <= 8 ? 'ปกติ ✅' : 'ผิดปกติ ⚠️'}\nผู้บันทึก: ${latest.recorder || '-'}`;
-            window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
-        }
+        
 
         // Export CSV
         function exportCSV() {
