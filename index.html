@@ -27,10 +27,8 @@ header{display:flex;align-items:center;gap:14px;padding:6px 2px 18px}
 .logo{width:52px;height:52px;border-radius:18px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-size:24px;flex:none;box-shadow:0 8px 24px var(--glow)}
 h1{font-size:20px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
 header p{margin:2px 0 0;font-size:13px;color:var(--sub)}
-.rules{display:grid;grid-template-columns:1.1fr 1.1fr 1fr;gap:8px;margin-bottom:14px}
-.rules div{background:var(--card);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);border-radius:20px;padding:12px 12px 11px}
-.rules div:first-child{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:var(--brand-ink)}
-.rules div:first-child small{color:rgba(255,255,255,.9)}
+.rules{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-bottom:14px}
+.rules div{background:var(--card);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);border-radius:20px;padding:12px 14px}
 .rules small{display:block;font-size:12px;color:var(--sub)}
 .rules b{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.01em}
 section.card{background:var(--card);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-radius:28px;padding:20px;border:1px solid var(--line);margin-bottom:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 32px -16px rgba(10,54,51,.15)}
@@ -103,6 +101,7 @@ textarea{border-radius:18px}
 
   <div class="rules" aria-label="เกณฑ์มาตรฐาน">
     <div><small>ตู้เย็น</small><b>2.0–8.0 °C</b></div>
+    <div><small>อุณหภูมิห้องยา</small><b>&lt; 30.0 °C</b></div>
     <div><small>ความชื้น</small><b>30–70 %RH</b></div>
     <div><small>รอบบันทึก</small><b>09:00 / 14:30</b></div>
   </div>
@@ -344,7 +343,7 @@ function live(){
  var h=num($("hum").value),hs=humStat(h);
  $("hum").parentNode.dataset.st=hs||"";
  badge($("humBadge"),hs,"ความชื้น"+msg[hs]);
- var need=st==="bad"||hs==="bad";
+ var need=st===bad||hs==="bad";
  $("noteHint").textContent=need?"(จำเป็น เพราะค่านอกเกณฑ์)":"(ไม่บังคับ)";
 }
 ["fridge","hum","room"].forEach(function(i){$(i).addEventListener("input",function(){live();$(i+"Err").classList.remove("show")})});
@@ -410,7 +409,6 @@ $("save").addEventListener("click",function(){
    note: $("note").value.trim()
  };
 
- // เด้งตอบสนองทันทีแบบรวดเร็ว (Optimistic UI) ไม่ต้องรอหน่วง
  toast((fs==="bad"||hs==="bad")?"บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า":"บันทึกข้อมูลแล้ว");
  ["fridge","room","hum","note"].forEach(function(i){$(i).value=""});
  if($("who").tagName==="INPUT") $("who").value="";
@@ -418,7 +416,6 @@ $("save").addEventListener("click",function(){
  window.scrollTo({top:0,behavior:"smooth"});
  drawRounds();
 
- // ส่งข้อมูลไปบันทึกที่ Google Sheets เบื้องหลังแบบเงียบๆ
  fetch(WEB_APP_URL, {
    method: "POST",
    mode: "no-cors",
