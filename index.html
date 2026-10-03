@@ -18,9 +18,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+        /* สไตล์สำหรับแป้นพิมพ์ตัวเลขขนาดใหญ่ */
+        .keypad-btn {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-radius: 1rem;
+            padding: 0.85rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.1s, transform 0.05s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .keypad-btn:active {
+            background-color: #334155;
+            transform: scale(0.96);
+        }
+        .keypad-btn-action {
+            background-color: #cbd5e1;
+            color: #1e293b;
+            font-size: 1.25rem;
+        }
+        .keypad-btn-action:active {
+            background-color: #94a3b8;
+        }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen pb-16">
+<body class="text-slate-800 min-h-screen pb-20">
 
     <!-- Header -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
@@ -98,29 +126,19 @@
                 </div>
             </div>
 
-            <!-- Card 2: ค่าที่วัดได้ -->
+            <!-- Card 2: ค่าที่วัดได้ (กดแล้วเลือกช่องเพื่อพิมพ์ผ่านแป้นใหญ่) -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-4">
                 <h2 class="font-bold text-blue-900 text-sm flex items-center space-x-2">
                     <i class="fa-solid fa-gauge"></i>
-                    <span>ค่าที่วัดได้</span>
+                    <span>ค่าที่วัดได้ (จิ้มเพื่อกรอกตัวเลข)</span>
                 </h2>
 
                 <!-- อุณหภูมิตู้เย็น -->
                 <div>
                     <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิตู้เย็น (°C)</label>
                     <div class="relative">
-                        <input type="number" step="0.1" id="temperature" placeholder="เช่น 5.2" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
-                        <span class="absolute right-3 top-2.5 text-slate-400 text-sm">°C</span>
-                    </div>
-                    <!-- แถบเกณฑ์มาตรฐาน -->
-                    <div class="mt-2 bg-slate-100 h-2 rounded-full overflow-hidden relative">
-                        <div class="absolute left-[16.66%] right-[33.33%] top-0 bottom-0 bg-emerald-400 opacity-75"></div>
-                    </div>
-                    <div class="flex justify-between text-[10px] text-slate-400 mt-0.5 px-0.5">
-                        <span>0</span>
-                        <span>2</span>
-                        <span>8</span>
-                        <span>12</span>
+                        <input type="text" id="temperature" readonly placeholder="จิ้มเพื่อกรอก" required onclick="setActiveInput('temperature')" class="w-full px-3 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-600 focus:outline-none text-base font-bold text-blue-900 cursor-pointer pr-8">
+                        <span class="absolute right-3 top-3 text-slate-400 text-sm">°C</span>
                     </div>
                 </div>
 
@@ -129,16 +147,35 @@
                     <div>
                         <label class="block text-slate-600 text-xs font-semibold mb-1">อุณหภูมิห้องยา (°C)</label>
                         <div class="relative">
-                            <input type="number" step="0.1" id="roomTemp" placeholder="เช่น 25.0" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
-                            <span class="absolute right-3 top-2.5 text-slate-400 text-sm">°C</span>
+                            <input type="text" id="roomTemp" readonly placeholder="จิ้มเพื่อกรอก" required onclick="setActiveInput('roomTemp')" class="w-full px-3 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-600 focus:outline-none text-base font-bold text-blue-900 cursor-pointer pr-8">
+                            <span class="absolute right-3 top-3 text-slate-400 text-sm">°C</span>
                         </div>
                     </div>
                     <div>
                         <label class="block text-slate-600 text-xs font-semibold mb-1">ความชื้น (% RH)</label>
                         <div class="relative">
-                            <input type="number" step="1" id="humidity" placeholder="เช่น 55" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium pr-8">
-                            <span class="absolute right-3 top-2.5 text-slate-400 text-sm">%</span>
+                            <input type="text" id="humidity" readonly placeholder="จิ้มเพื่อกรอก" required onclick="setActiveInput('humidity')" class="w-full px-3 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-600 focus:outline-none text-base font-bold text-blue-900 cursor-pointer pr-8">
+                            <span class="absolute right-3 top-3 text-slate-400 text-sm">%</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Custom On-Screen Keypad (แป้นพิมพ์ตัวเลขขนาดใหญ่) -->
+                <div class="bg-slate-100 p-3 rounded-2xl border border-slate-200 mt-3 shadow-inner">
+                    <div class="text-center text-xs font-semibold text-slate-500 mb-2" id="keypadTitle">กำลังกรอก: อุณหภูมิตู้เย็น</div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+                        <button type="button" class="keypad-btn keypad-btn-action" onclick="pressKey('.')">.</button>
+                        <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+                        <button type="button" class="keypad-btn keypad-btn-action" onclick="pressKey('del')"><i class="fa-solid fa-delete-left"></i></button>
                     </div>
                 </div>
             </div>
@@ -155,7 +192,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl shadow transition text-base flex items-center justify-center space-x-2">
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow transition text-base flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-floppy-disk"></i>
                 <span>บันทึกข้อมูล</span>
             </button>
@@ -204,6 +241,51 @@
         const zones = ['ห้องยาเก่า', 'ห้องยาตึกใหม่', 'คลังยา', 'ห้องผลิตชั้นบน', 'ห้องผลิตชั้นล่าง'];
         let selectedZone = 'ห้องยาเก่า';
         let selectedSession = '';
+        let activeInputId = 'temperature'; // ช่องที่กำลังถูกเลือกพิมพ์อยู่เริ่มต้น
+
+        function setActiveInput(id) {
+            activeInputId = id;
+            // ไฮไลท์ช่องที่กำลังเลือก
+            ['temperature', 'roomTemp', 'humidity'].forEach(i => {
+                const el = document.getElementById(i);
+                if (i === id) {
+                    el.classList.add('border-blue-600', 'bg-blue-50/50');
+                } else {
+                    el.classList.remove('border-blue-600', 'bg-blue-50/50');
+                }
+            });
+
+            const titles = {
+                'temperature': 'กำลังกรอก: อุณหภูมิตู้เย็น (°C)',
+                'roomTemp': 'กำลังกรอก: อุณหภูมิห้องยา (°C)',
+                'humidity': 'กำลังกรอก: ความชื้น (% RH)'
+            };
+            document.getElementById('keypadTitle').textContent = titles[id];
+        }
+
+        function pressKey(key) {
+            const input = document.getElementById(activeInputId);
+            if (!input) return;
+
+            let val = input.value;
+            if (key === 'del') {
+                input.value = val.slice(0, -1);
+            } else if (key === '.') {
+                if (!val.includes('.')) {
+                    input.value = val + key;
+                }
+            } else {
+                // จำกัดความยาวไม่ให้เกิน 5 ตัวอักษร
+                if (val.length < 5) {
+                    input.value = val + key;
+                }
+            }
+        }
+
+        // ตั้งค่าเริ่มต้นช่องแรกตอนโหลดหน้าเว็บ
+        window.onload = () => {
+            setActiveInput('temperature');
+        };
 
         function renderZoneButtons() {
             const container = document.getElementById('zoneButtonsContainer');
@@ -358,9 +440,13 @@
                 alert('บันทึกข้อมูลสำเร็จเรียบร้อยครับ');
                 document.getElementById('tempForm').reset();
                 document.getElementById('recordDate').valueAsDate = new Date();
-                selectedZone = 'ห้องยาตึกเก่า';
+                document.getElementById('temperature').value = '';
+                document.getElementById('roomTemp').value = '';
+                document.getElementById('humidity').value = '';
+                selectedZone = 'ห้องยาเก่า';
                 renderZoneButtons();
                 updateSubLocations();
+                setActiveInput('temperature');
                 setTimeout(loadTable, 1500);
             } catch (error) {
                 console.error('Error saving data:', error);
