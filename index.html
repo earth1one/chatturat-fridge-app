@@ -92,33 +92,15 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <script>
-  function updateSessions() {
-    const location = document.getElementById('fridgeName').value;
-    const sessionSelect = document.getElementById('recordSession');
-    
-    sessionSelect.innerHTML = '';
-    
-    if (location === 'ห้องยาตึกใหม่') {
-      sessionSelect.innerHTML = `
-        <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-        <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-        <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
-      `;
-    } else {
-      sessionSelect.innerHTML = `
-        <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-        <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-      `;
-    }
-  }
-
-  window.onload = function() {
-    if (document.getElementById('fridgeName')) {
-      updateSessions();
-    }
-  };
-</script>
+                    <!-- Location Selector -->
+<div>
+  <label class="block text-xs font-semibold text-slate-600 mb-1">สถานที่ / จุดตรวจ</label>
+  <select id="fridgeName" onchange="updateSessions()" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+    <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
+    <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
+    <option value="คลังยา">คลังยา</option>
+  </select>
+</div>
                     <!-- Temperature -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">อุณหภูมิ (°C)</label>
@@ -360,9 +342,28 @@
                 }
             });
         }
-
+function updateSessions() {
+  const location = document.getElementById('fridgeName').value;
+  const sessionSelect = document.getElementById('recordSession');
+  
+  sessionSelect.innerHTML = '';
+  
+  if (location === 'ห้องยาตึกใหม่') {
+    sessionSelect.innerHTML = `
+      <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+      <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+      <option value="เวรบ่าย (20:30 น.)">เวรบ่าย (20:30 น.)</option>
+    `;
+  } else {
+    sessionSelect.innerHTML = `
+      <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
+      <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
+    `;
+  }
+}
         // Init load
         loadTableAndChart();
+        updateSessions();
     </script>
 </body>
 </html>
