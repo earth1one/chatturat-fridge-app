@@ -218,6 +218,7 @@ function loadRemoteLogs(){
 }
 function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
 function thDateShort(s){
+  if(!s) return s;
   var p=s.split("-");
   if(p.length===3){
     var y = parseInt(p[0]) + 543;
@@ -226,8 +227,12 @@ function thDateShort(s){
   }
   return s;
 }
-$("date").value=iso(new Date());$("date").max=iso(new Date());
+if($("date")){
+  $("date").value=iso(new Date());
+  $("date").max=iso(new Date());
+}
 function showDate(){
+  if(!$("date") || !$("dateShown")) return;
   var p = $("date").value.split("-");
   if(p.length===3){
     var y = parseInt(p[0]) + 543;
@@ -236,7 +241,10 @@ function showDate(){
     $("dateShown").textContent = $("date").value;
   }
 }
-$("date").addEventListener("change",function(){showDate();drawRounds()});showDate();
+if($("date")){
+  $("date").addEventListener("change",function(){showDate();drawRounds()});
+  showDate();
+}
 
 function getActiveRounds(){
   if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
@@ -283,7 +291,7 @@ function updateSubZoneField(){
 }
 
 function updateWarehouseField(){
-  var wrap = $("warehouseField") \vert{}\vert{} $("warehouseFridgesField");
+  var wrap = $("warehouseFridgesField");
   if(!wrap) return;
   if(S.zone === "คลังยา"){
     wrap.style.display = "block";
@@ -308,15 +316,15 @@ function drawWarehouseFridges(){
     card.className = "fridge-card" + (isFilled ? " filled" : "");
     card.setAttribute("aria-pressed", fName === activeWarehouseFridge);
     card.innerHTML = `
-      <div class="f-top"><span>${fName}</span><i class="fa-solid ${isFilled ? 'fa-circle-check text-ok' : 'fa-circle-dot'}"></i></div>
+      <div class="f-top"><span>${fName}</span><i class="fa-solid ${isFilled ? 'fa-circle-check' : 'fa-circle-dot'}"></i></div>
       <div class="f-status">${isFilled ? val + ' °C' : 'ยังไม่กรอก'}</div>
     `;
     card.onclick = function(){
-      warehouseData[activeWarehouseFridge] = $("fridge").value;
+      if($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
       activeWarehouseFridge = fName;
       drawWarehouseFridges();
-      $("fridge").value = warehouseData[activeWarehouseFridge];
-      $("fridgeLabel").textContent = "อุณหภูมิตู้ " + activeWarehouseFridge;
+      if($("fridge")) $("fridge").value = warehouseData[activeWarehouseFridge];
+      if($("fridgeLabel")) $("fridgeLabel").textContent = "อุณหภูมิตู้ " + activeWarehouseFridge;
       live();
     };
     grid.appendChild(card);
@@ -370,7 +378,7 @@ function drawRounds(){
   var h=$("rounds");if(!h)return;h.innerHTML="";
   var activeRounds = getActiveRounds();
   activeRounds.forEach(function(r){
-    var currentLoc = S.zone.includes("ห้องผลิต") ? $("subZoneSelect").value : S.zone;
+    var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
     var remote = window.remoteLogs || [];
     var done = remote.some(function(m){
       var itemLoc = m.subLocation || m.location;
@@ -395,15 +403,15 @@ if($("subZoneSelect")) {
   $("subZoneSelect").addEventListener("change", function(){ drawRounds(); });
 }
 
-function num(v){v=String(v).trim().replace(",",".");if(v===""||isNaN(v))return null;return parseFloat(v)}
+function num(v){if(v===undefined||v===null)return null;var s=String(v).trim().replace(",",".");if(s===""||isNaN(s))return null;return parseFloat(s)}
 function fridgeStat(v){if(v===null)return null;if(v<2||v>8)return"bad";if(v<2.5||v>7.5)return"warn";return"ok"}
 function humStat(v){if(v===null)return null;return(v<30||v>70)?"bad":(v<35||v>65)?"warn":"ok"}
 var msg={ok:"อยู่ในเกณฑ์ปกติ",warn:"ใกล้ขอบเกณฑ์ ควรเฝ้าระวัง",bad:"นอกเกณฑ์ ต้องแก้ไขและแจ้งหัวหน้า"};
 function badge(el,st,txt){if(!el)return;el.className="badge"+(st?" "+st:"");el.textContent=st?txt:""}
 
 function live(){
- var f=num($("fridge").value),st=fridgeStat(f),pin=$("pin");
- if(S.zone==="คลังยา"){
+ var f=num($("fridge")?$("fridge").value:null),st=fridgeStat(f),pin=$("pin");
+ if(S.zone==="คลังยา" && $("fridge")){
    warehouseData[activeWarehouseFridge] = $("fridge").value;
    drawWarehouseFridges();
  }
@@ -414,7 +422,7 @@ function live(){
    $("fridge").parentNode.dataset.st=st||"";
  }
  badge($("fridgeBadge"),st,msg[st]+(st==="bad"?(f<2?" (ต่ำกว่า 2.0)":" (สูงกว่า 8.0)"):""));
- var h=num($("hum").value),hs=humStat(h);
+ var h=num($("hum")?$("hum").value:null),hs=humStat(h);
  if($("hum") && $("hum").parentNode){
    $("hum").parentNode.dataset.st=hs||"";
  }
@@ -456,11 +464,11 @@ function drawLog(){
 
 if($("save")) {
 $("save").addEventListener("click",function(){
- var r=num($("room").value),h=num($("hum").value),ok=true,first=null;
+ var r=num($("room")?$("room").value:null),h=num($("hum")?$("hum").value:null),ok=true,first=null;
  function bad(id){if($(id))$(id).classList.add("show");ok=false;if(!first)first=id.replace("Err","")}
  
  if(S.zone==="คลังยา"){
-   warehouseData[activeWarehouseFridge] = $("fridge").value;
+   if($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
    var missing = WAREHOUSE_FRIDGES.some(function(fName){ return num(warehouseData[fName]) === null; });
    if(missing){
      alert("กรุณากรอกอุณหภูมิตู้เย็นให้ครบทั้ง 4 ตู้ (T31, T32, TH1, TV1)");
@@ -468,7 +476,7 @@ $("save").addEventListener("click",function(){
      first="fridge";
    }
  } else {
-   var f=num($("fridge").value);
+   var f=num($("fridge")?$("fridge").value:null);
    if(f===null)bad("fridgeErr");
  }
  
@@ -481,7 +489,7 @@ $("save").addEventListener("click",function(){
      if(val < 2 || val > 8) hasBad = true;
    });
  } else {
-   var f=num($("fridge").value);
+   var f=num($("fridge")?$("fridge").value:null);
    if(f<2 || f>8) hasBad = true;
  }
  var hs=humStat(h);
@@ -503,7 +511,7 @@ $("save").addEventListener("click",function(){
  if(S.zone==="คลังยา"){
    WAREHOUSE_FRIDGES.forEach(function(fName){
      payloads.push({
-       date: $("date").value,
+       date: $("date")?$("date").value:"",
        location: targetTab,
        subLocation: `${zoneVal} (${fName})`,
        round: roundText,
@@ -517,11 +525,11 @@ $("save").addEventListener("click",function(){
    });
  } else {
    payloads.push({
-     date: $("date").value,
+     date: $("date")?$("date").value:"",
      location: targetTab,
      subLocation: subLocVal,
      round: roundText,
-     fridgeTemp: num($("fridge").value),
+     fridgeTemp: num($("fridge")?$("fridge").value:null),
      roomTemp: r,
      humidity: h,
      status: statusText,
