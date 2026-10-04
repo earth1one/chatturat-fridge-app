@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>บันทึกอุณหภูมิตู้เย็นยาและวัคซีน</title>
-<link rel="apple-touch-icon" href="pharmaTemp.jpg">
-<link rel="icon" type="image/jpeg" href="pharmaTemp.jpg">
+<!-- เปลี่ยนมาใช้ชื่อไฟล์ใหม่เพื่อล้างแคชบนมือถือ -->
+<link rel="apple-touch-icon" href="pharmaTemp-new.jpg">
+<link rel="icon" type="image/jpeg" href="pharmaTemp-new.jpg">
 <meta name="apple-mobile-web-app-title" content="PharmaTemp">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -93,8 +94,8 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 .save{width:100%;font:inherit;font-size:17px;font-weight:700;border:0;border-radius:999px;min-height:58px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:var(--brand-ink);cursor:pointer;box-shadow:0 12px 30px -6px var(--glow);transition:transform .15s}
 .save:active{transform:scale(.98)}
 
-/* Toast แสดงผลบรรทัดเดียวตรงกลางจอ พร้อมความโค้งมนสวยงาม */
-.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:rgba(10,54,51,0.95);color:#fff;padding:16px 26px;border-radius:20px;font-weight:600;font-size:15px;white-space:nowrap;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
+/* Toast สีขาว ตัวหนังสือเขียวเข้ม บรรทัดเดียว */
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:#ffffff;color:#0F4C3A;padding:16px 26px;border-radius:20px;font-weight:700;font-size:15px;white-space:nowrap;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.25);border:2px solid rgba(10,76,89,0.15)}
 .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
