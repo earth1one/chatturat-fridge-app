@@ -179,7 +179,7 @@ textarea{border-radius:18px}
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
+(function(){
   var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwo43dY-e7OeZndg6p0ZhFwViGaK7TrDWJUWINT8OuyhO1GhrtgaBJMVc4FdPeMmXph5g/exec";
   var ZONES=["ห้องยาตึกใหม่","ห้องยาตึกเก่า","คลังยา","ห้องผลิตชั้นบน","ห้องผลิตชั้นล่าง"];
   var ROUNDS_DEFAULT=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."}];
@@ -222,15 +222,9 @@ document.addEventListener("DOMContentLoaded", function(){
     var h=$("rounds");if(!h)return;h.innerHTML="";
     var activeRounds = getActiveRounds();
     activeRounds.forEach(function(r){
-      var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
-      var remote = window.remoteLogs || [];
-      var done = remote.some(function(m){
-        var itemLoc = m.subLocation || m.location;
-        return m.date===$("date").value && itemLoc===currentLoc && m.round.includes(r.n);
-      });
-      var b=document.createElement("button");b.type="button";b.className=done?"done":"";
+      var b=document.createElement("button");b.type="button";b.className="";
       b.setAttribute("aria-pressed",r.id===S.round);
-      b.innerHTML="<b>"+r.n+"</b><span>"+(done?"✓ บันทึกแล้ว":r.t)+"</span>";
+      b.innerHTML="<b>"+r.n+"</b><span>"+r.t+"</span>";
       b.onclick=function(){S.round=r.id;drawRounds()};
       h.appendChild(b);
     });
@@ -345,17 +339,6 @@ document.addEventListener("DOMContentLoaded", function(){
   updateWarehouseField();
   updateWhoField();
   drawRounds();
-
-  function loadRemoteLogs(){
-    fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
-      if(Array.isArray(data)){
-        window.remoteLogs = data;
-        if($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
-        drawRounds();
-      }
-    }).catch(function(e){console.error(e);});
-  }
-  loadRemoteLogs();
 
   function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
   if($("date")){
@@ -518,7 +501,7 @@ document.addEventListener("DOMContentLoaded", function(){
       });
     });
   }
-});
+})();
 </script>
 </body>
 </html>
