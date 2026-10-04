@@ -339,6 +339,7 @@ function updateWhoField(){
   }
 }
 
+// วาดปุ่มสถานที่และรอบเวลาก่อนทันที
 drawZones();
 updateSubZoneField();
 updateWarehouseField();
@@ -346,13 +347,15 @@ updateWhoField();
 drawRounds();
 
 function loadRemoteLogs(){
-  fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
-    if(Array.isArray(data)){
-      window.remoteLogs = data;
-      if($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
-      drawRounds();
-    }
-  }).catch(function(e){console.error(e);});
+  setTimeout(function(){
+    fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
+      if(Array.isArray(data)){
+        window.remoteLogs = data;
+        if($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
+        drawRounds();
+      }
+    }).catch(function(e){console.error(e);});
+  }, 100);
 }
 loadRemoteLogs();
 
