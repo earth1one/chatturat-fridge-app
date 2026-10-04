@@ -98,7 +98,7 @@ textarea{border-radius:18px}
       </div>
       <div><h1>โรงพยาบาลจัตุรัส</h1><p>บันทึกอุณหภูมิและความชื้น ตู้แช่ยาและวัคซีน</p></div>
     </div>
-    <button class="history-btn" id="historyBtn" type="button"><i class="fa-solid fa-clock-rotate-left"></i> <span id="historyCount">ประวัติ (0)</span></button>
+    <button class="history-btn" id="historyBtn" type="button"><i class="fa-solid fa-clock-rotate-left"></i> <span id="historyCount">ประวัติ</span></button>
   </header>
 
   <div class="rules" aria-label="เกณฑ์มาตรฐาน">
@@ -193,7 +193,12 @@ var activeWarehouseFridge = "T31";
 var S={zone:ZONES[0],round:"am"};
 var $=function(i){return document.getElementById(i)};
 
-// วาดปุ่มโซนทันที ป้องกันปุ่มหาย
+function getActiveRounds(){
+  if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
+  if(S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
+  return ROUNDS_DEFAULT;
+}
+
 function drawZones(){
   var h=$("zones");if(!h)return;h.innerHTML="";
   ZONES.forEach(function(z){
@@ -211,12 +216,6 @@ function drawZones(){
     };
     h.appendChild(b);
   });
-}
-
-function getActiveRounds(){
-  if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
-  if(S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
-  return ROUNDS_DEFAULT;
 }
 
 function drawRounds(){
@@ -340,7 +339,7 @@ function updateWhoField(){
   }
 }
 
-// เริ่มต้นวาดหน้าจอทันทีตั้งแต่โหลดสคริปต์
+// วาดหน้าจอทันที ไม่รอโหลดเครือข่าย
 drawZones();
 updateSubZoneField();
 updateWarehouseField();
