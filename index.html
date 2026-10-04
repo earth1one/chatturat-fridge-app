@@ -191,7 +191,9 @@ document.addEventListener("DOMContentLoaded", function() {
   var activeWarehouseFridge = "T31";
 
   var S = { zone: ZONES[0], round: "am" };
-  var $ = function(i) { return document.getElementById(i); };
+  var windowRemoteLogs = [];
+
+  function $(i) { return document.getElementById(i); }
 
   function getActiveRounds() {
     if (S.zone === "ห้องยาตึกใหม่") return ROUNDS_NEW;
@@ -222,9 +224,14 @@ document.addEventListener("DOMContentLoaded", function() {
     var h = $("rounds"); if (!h) return; h.innerHTML = "";
     var activeRounds = getActiveRounds();
     activeRounds.forEach(function(r) {
-      var b = document.createElement("button"); b.type = "button"; b.className = "";
+      var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
+      var done = windowRemoteLogs.some(function(m) {
+        var itemLoc = m.subLocation || m.location;
+        return m.date === $("date").value && itemLoc === currentLoc && m.round && m.round.includes(r.n);
+      });
+      var b = document.createElement("button"); b.type = "button"; b.className = done ? "done" : "";
       b.setAttribute("aria-pressed", r.id === S.round);
-      b.innerHTML = "<b>" + r.n + "</b><span>" + r.t + "</span>";
+      b.innerHTML = "<b>" + r.n + "</b><span>" + (done ? "✓ บันทึกแล้ว" : r.t) + "</span>";
       b.onclick = function() { S.round = r.id; drawRounds(); };
       h.appendChild(b);
     });
@@ -333,12 +340,31 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // วาดองค์ประกอบหน้าจอทันที
+  // วาดองค์ประกอบหน้าจอทันทีโดยไม่ต้องรอโหลดเน็ต
   drawZones();
   updateSubZoneField();
   updateWarehouseField();
   updateWhoField();
   drawRounds();
+
+  // โหลดประวัติแบบปลอดภัย แยกส่วนอิสระ
+  function loadRemoteLogs() {
+    try {
+      fetch(WEB_APP_URL)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (Array.isArray(data)) {
+            windowRemoteLogs = data;
+            if ($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
+            drawRounds();
+          }
+        })
+        .catch(function(e) { console.log("Offline mode or fetch error", e); });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+  loadRemoteLogs();
 
   function iso(d) { var m = d.getMonth() + 1, x = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (x < 10 ? "0" : "") + x; }
   if ($("date")) {
