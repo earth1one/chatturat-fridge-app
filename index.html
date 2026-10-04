@@ -122,7 +122,7 @@ textarea{border-radius:18px}
       <div class="chips" id="zones" role="group" aria-labelledby="zl"></div>
     </div>
     <div class="field" id="subZoneField" style="display:none;">
-      <label for="subZoneSelect">ระบุหมายเลขห้องผลิต</label>
+      <label for="subZoneSelect" id="subZoneLabel">ระบุประเภทย่อย</label>
       <select id="subZoneSelect"></select>
     </div>
     <div class="field" id="warehouseFridgesField" style="display:none;">
@@ -135,33 +135,36 @@ textarea{border-radius:18px}
     </div>
   </section>
 
-  <section class="card">
+  <section class="card" id="measureCard">
     <h2><span id="measuredTitle">ค่าที่วัดได้</span></h2>
-    <div class="two">
-      <div class="field">
-        <label for="fridge" id="fridgeLabel">อุณหภูมิตู้เย็น</label>
-        <div class="num"><input id="fridge" inputmode="decimal" placeholder="เช่น 5.2" autocomplete="off"><em>°C</em></div>
-        <div class="err" id="fridgeErr">กรอกอุณหภูมิตู้เย็นเป็นตัวเลข</div>
+    <div id="fridgeSection">
+      <div class="two">
+        <div class="field">
+          <label for="fridge" id="fridgeLabel">อุณหภูมิตู้เย็น</label>
+          <div class="num"><input id="fridge" inputmode="decimal" placeholder="เช่น 5.2" autocomplete="off"><em>°C</em></div>
+          <div class="err" id="fridgeErr">กรอกอุณหภูมิตู้เย็นเป็นตัวเลข</div>
+        </div>
+        <div class="field">
+          <label for="fridgeHum" id="fridgeHumLabel">ความชื้นตู้เย็น</label>
+          <div class="num"><input id="fridgeHum" inputmode="decimal" placeholder="เช่น 60" autocomplete="off"><em>%</em></div>
+          <div class="err" id="fridgeHumErr">กรอกเป็นตัวเลข</div>
+        </div>
       </div>
-      <div class="field">
-        <label for="fridgeHum" id="fridgeHumLabel">ความชื้นตู้เย็น</label>
-        <div class="num"><input id="fridgeHum" inputmode="decimal" placeholder="เช่น 60" autocomplete="off"><em>%</em></div>
-        <div class="err" id="fridgeHumErr">กรอกเป็นตัวเลข</div>
+      <div class="gauge" aria-hidden="true">
+        <div class="track"><div class="band"></div><div class="pin" id="pin"></div></div>
+        <div class="scale"><span style="left:0">0</span><span style="left:16.66%">2</span><span style="left:66.66%">8</span><span style="left:100%">12</span></div>
       </div>
+      <div class="badge" id="fridgeBadge" role="status"></div>
     </div>
-    <div class="gauge" aria-hidden="true">
-      <div class="track"><div class="band"></div><div class="pin" id="pin"></div></div>
-      <div class="scale"><span style="left:0">0</span><span style="left:16.66%">2</span><span style="left:66.66%">8</span><span style="left:100%">12</span></div>
-    </div>
-    <div class="badge" id="fridgeBadge" role="status"></div>
-    <div class="two" style="margin-top: 18px;">
+    
+    <div class="two" style="margin-top: 18px;" id="roomSection">
       <div class="field">
-        <label for="room">อุณหภูมิห้องยา</label>
+        <label for="room" id="roomLabel">อุณหภูมิห้องยา</label>
         <div class="num"><input id="room" inputmode="decimal" placeholder="25.0" autocomplete="off"><em>°C</em></div>
         <div class="err" id="roomErr">กรอกเป็นตัวเลข</div>
       </div>
       <div class="field">
-        <label for="hum">ความชื้นห้องยา</label>
+        <label for="hum" id="humLabel">ความชื้นห้องยา</label>
         <div class="num"><input id="hum" inputmode="decimal" placeholder="55" autocomplete="off"><em>%</em></div>
         <div class="err" id="humErr">กรอกเป็นตัวเลข</div>
       </div>
@@ -226,17 +229,37 @@ document.addEventListener("DOMContentLoaded", function() {
         updateSubZoneField();
         updateWarehouseField();
         updateWhoField();
+        updateFormVisibility();
         drawRounds();
       };
       h.appendChild(b);
     });
   }
 
+  function updateFormVisibility() {
+    var subSel = $("subZoneSelect");
+    var isSubStock = subSel && subSel.value.includes("substock");
+    
+    var fridgeSec = $("fridgeSection");
+    var roomSec = $("roomSection");
+    var humBadge = $("humBadge");
+    
+    if (isSubStock) {
+      if (fridgeSec) fridgeSec.style.display = "none";
+      if (roomSec) roomSec.style.display = "block";
+      if ($("measuredTitle")) $("measuredTitle").textContent = "ค่าที่วัดได้ (ห้อง Substock)";
+    } else {
+      if (fridgeSec) fridgeSec.style.display = "block";
+      if (roomSec) roomSec.style.display = "block";
+      if ($("measuredTitle")) $("measuredTitle").textContent = "ค่าที่วัดได้";
+    }
+  }
+
   function drawRounds() {
     var h = $("rounds"); if (!h) return; h.innerHTML = "";
     var activeRounds = getActiveRounds();
     activeRounds.forEach(function(r) {
-      var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
+      var currentLoc = S.zone.includes("ห้องผลิต") || S.zone.includes("ห้องยา") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
       var done = windowRemoteLogs.some(function(m) {
         var itemLoc = m.subLocation || m.location;
         return m.date === $("date").value && itemLoc === currentLoc && m.round && m.round.includes(r.n);
@@ -254,8 +277,10 @@ document.addEventListener("DOMContentLoaded", function() {
     var sel = $("subZoneSelect");
     if (!wrap || !sel) return;
     sel.innerHTML = "";
+    
     if (S.zone.includes("ห้องผลิต")) {
       wrap.style.display = "block";
+      if ($("subZoneLabel")) $("subZoneLabel").textContent = "ระบุหมายเลขห้องผลิต";
       var rooms = S.zone === "ห้องผลิตชั้นบน" ? ['1', '2', '3', '4', '5', '6'] : ['1', '2', '3'];
       rooms.forEach(function(r) {
         var opt = document.createElement("option");
@@ -263,9 +288,23 @@ document.addEventListener("DOMContentLoaded", function() {
         opt.textContent = "ห้องที่ " + r;
         sel.appendChild(opt);
       });
+    } else if (S.zone === "ห้องยาตึกใหม่" || S.zone === "ห้องยาตึกเก่า") {
+      wrap.style.display = "block";
+      if ($("subZoneLabel")) $("subZoneLabel").textContent = "เลือกพื้นที่ใน" + S.zone;
+      
+      var optMain = document.createElement("option");
+      optMain.value = S.zone;
+      optMain.textContent = S.zone + " (หลัก)";
+      sel.appendChild(optMain);
+
+      var optSub = document.createElement("option");
+      optSub.value = S.zone + " (substock)";
+      optSub.textContent = S.zone + " - substock";
+      sel.appendChild(optSub);
     } else {
       wrap.style.display = "none";
     }
+    updateFormVisibility();
   }
 
   function updateWarehouseField() {
@@ -407,7 +446,10 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   if ($("subZoneSelect")) {
-    $("subZoneSelect").addEventListener("change", function() { drawRounds(); });
+    $("subZoneSelect").addEventListener("change", function() { 
+      updateFormVisibility();
+      drawRounds(); 
+    });
   }
 
   function num(v) { if (v === undefined || v === null) return null; var s = String(v).trim().replace(",", "."); if (s === "" || isNaN(s)) return null; return parseFloat(s); }
@@ -447,6 +489,9 @@ document.addEventListener("DOMContentLoaded", function() {
       var r = num($("room") ? $("room").value : null), h = num($("hum") ? $("hum").value : null), ok = true, first = null;
       function bad(id) { if ($(id)) { $(id).classList.add("show"); } ok = false; if (!first) first = id.replace("Err", ""); }
       
+      var subSel = $("subZoneSelect");
+      var isSubStock = subSel && subSel.value.includes("substock");
+
       if (S.zone === "คลังยา") {
         var missing = WAREHOUSE_FRIDGES.some(function(fName) { return num(warehouseData[fName].temp) === null; });
         if (missing) {
@@ -454,7 +499,7 @@ document.addEventListener("DOMContentLoaded", function() {
           ok = false;
           first = "fridge";
         }
-      } else {
+      } else if (!isSubStock) {
         var f = num($("fridge") ? $("fridge").value : null);
         if (f === null) bad("fridgeErr");
       }
@@ -467,7 +512,7 @@ document.addEventListener("DOMContentLoaded", function() {
           var val = num(warehouseData[fName].temp);
           if (val < 2 || val > 8) hasBad = true;
         });
-      } else {
+      } else if (!isSubStock) {
         var f = num($("fridge") ? $("fridge").value : null);
         if (f < 2 || f > 8) hasBad = true;
       }
@@ -478,7 +523,7 @@ document.addEventListener("DOMContentLoaded", function() {
       if (!ok) { if (first && $(first)) { $(first).focus(); } return; }
 
       var zoneVal = S.zone;
-      var subLocVal = zoneVal.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : zoneVal;
+      var subLocVal = (zoneVal.includes("ห้องผลิต") || zoneVal.includes("ห้องยา")) && $("subZoneSelect") ? $("subZoneSelect").value : zoneVal;
       var targetTab = zoneVal.includes("ห้องผลิต") ? "ห้องผลิต" : zoneVal;
       var activeRounds = getActiveRounds();
       var roundObj = activeRounds.filter(function(x) { return x.id === S.round; })[0];
@@ -509,8 +554,8 @@ document.addEventListener("DOMContentLoaded", function() {
           location: targetTab,
           subLocation: subLocVal,
           round: roundText,
-          fridgeTemp: num($("fridge") ? $("fridge").value : null),
-          fridgeHumidity: num($("fridgeHum") ? $("fridgeHum").value : null),
+          fridgeTemp: isSubStock ? null : num($("fridge") ? $("fridge").value : null),
+          fridgeHumidity: isSubStock ? null : num($("fridgeHum") ? $("fridgeHum").value : null),
           roomTemp: r,
           humidity: h,
           status: statusText,
