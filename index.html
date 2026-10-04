@@ -179,35 +179,35 @@ textarea{border-radius:18px}
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-(function(){
+document.addEventListener("DOMContentLoaded", function() {
   var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwo43dY-e7OeZndg6p0ZhFwViGaK7TrDWJUWINT8OuyhO1GhrtgaBJMVc4FdPeMmXph5g/exec";
-  var ZONES=["ห้องยาตึกใหม่","ห้องยาตึกเก่า","คลังยา","ห้องผลิตชั้นบน","ห้องผลิตชั้นล่าง"];
-  var ROUNDS_DEFAULT=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."}];
-  var ROUNDS_NEW=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."},{id:"eve",n:"เวรบ่าย",t:"20:30 น."}];
-  var ROUNDS_PROD=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"16:00 น."}];
+  var ZONES = ["ห้องยาตึกใหม่", "ห้องยาตึกเก่า", "คลังยา", "ห้องผลิตชั้นบน", "ห้องผลิตชั้นล่าง"];
+  var ROUNDS_DEFAULT = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"14:30 น."}];
+  var ROUNDS_NEW = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"14:30 น."}, {id:"eve", n:"เวรบ่าย", t:"20:30 น."}];
+  var ROUNDS_PROD = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"16:00 น."}];
 
   var WAREHOUSE_FRIDGES = ["T31", "T32", "TH1", "TV1"];
   var warehouseData = { "T31": "", "T32": "", "TH1": "", "TV1": "" };
   var activeWarehouseFridge = "T31";
 
-  var S={zone:ZONES[0],round:"am"};
-  var $=function(i){return document.getElementById(i)};
+  var S = { zone: ZONES[0], round: "am" };
+  var $ = function(i) { return document.getElementById(i); };
 
-  function getActiveRounds(){
-    if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
-    if(S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
+  function getActiveRounds() {
+    if (S.zone === "ห้องยาตึกใหม่") return ROUNDS_NEW;
+    if (S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
     return ROUNDS_DEFAULT;
   }
 
-  function drawZones(){
-    var h=$("zones");if(!h)return;h.innerHTML="";
-    ZONES.forEach(function(z){
-      var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=z;
-      b.setAttribute("aria-pressed",z===S.zone);
-      b.onclick=function(){
-        S.zone=z;
+  function drawZones() {
+    var h = $("zones"); if (!h) return; h.innerHTML = "";
+    ZONES.forEach(function(z) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = z;
+      b.setAttribute("aria-pressed", z === S.zone);
+      b.onclick = function() {
+        S.zone = z;
         var rList = getActiveRounds();
-        if(!rList.some(function(r){return r.id===S.round;})){S.round=rList[0].id;}
+        if (!rList.some(function(r) { return r.id === S.round; })) { S.round = rList[0].id; }
         drawZones();
         updateSubZoneField();
         updateWarehouseField();
@@ -218,41 +218,41 @@ textarea{border-radius:18px}
     });
   }
 
-  function drawRounds(){
-    var h=$("rounds");if(!h)return;h.innerHTML="";
+  function drawRounds() {
+    var h = $("rounds"); if (!h) return; h.innerHTML = "";
     var activeRounds = getActiveRounds();
-    activeRounds.forEach(function(r){
-      var b=document.createElement("button");b.type="button";b.className="";
-      b.setAttribute("aria-pressed",r.id===S.round);
-      b.innerHTML="<b>"+r.n+"</b><span>"+r.t+"</span>";
-      b.onclick=function(){S.round=r.id;drawRounds()};
+    activeRounds.forEach(function(r) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "";
+      b.setAttribute("aria-pressed", r.id === S.round);
+      b.innerHTML = "<b>" + r.n + "</b><span>" + r.t + "</span>";
+      b.onclick = function() { S.round = r.id; drawRounds(); };
       h.appendChild(b);
     });
   }
 
-  function updateSubZoneField(){
-    var wrap=$("subZoneField");
-    var sel=$("subZoneSelect");
-    if(!wrap||!sel)return;
-    sel.innerHTML="";
-    if(S.zone.includes("ห้องผลิต")){
-      wrap.style.display="block";
-      var rooms = S.zone==="ห้องผลิตชั้นบน"?['1','2','3','4','5','6']:['1','2','3'];
-      rooms.forEach(function(r){
-        var opt=document.createElement("option");
-        opt.value=`${S.zone} ห้องที่ ${r}`;
-        opt.textContent=`ห้องที่ ${r}`;
+  function updateSubZoneField() {
+    var wrap = $("subZoneField");
+    var sel = $("subZoneSelect");
+    if (!wrap || !sel) return;
+    sel.innerHTML = "";
+    if (S.zone.includes("ห้องผลิต")) {
+      wrap.style.display = "block";
+      var rooms = S.zone === "ห้องผลิตชั้นบน" ? ['1', '2', '3', '4', '5', '6'] : ['1', '2', '3'];
+      rooms.forEach(function(r) {
+        var opt = document.createElement("option");
+        opt.value = `${S.zone} ห้องที่ ${r}`;
+        opt.textContent = `ห้องที่ ${r}`;
         sel.appendChild(opt);
       });
     } else {
-      wrap.style.display="none";
+      wrap.style.display = "none";
     }
   }
 
-  function updateWarehouseField(){
+  function updateWarehouseField() {
     var wrap = $("warehouseFridgesField");
-    if(!wrap) return;
-    if(S.zone === "คลังยา"){
+    if (!wrap) return;
+    if (S.zone === "คลังยา") {
       wrap.style.display = "block";
       drawWarehouseFridges();
     } else {
@@ -260,16 +260,16 @@ textarea{border-radius:18px}
     }
   }
 
-  function drawWarehouseFridges(){
+  function drawWarehouseFridges() {
     var grid = $("warehouseFridges");
-    if(!grid) return;
+    if (!grid) return;
     grid.innerHTML = "";
     var filledCount = 0;
     
-    WAREHOUSE_FRIDGES.forEach(function(fName){
+    WAREHOUSE_FRIDGES.forEach(function(fName) {
       var val = warehouseData[fName];
       var isFilled = val !== "" && !isNaN(val);
-      if(isFilled) filledCount++;
+      if (isFilled) filledCount++;
       
       var card = document.createElement("div");
       card.className = "fridge-card" + (isFilled ? " filled" : "");
@@ -278,25 +278,25 @@ textarea{border-radius:18px}
         <div class="f-top"><span>${fName}</span><i class="fa-solid ${isFilled ? 'fa-circle-check' : 'fa-circle-dot'}"></i></div>
         <div class="f-status">${isFilled ? val + ' °C' : 'ยังไม่กรอก'}</div>
       `;
-      card.onclick = function(){
-        if($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
+      card.onclick = function() {
+        if ($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
         activeWarehouseFridge = fName;
         drawWarehouseFridges();
-        if($("fridge")) $("fridge").value = warehouseData[activeWarehouseFridge];
-        if($("fridgeLabel")) $("fridgeLabel").textContent = "อุณหภูมิตู้ " + activeWarehouseFridge;
+        if ($("fridge")) $("fridge").value = warehouseData[activeWarehouseFridge];
+        if ($("fridgeLabel")) $("fridgeLabel").textContent = "อุณหภูมิตู้ " + activeWarehouseFridge;
         live();
       };
       grid.appendChild(card);
     });
     
-    if($("fridgeCountStatus")) $("fridgeCountStatus").textContent = `กรอกแล้ว ${filledCount} จาก 4 ตู้`;
+    if ($("fridgeCountStatus")) $("fridgeCountStatus").textContent = `กรอกแล้ว ${filledCount} จาก 4 ตู้`;
   }
 
-  function updateWhoField(){
-    var c=$("whoContainer");
-    if(!c)return;
-    if(S.zone==="ห้องยาตึกใหม่"){
-      c.innerHTML=`
+  function updateWhoField() {
+    var c = $("whoContainer");
+    if (!c) return;
+    if (S.zone === "ห้องยาตึกใหม่") {
+      c.innerHTML = `
         <label for="who">ผู้บันทึก</label>
         <select id="who" required>
           <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
@@ -305,8 +305,8 @@ textarea{border-radius:18px}
           <option value="เพ็ญลักษณ์">เพ็ญลักษณ์</option>
         </select>
       `;
-    } else if(S.zone==="ห้องยาตึกเก่า"){
-      c.innerHTML=`
+    } else if (S.zone === "ห้องยาตึกเก่า") {
+      c.innerHTML = `
         <label for="who">ผู้บันทึก</label>
         <select id="who" required>
           <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
@@ -316,8 +316,8 @@ textarea{border-radius:18px}
           <option value="ดาราณี">ดาราณี</option>
         </select>
       `;
-    } else if(S.zone==="คลังยา"){
-      c.innerHTML=`
+    } else if (S.zone === "คลังยา") {
+      c.innerHTML = `
         <label for="who">ผู้บันทึก</label>
         <select id="who" required>
           <option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>
@@ -326,149 +326,149 @@ textarea{border-radius:18px}
         </select>
       `;
     } else {
-      c.innerHTML=`
+      c.innerHTML = `
         <label for="who">ผู้บันทึก</label>
         <input id="who" placeholder="ชื่อ-นามสกุล / ตำแหน่ง" autocomplete="name">
       `;
     }
   }
 
-  // เรียกวาดองค์ประกอบหน้าจอทันที
+  // วาดองค์ประกอบหน้าจอทันที
   drawZones();
   updateSubZoneField();
   updateWarehouseField();
   updateWhoField();
   drawRounds();
 
-  function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
-  if($("date")){
-    $("date").value=iso(new Date());
-    $("date").max=iso(new Date());
+  function iso(d) { var m = d.getMonth() + 1, x = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (x < 10 ? "0" : "") + x; }
+  if ($("date")) {
+    $("date").value = iso(new Date());
+    $("date").max = iso(new Date());
   }
-  function showDate(){
-    if(!$("date") \vert{}\vert{} !$("dateShown")) return;
+  function showDate() {
+    if (!$("date") \vert{}\vert{} !$("dateShown")) return;
     var p = $("date").value.split("-");
-    if(p.length===3){
+    if (p.length === 3) {
       var y = parseInt(p[0]) + 543;
       $("dateShown").textContent = (String(y).slice(2)) + "-" + p[1] + "-" + p[2];
     } else {
       $("dateShown").textContent = $("date").value;
     }
   }
-  if($("date")){
-    $("date").addEventListener("change",function(){showDate();drawRounds()});
+  if ($("date")) {
+    $("date").addEventListener("change", function() { showDate(); drawRounds(); });
     showDate();
   }
 
-  if($("historyBtn")) {
-    $("historyBtn").addEventListener("click", function(){
+  if ($("historyBtn")) {
+    $("historyBtn").addEventListener("click", function() {
       window.open(WEB_APP_URL, "_blank");
     });
   }
 
-  if($("subZoneSelect")) {
-    $("subZoneSelect").addEventListener("change", function(){ drawRounds(); });
+  if ($("subZoneSelect")) {
+    $("subZoneSelect").addEventListener("change", function() { drawRounds(); });
   }
 
-  function num(v){if(v===undefined||v===null)return null;var s=String(v).trim().replace(",",".");if(s===""||isNaN(s))return null;return parseFloat(s)}
-  function fridgeStat(v){if(v===null)return null;if(v<2||v>8)return"bad";if(v<2.5||v>7.5)return"warn";return"ok"}
-  function humStat(v){if(v===null)return null;return(v<30||v>70)?"bad":(v<35||v>65)?"warn":"ok"}
-  var msg={ok:"อยู่ในเกณฑ์ปกติ",warn:"ใกล้ขอบเกณฑ์ ควรเฝ้าระวัง",bad:"นอกเกณฑ์ ต้องแก้ไขและแจ้งหัวหน้า"};
-  function badge(el,st,txt){if(!el)return;el.className="badge"+(st?" "+st:"");el.textContent=st?txt:""}
+  function num(v) { if (v === undefined || v === null) return null; var s = String(v).trim().replace(",", "."); if (s === "" || isNaN(s)) return null; return parseFloat(s); }
+  function fridgeStat(v) { if (v === null) return null; if (v < 2 || v > 8) return "bad"; if (v < 2.5 || v > 7.5) return "warn"; return "ok"; }
+  function humStat(v) { if (v === null) return null; return (v < 30 || v > 70) ? "bad" : (v < 35 || v > 65) ? "warn" : "ok"; }
+  var msg = { ok: "อยู่ในเกณฑ์ปกติ", warn: "ใกล้ขอบเกณฑ์ ควรเฝ้าระวัง", bad: "นอกเกณฑ์ ต้องแก้ไขและแจ้งหัวหน้า" };
+  function badge(el, st, txt) { if (!el) return; el.className = "badge" + (st ? " " + st : ""); el.textContent = st ? txt : ""; }
 
-  function live(){
-    var f=num($("fridge")?$("fridge").value:null),st=fridgeStat(f),pin=$("pin");
-    if(S.zone==="คลังยา" && $("fridge")){
+  function live() {
+    var f = num($("fridge") ? $("fridge").value : null), st = fridgeStat(f), pin = $("pin");
+    if (S.zone === "คลังยา" && $("fridge")) {
       warehouseData[activeWarehouseFridge] = $("fridge").value;
       drawWarehouseFridges();
     }
-    if(pin){
-      if(f===null){pin.style.display="none"}else{pin.style.display="block";pin.style.left=Math.max(0,Math.min(12,f))/12*100+"%"}
+    if (pin) {
+      if (f === null) { pin.style.display = "none"; } else { pin.style.display = "block"; pin.style.left = Math.max(0, Math.min(12, f)) / 12 * 100 + "%"; }
     }
-    if($("fridge") && $("fridge").parentNode){
-      $("fridge").parentNode.dataset.st=st||"";
+    if ($("fridge") && $("fridge").parentNode) {
+      $("fridge").parentNode.dataset.st = st || "";
     }
-    badge($("fridgeBadge"),st,msg[st]+(st==="bad"?(f<2?" (ต่ำกว่า 2.0)":" (สูงกว่า 8.0)"):""));
-    var h=num($("hum")?$("hum").value:null),hs=humStat(h);
-    if($("hum") && $("hum").parentNode){
-      $("hum").parentNode.dataset.st=hs||"";
+    badge($("fridgeBadge"), st, msg[st] + (st === "bad" ? (f < 2 ? " (ต่ำกว่า 2.0)" : " (สูงกว่า 8.0)") : ""));
+    var h = num($("hum") ? $("hum").value : null), hs = humStat(h);
+    if ($("hum") && $("hum").parentNode) {
+      $("hum").parentNode.dataset.st = hs || "";
     }
-    badge($("humBadge"),hs,"ความชื้น"+msg[hs]);
-    var need=st==="bad"||hs==="bad";
-    if($("noteHint")) $("noteHint").textContent=need?"(จำเป็น เพราะค่านอกเกณฑ์)":"(ไม่บังคับ)";
+    badge($("humBadge"), hs, "ความชื้น" + msg[hs]);
+    var need = st === "bad" || hs === "bad";
+    if ($("noteHint")) $("noteHint").textContent = need ? "(จำเป็น เพราะค่านอกเกณฑ์)" : "(ไม่บังคับ)";
   }
-  ["fridge","hum","room"].forEach(function(i){if($(i))$(i).addEventListener("input",function(){live();if($(i+"Err"))$(i+"Err").classList.remove("show")})});
+  ["fridge", "hum", "room"].forEach(function(i) { if ($(i))$(i).addEventListener("input", function() { live(); if ($(i + "Err")) $(i + "Err").classList.remove("show"); }); });
 
-  var tt;function toast(t){var e=$("toast");if(!e)return;e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("show")},2200)}
+  var tt; function toast(t) { var e = $("toast"); if (!e) return; e.textContent = t; e.classList.add("show"); clearTimeout(tt); tt = setTimeout(function() { e.classList.remove("show"); }, 2200); }
 
-  if($("save")) {
-    $("save").addEventListener("click",function(){
-      var r=num($("room")?$("room").value:null),h=num($("hum")?$("hum").value:null),ok=true,first=null;
-      function bad(id){if($(id))$(id).classList.add("show");ok=false;if(!first)first=id.replace("Err","")}
+  if ($("save")) {
+    $("save").addEventListener("click", function() {
+      var r = num($("room") ? $("room").value : null), h = num($("hum") ? $("hum").value : null), ok = true, first = null;
+      function bad(id) { if ($(id))$(id).classList.add("show"); ok = false; if (!first) first = id.replace("Err", ""); }
       
-      if(S.zone==="คลังยา"){
-        if($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
-        var missing = WAREHOUSE_FRIDGES.some(function(fName){ return num(warehouseData[fName]) === null; });
-        if(missing){
+      if (S.zone === "คลังยา") {
+        if ($("fridge")) warehouseData[activeWarehouseFridge] = $("fridge").value;
+        var missing = WAREHOUSE_FRIDGES.some(function(fName) { return num(warehouseData[fName]) === null; });
+        if (missing) {
           alert("กรุณากรอกอุณหภูมิตู้เย็นให้ครบทั้ง 4 ตู้ (T31, T32, TH1, TV1)");
-          ok=false;
-          first="fridge";
+          ok = false;
+          first = "fridge";
         }
       } else {
-        var f=num($("fridge")?$("fridge").value:null);
-        if(f===null)bad("fridgeErr");
+        var f = num($("fridge") ? $("fridge").value : null);
+        if (f === null) bad("fridgeErr");
       }
       
-      if(r===null)bad("roomErr");if(h===null)bad("humErr");
+      if (r === null) bad("roomErr"); if (h === null) bad("humErr");
       
       var hasBad = false;
-      if(S.zone==="คลังยา"){
-        WAREHOUSE_FRIDGES.forEach(function(fName){
+      if (S.zone === "คลังยา") {
+        WAREHOUSE_FRIDGES.forEach(function(fName) {
           var val = num(warehouseData[fName]);
-          if(val < 2 || val > 8) hasBad = true;
+          if (val < 2 || val > 8) hasBad = true;
         });
       } else {
-        var f=num($("fridge")?$("fridge").value:null);
-        if(f<2 || f>8) hasBad = true;
+        var f = num($("fridge") ? $("fridge").value : null);
+        if (f < 2 || f > 8) hasBad = true;
       }
-      var hs=humStat(h);
-      if(hs==="bad") hasBad = true;
+      var hs = humStat(h);
+      if (hs === "bad") hasBad = true;
 
-      if(hasBad && $("note") && !$("note").value.trim()){bad("noteErr");if(first===null)first="note"}
-      if(!ok){if(first && $(first))$(first).focus();return}
+      if (hasBad && $("note") && !$("note").value.trim()) { bad("noteErr"); if (first === null) first = "note"; }
+      if (!ok) { if (first && $(first))$(first).focus(); return; }
 
       var zoneVal = S.zone;
       var subLocVal = zoneVal.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : zoneVal;
       var targetTab = zoneVal.includes("ห้องผลิต") ? "ห้องผลิต" : zoneVal;
       var activeRounds = getActiveRounds();
-      var roundObj = activeRounds.filter(function(x){return x.id===S.round})[0];
+      var roundObj = activeRounds.filter(function(x) { return x.id === S.round; })[0];
       var roundText = roundObj ? (roundObj.n + " (" + roundObj.t + ")") : S.round;
       var statusText = hasBad ? "ผิดปกติ" : "ปกติ";
       var recorderVal = $("who") ? $("who").value.trim() : "";
 
       var payloads = [];
-      if(S.zone==="คลังยา"){
-        WAREHOUSE_FRIDGES.forEach(function(fName){
+      if (S.zone === "คลังยา") {
+        WAREHOUSE_FRIDGES.forEach(function(fName) {
           payloads.push({
-            date: $("date")?$("date").value:"",
+            date: $("date") ? $("date").value : "",
             location: targetTab,
             subLocation: `${zoneVal} (${fName})`,
             round: roundText,
             fridgeTemp: num(warehouseData[fName]),
             roomTemp: r,
             humidity: h,
-            status: (num(warehouseData[fName]) < 2 || num(warehouseData[fName]) > 8 || hs==="bad") ? "ผิดปกติ" : "ปกติ",
+            status: (num(warehouseData[fName]) < 2 || num(warehouseData[fName]) > 8 || hs === "bad") ? "ผิดปกติ" : "ปกติ",
             recorder: recorderVal,
             note: $("note") ? $("note").value.trim() : ""
           });
         });
       } else {
         payloads.push({
-          date: $("date")?$("date").value:"",
+          date: $("date") ? $("date").value : "",
           location: targetTab,
           subLocation: subLocVal,
           round: roundText,
-          fridgeTemp: num($("fridge")?$("fridge").value:null),
+          fridgeTemp: num($("fridge") ? $("fridge").value : null),
           roomTemp: r,
           humidity: h,
           status: statusText,
@@ -479,29 +479,29 @@ textarea{border-radius:18px}
 
       toast(hasBad ? "บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า" : "บันทึกข้อมูลเรียบร้อยแล้ว");
       
-      if(S.zone==="คลังยา"){
+      if (S.zone === "คลังยา") {
         warehouseData = { "T31": "", "T32": "", "TH1": "", "TV1": "" };
         drawWarehouseFridges();
       }
-      ["fridge","room","hum","note"].forEach(function(i){if($(i))$(i).value=""});
-      if($("who") && $("who").tagName==="INPUT") $("who").value="";
+      ["fridge", "room", "hum", "note"].forEach(function(i) { if ($(i))$(i).value = ""; });
+      if ($("who") && $("who").tagName === "INPUT") $("who").value = "";
       live();
-      window.scrollTo({top:0,behavior:"smooth"});
+      window.scrollTo({ top: 0, behavior: "smooth" });
       drawRounds();
 
-      payloads.forEach(function(payload, idx){
-        setTimeout(function(){
+      payloads.forEach(function(payload, idx) {
+        setTimeout(function() {
           fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
-          }).catch(function(err){ console.error(err); });
+          }).catch(function(err) { console.error(err); });
         }, idx * 300);
       });
     });
   }
-})();
+});
 </script>
 </body>
 </html>
