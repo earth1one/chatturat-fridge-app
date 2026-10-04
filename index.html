@@ -366,7 +366,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var p = $("date").value.split("-");
     if (p.length === 3) {
       var y = parseInt(p[0]) + 543;
-      $("dateShown").textContent = (String(y).slice(2)) + "-" + p[1] + "-" + p[2];
+      // เปลี่ยนลำดับเป็น วัน/เดือน/ปี (DD/MM/YY)
+      $("dateShown").textContent = p[2] + "/" + p[1] + "/" + (String(y).slice(2));
     } else {
       $("dateShown").textContent = $("date").value;
     }
@@ -493,7 +494,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
       }
 
-      toast(hasBad ? "บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า" : "บันทึกข้อมูลเรียบร้อยแล้ว");
+(toast)(hasBad ? "บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า" : "บันทึกข้อมูลเรียบร้อยแล้ว");
       
       if (S.zone === "คลังยา") {
         warehouseData = { "T31": "", "T32": "", "TH1": "", "TV1": "" };
