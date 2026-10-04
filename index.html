@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>บันทึกอุณหภูมิตู้เย็นยาและวัคซีน</title>
-<!-- เปลี่ยนมาใช้ชื่อไฟล์ใหม่เพื่อล้างแคชบนมือถือ -->
-<link rel="apple-touch-icon" href="pharmaTemp-new.jpg">
-<link rel="icon" type="image/jpeg" href="pharmaTemp-new.jpg">
+<link rel="apple-touch-icon" href="pharmaTemp-New.jpg">
+<link rel="icon" type="image/jpeg" href="pharmaTemp-New.jpg">
 <meta name="apple-mobile-web-app-title" content="PharmaTemp">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -14,7 +13,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- โหลดไลบรารีพลุ (Canvas Confetti) -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
@@ -94,7 +92,6 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 .save{width:100%;font:inherit;font-size:17px;font-weight:700;border:0;border-radius:999px;min-height:58px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:var(--brand-ink);cursor:pointer;box-shadow:0 12px 30px -6px var(--glow);transition:transform .15s}
 .save:active{transform:scale(.98)}
 
-/* Toast สีขาว ตัวหนังสือเขียวเข้ม บรรทัดเดียว */
 .toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:#ffffff;color:#0F4C3A;padding:16px 26px;border-radius:20px;font-weight:700;font-size:15px;white-space:nowrap;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.25);border:2px solid rgba(10,76,89,0.15)}
 .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
@@ -148,7 +145,6 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
   <section class="card">
     <h2><span id="measuredTitle">ค่าที่วัดได้</span></h2>
     
-    <!-- การ์ดตู้เย็น -->
     <div class="sub-card" id="fridgeCardSection">
       <div class="sub-card-header">
         <div class="sub-card-title"><i class="fa-solid fa-snowflake"></i> <span id="fridgeCardTitle">ตู้เย็น</span></div>
@@ -173,7 +169,6 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
       <div class="badge" id="fridgeBadge" role="status"></div>
     </div>
 
-    <!-- การ์ดห้องยา -->
     <div class="sub-card" id="roomCardSection" style="border-color:#e6d5b8; background:rgba(255,252,247,.7);">
       <div class="sub-card-header" style="border-bottom-color:rgba(154,98,0,.1);">
         <div class="sub-card-title" style="color:#7A4E00;"><i class="fa-solid fa-house-medical" style="color:#C48200;"></i> <span id="roomCardTitle">ห้องยา</span></div>
@@ -263,7 +258,6 @@ document.addEventListener("DOMContentLoaded", function() {
   function updateFormVisibility() {
     var subSel = $("subZoneSelect");
     var isSubStock = subSel && subSel.value.includes("substock");
-    
     var fridgeCard = $("fridgeCardSection");
     if (isSubStock) {
       if (fridgeCard) fridgeCard.style.display = "none";
@@ -310,12 +304,10 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (S.zone === "ห้องยาตึกใหม่" || S.zone === "ห้องยาตึกเก่า") {
       wrap.style.display = "block";
       if ($("subZoneLabel")) $("subZoneLabel").textContent = "เลือกพื้นที่ใน" + S.zone;
-      
       var optMain = document.createElement("option");
       optMain.value = S.zone;
       optMain.textContent = S.zone + " (หลัก)";
       sel.appendChild(optMain);
-
       var optSub = document.createElement("option");
       optSub.value = S.zone + " (substock)";
       optSub.textContent = S.zone + " - substock";
@@ -363,7 +355,6 @@ document.addEventListener("DOMContentLoaded", function() {
       };
       grid.appendChild(card);
     });
-    
     if ($("fridgeCountStatus")) $("fridgeCountStatus").textContent = "กรอกแล้ว " + filledCount + " จาก 4 ตู้";
   }
 
@@ -385,32 +376,13 @@ document.addEventListener("DOMContentLoaded", function() {
     var c = $("whoContainer");
     if (!c) return;
     if (S.zone === "ห้องยาตึกใหม่") {
-      c.innerHTML = '<label for="who">ผู้บันทึก</label>' +
-                    '<select id="who" required>' +
-                    '<option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>' +
-                    '<option value="ภัทราภรณ์">ภัทราภรณ์</option>' +
-                    '<option value="ณัชชา">ณัชชา</option>' +
-                    '<option value="เพ็ญลักษณ์">เพ็ญลักษณ์</option>' +
-                    '</select>';
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="ภัทราภรณ์">ภัทราภรณ์</option><option value="ณัชชา">ณัชชา</option><option value="เพ็ญลักษณ์">เพ็ญลักษณ์</option></select>';
     } else if (S.zone === "ห้องยาตึกเก่า") {
-      c.innerHTML = '<label for="who">ผู้บันทึก</label>' +
-                    '<select id="who" required>' +
-                    '<option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>' +
-                    '<option value="ระพีพรรณ">ระพีพรรณ</option>' +
-                    '<option value="รณชัย">รณชัย</option>' +
-                    '<option value="ปริยฉัตร">ปริยฉัตร</option>' +
-                    '<option value="ดาราณี">ดาราณี</option>' +
-                    '</select>';
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="ระพีพรรณ">ระพีพรรณ</option><option value="รณชัย">รณชัย</option><option value="ปริยฉัตร">ปริยฉัตร</option><option value="ดาราณี">ดาราณี</option></select>';
     } else if (S.zone === "คลังยา") {
-      c.innerHTML = '<label for="who">ผู้บันทึก</label>' +
-                    '<select id="who" required>' +
-                    '<option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option>' +
-                    '<option value="พงศ์พันธ์">พงศ์พันธ์</option>' +
-                    '<option value="นาวิน">นาวิน</option>' +
-                    '</select>';
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="พงศ์พันธ์">พงศ์พันธ์</option><option value="นาวิน">นาวิน</option></select>';
     } else {
-      c.innerHTML = '<label for="who">ผู้บันทึก</label>' +
-                    '<input id="who" placeholder="ชื่อ-นามสกุล / ตำแหน่ง" autocomplete="name">';
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><input id="who" placeholder="ชื่อ-นามสกุล / ตำแหน่ง" autocomplete="name">';
     }
   }
 
@@ -432,9 +404,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         })
         .catch(function(e) { console.log("Offline mode or fetch error", e); });
-    } catch(err) {
-      console.log(err);
-    }
+    } catch(err) { console.log(err); }
   }
   loadRemoteLogs();
 
@@ -459,16 +429,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   if ($("historyBtn")) {
-    $("historyBtn").addEventListener("click", function() {
-      window.open(WEB_APP_URL, "_blank");
-    });
+    $("historyBtn").addEventListener("click", function() { window.open(WEB_APP_URL, "_blank"); });
   }
 
   if ($("subZoneSelect")) {
-    $("subZoneSelect").addEventListener("change", function() { 
-      updateFormVisibility();
-      drawRounds(); 
-    });
+    $("subZoneSelect").addEventListener("change", function() { updateFormVisibility(); drawRounds(); });
   }
 
   function num(v) { if (v === undefined || v === null) return null; var s = String(v).trim().replace(",", "."); if (s === "" || isNaN(s)) return null; return parseFloat(s); }
@@ -480,20 +445,14 @@ document.addEventListener("DOMContentLoaded", function() {
   function live() {
     var f = num($("fridge") ? $("fridge").value : null), st = fridgeStat(f), pin = $("pin");
     saveCurrentFridgeInputs();
-    if (S.zone === "คลังยา") {
-      drawWarehouseFridges();
-    }
+    if (S.zone === "คลังยา") drawWarehouseFridges();
     if (pin) {
       if (f === null) { pin.style.display = "none"; } else { pin.style.display = "block"; pin.style.left = Math.max(0, Math.min(12, f)) / 12 * 100 + "%"; }
     }
-    if ($("fridge") && $("fridge").parentNode) {
-      $("fridge").parentNode.dataset.st = st || "";
-    }
+    if ($("fridge") && $("fridge").parentNode) $("fridge").parentNode.dataset.st = st || "";
     badge($("fridgeBadge"), st, msg[st] + (st === "bad" ? (f < 2 ? " (ต่ำกว่า 2.0)" : " (สูงกว่า 8.0)") : ""));
     var h = num($("hum") ? $("hum").value : null), hs = humStat(h);
-    if ($("hum") && $("hum").parentNode) {
-      $("hum").parentNode.dataset.st = hs || "";
-    }
+    if ($("hum") && $("hum").parentNode) $("hum").parentNode.dataset.st = hs || "";
     badge($("humBadge"), hs, "ความชื้นห้องยา" + msg[hs]);
     var need = st === "bad" || hs === "bad";
     if ($("noteHint")) $("noteHint").textContent = need ? "(จำเป็น เพราะค่านอกเกณฑ์)" : "(ไม่บังคับ)";
@@ -504,16 +463,9 @@ document.addEventListener("DOMContentLoaded", function() {
     var e = $("toast"); if (!e) return; 
     e.textContent = t; 
     e.classList.add("show"); 
-    
-    // ยิงเอฟเฟกต์พลุเฉลิมฉลอง
     if (typeof confetti === "function") {
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.5 }
-      });
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
     }
-
     clearTimeout(tt); 
     tt = setTimeout(function() { e.classList.remove("show"); }, 2500); 
   }
@@ -602,12 +554,7 @@ document.addEventListener("DOMContentLoaded", function() {
       toast("ขอบคุณที่ให้ความร่วมมือจ้า");
       
       if (S.zone === "คลังยา") {
-        warehouseData = { 
-          "T31": {temp: "", hum: ""}, 
-          "T32": {temp: "", hum: ""}, 
-          "TH1": {temp: "", hum: ""}, 
-          "TV1": {temp: "", hum: ""} 
-        };
+        warehouseData = { "T31": {temp: "", hum: ""}, "T32": {temp: "", hum: ""}, "TH1": {temp: "", hum: ""}, "TV1": {temp: "", hum: ""} };
         drawWarehouseFridges();
       }
       ["fridge", "fridgeHum", "room", "hum", "note"].forEach(function(i) { if ($(i)) { $(i).value = ""; } });
