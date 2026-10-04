@@ -53,6 +53,12 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 .seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:var(--brand-ink);box-shadow:0 6px 18px var(--glow)}
 .seg button[aria-pressed="true"] span{color:rgba(255,255,255,.9)}
 .seg button[aria-pressed="true"].done span{color:#fff}
+.fridge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fridge-card{border:1.5px solid var(--line);background:var(--field);border-radius:18px;padding:14px;cursor:pointer;position:relative;transition:all .2s}
+.fridge-card[aria-pressed="true"]{background:linear-gradient(135deg,rgba(13,148,136,.12),rgba(20,184,166,.18));border-color:var(--brand);box-shadow:0 4px 14px var(--glow)}
+.fridge-card .f-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:16px}
+.fridge-card .f-status{font-size:12px;color:var(--sub);margin-top:4px}
+.fridge-card.filled .f-status{color:var(--ok);font-weight:600}
 .num{position:relative;border-radius:22px;transition:box-shadow .25s}
 .num input{font-size:34px;font-weight:700;padding:14px 60px 14px 18px;min-height:68px;border-radius:22px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .num em{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--sub);font-size:18px;font-weight:600}
@@ -127,6 +133,10 @@ textarea{border-radius:18px}
         <!-- Injected by JS -->
       </select>
     </div>
+    <div class="field" id="warehouseFridgesField" style="display:none;">
+      <label class="lbl">เลือกตู้เย็น (<span id="fridgeCountStatus">กรอกแล้ว 0 จาก 4 ตู้</span>)</label>
+      <div class="fridge-grid" id="warehouseFridges"></div>
+    </div>
     <div class="field">
       <span class="lbl" id="rl">รอบเวลา</span>
       <div class="seg" id="rounds" role="group" aria-labelledby="rl"></div>
@@ -134,9 +144,9 @@ textarea{border-radius:18px}
   </section>
 
   <section class="card">
-    <h2>ค่าที่วัดได้</h2>
+    <h2><span id="measuredTitle">ค่าที่วัดได้</span></h2>
     <div class="field">
-      <label for="fridge">อุณหภูมิตู้เย็น</label>
+      <label for="fridge" id="fridgeLabel">อุณหภูมิตู้เย็น</label>
       <div class="num"><input id="fridge" inputmode="decimal" placeholder="เช่น 5.2" autocomplete="off"><em>°C</em></div>
       <div class="gauge" aria-hidden="true">
         <div class="track"><div class="band"></div><div class="pin" id="pin"></div></div>
@@ -190,8 +200,13 @@ var ROUNDS_DEFAULT=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",
 var ROUNDS_NEW=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"14:30 น."},{id:"eve",n:"เวรบ่าย",t:"20:30 น."}];
 var ROUNDS_PROD=[{id:"am",n:"รอบเช้า",t:"09:00 น."},{id:"pm",n:"รอบบ่าย",t:"16:00 น."}];
 
+var WAREHOUSE_FRIDGES = ["T31", "T32", "TH1", "TV1"];
+var warehouseData = { "T31": "", "T32": "", "TH1": "", "TV1": "" };
+var activeWarehouseFridge = "T31";
+
 var S={zone:ZONES[0],round:"am"};
 var $=function(i){return document.getElementById(i)};
+
 function loadRemoteLogs(){
   fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
     if(Array.isArray(data)){
@@ -240,6 +255,7 @@ function drawZones(){
       if(!rList.some(function(r){return r.id===S.round;})){S.round=rList[0].id;}
       drawZones();
       updateSubZoneField();
+      updateWarehouseField();
       updateWhoField();
       drawRounds();
     };
@@ -263,6 +279,50 @@ function updateSubZoneField(){
   } else {
     wrap.style.display="none";
   }
+}
+
+function updateWarehouseField(){
+  var wrap = $("warehouseField") \vert{}\vert{} $("warehouseFridgesField");
+  if(S.zone === "คลังยา"){
+    wrap.style.display = "block";
+    drawWarehouseFridges();
+  } else {
+    wrap.style.display = "none";
+  }
+}
+
+function drawWarehouseFridges(){
+  var grid = $("warehouseFridges");
+  grid.innerHTML = "";
+  var filledCount = 0;
+  
+  WAREHOUSE_FRIDGES.forEach(function(fName){
+    var val = warehouseData[fName];
+    var isFilled = val !== "" && !isNaN(val);
+    if(isFilled) filledCount++;
+    
+    var card = document.createElement("div");
+    card.className = "fridge-card" + (isFilled ? " filled" : "");
+    card.setAttribute("aria-pressed", fName === activeWarehouseFridge);
+    card.innerHTML = `
+      <div class="f-top"><span>${fName}</span><i class="fa-solid ${isFilled ? 'fa-circle-check text-ok' : 'fa-circle-dot'}"></i></div>
+      <div class="f-status">${isFilled ? val + ' °ค' : 'ยังไม่กรอก'}</div>
+    `;
+    card.onclick = function(){
+      // บันทึกค่าปัจจุบันเก็บไว้ก่อนเปลี่ยนตู้
+      warehouseData[activeWarehouseFridge] = $("fridge").value;
+      activeWarehouseFridge = fName;
+      drawWarehouseFridges();
+      $("fridge").value = warehouseData[activeWarehouseFridge];
+      $("fridgeLabel").textContent = "อุณหภูมิตู้ " + activeWarehouseFridge;
+      live();
+    };
+    grid.appendChild(card);
+  });
+  
+  $("fridgeCountStatus").textContent = `กรอกแล้ว ${filledCount} จาก 4 ตู้`;
+  var saveBtn = $("save");
+  saveBtn.textContent = `บันทึกข้อมูล (${filledCount}/4 ตู้)`;
 }
 
 function updateWhoField(){
@@ -325,6 +385,7 @@ function drawRounds(){
 
 drawZones();
 updateSubZoneField();
+updateWarehouseField();
 updateWhoField();
 drawRounds();
 loadRemoteLogs();
@@ -339,6 +400,10 @@ function badge(el,st,txt){el.className="badge"+(st?" "+st:"");el.textContent=st?
 
 function live(){
  var f=num($("fridge").value),st=fridgeStat(f),pin=$("pin");
+ if(S.zone==="คลังยา"){
+   warehouseData[activeWarehouseFridge] = $("fridge").value;
+   drawWarehouseFridges();
+ }
  if(f===null){pin.style.display="none"}else{pin.style.display="block";pin.style.left=Math.max(0,Math.min(12,f))/12*100+"%"}
  $("fridge").parentNode.dataset.st=st||"";
  badge($("fridgeBadge"),st,msg[st]+(st==="bad"?(f<2?" (ต่ำกว่า 2.0)":" (สูงกว่า 8.0)"):""));
@@ -381,12 +446,40 @@ function drawLog(){
 }
 
 $("save").addEventListener("click",function(){
- var f=num($("fridge").value),r=num($("room").value),h=num($("hum").value),ok=true,first=null;
+ var r=num($("room").value),h=num($("hum").value),ok=true,first=null;
  function bad(id){$(id).classList.add("show");ok=false;if(!first)first=id.replace("Err","")}
- if(f===null)bad("fridgeErr");if(r===null)bad("roomErr");if(h===null)bad("humErr");
- var fs=fridgeStat(f),hs=humStat(h);
- if((fs==="bad"||hs==="bad")&&!$("note").value.trim()){bad("noteErr");if(first===null)first="note"}
- if(!ok){$(first).focus();return}
+ 
+ if(S.zone==="คลังยา"){
+   warehouseData[activeWarehouseFridge] = $("fridge").value;
+   var missing = WAREHOUSE_FRIDGES.some(function(fName){ return num(warehouseData[fName]) === null; });
+   if(missing){
+     alert("กรุณากรอกอุณหภูมิตู้เย็นให้ครบทั้ง 4 ตู้ (T31, T32, TH1, TV1)");
+     ok=false;
+     first="fridge";
+   }
+ } else {
+   var f=num($("fridge").value);
+   if(f===null)bad("fridgeErr");
+ }
+ 
+ if(r===null)bad("roomErr");if(h===null)bad("humErr");
+ 
+ // ตรวจสอบสถานะความผิดปกติ
+ var hasBad = false;
+ if(S.zone==="คลังยา"){
+   WAREHOUSE_FRIDGES.forEach(function(fName){
+     var val = num(warehouseData[fName]);
+     if(val < 2 || val > 8) hasBad = true;
+   });
+ } else {
+   var f=num($("fridge").value);
+   if(f<2 || f>8) hasBad = true;
+ }
+ var hs=humStat(h);
+ if(hs==="bad") hasBad = true;
+
+ if(hasBad && !$("note").value.trim()){bad("noteErr");if(first===null)first="note"}
+ if(!ok){if(first && $(first))$(first).focus();return}
 
  var zoneVal = S.zone;
  var subLocVal = zoneVal.includes("ห้องผลิต") ? $("subZoneSelect").value : zoneVal;
@@ -394,42 +487,69 @@ $("save").addEventListener("click",function(){
  var activeRounds = getActiveRounds();
  var roundObj = activeRounds.filter(function(x){return x.id===S.round})[0];
  var roundText = roundObj ? (roundObj.n + " (" + roundObj.t + ")") : S.round;
-
- var statusText = (fs==="bad"||hs==="bad") ? "ผิดปกติ" : "ปกติ";
+ var statusText = hasBad ? "ผิดปกติ" : "ปกติ";
  var recorderVal = $("who").value.trim();
 
- var payload = {
-   date: $("date").value,
-   location: targetTab,
-   subLocation: subLocVal,
-   round: roundText,
-   fridgeTemp: f,
-   roomTemp: r,
-   humidity: h,
-   status: statusText,
-   recorder: recorderVal,
-   note: $("note").value.trim()
- };
+ // เตรียมส่งข้อมูล (ถ้าเป็นคลังยาจะวนส่งทีเดียว 4 ตู้ หรือแยกตู้ตามที่ออกแบบ)
+ var payloads = [];
+ if(S.zone==="คลังยา"){
+   WAREHOUSE_FRIDGES.forEach(function(fName){
+     payloads.push({
+       date: $("date").value,
+       location: targetTab,
+       subLocation: `${zoneVal} (${fName})`,
+       round: roundText,
+       fridgeTemp: num(warehouseData[fName]),
+       roomTemp: r,
+       humidity: h,
+       status: (num(warehouseData[fName]) < 2 || num(warehouseData[fName]) > 8 || hs==="bad") ? "ผิดปกติ" : "ปกติ",
+       recorder: recorderVal,
+       note: $("note").value.trim()
+     });
+   });
+ } else {
+   payloads.push({
+     date: $("date").value,
+     location: targetTab,
+     subLocation: subLocVal,
+     round: roundText,
+     fridgeTemp: num($("fridge").value),
+     roomTemp: r,
+     humidity: h,
+     status: statusText,
+     recorder: recorderVal,
+     note: $("note").value.trim()
+   });
+ }
 
- toast((fs==="bad"||hs==="bad")?"บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า":"บันทึกข้อมูลแล้ว");
- ["fridge","room","hum","note"].forEach(function(i){$(i).value=""});
+ toast(hasBad ? "บันทึกแล้ว · ค่านอกเกณฑ์ กรุณาแจ้งหัวหน้า" : "บันทึกข้อมูลเรียบร้อยแล้ว");
+ 
+ // เคลียร์ฟอร์ม
+ if(S.zone==="คลังยา"){
+   warehouseData = { "T31": "", "T32": "", "TH1": "", "TV1": "" };
+   drawWarehouseFridges();
+ }
+ ["fridge","room","hum","note"].forEach(function(i){if($(i))$(i).value=""});
  if($("who").tagName==="INPUT") $("who").value="";
  live();
  window.scrollTo({top:0,behavior:"smooth"});
  drawRounds();
 
- fetch(WEB_APP_URL, {
-   method: "POST",
-   mode: "no-cors",
-   headers: { "Content-Type": "application/json" },
-   body: JSON.stringify(payload)
- }).then(function(){
+ // ส่งข้อมูลไป Google Sheets เบื้องหลัง
+ payloads.forEach(function(payload, idx){
    setTimeout(function(){
-     loadRemoteLogs();
-   }, 1200);
- }).catch(function(err){
-   console.error(err);
+     fetch(WEB_APP_URL, {
+       method: "POST",
+       mode: "no-cors",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(payload)
+     }).catch(function(err){ console.error(err); });
+   }, idx * 300);
  });
+
+ setTimeout(function(){
+   loadRemoteLogs();
+ }, 2000);
 });
 })();
 </script>
