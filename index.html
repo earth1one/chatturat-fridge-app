@@ -123,9 +123,7 @@ textarea{border-radius:18px}
     </div>
     <div class="field" id="subZoneField" style="display:none;">
       <label for="subZoneSelect">ระบุหมายเลขห้องผลิต</label>
-      <select id="subZoneSelect">
-        <!-- Injected by JS -->
-      </select>
+      <select id="subZoneSelect"></select>
     </div>
     <div class="field" id="warehouseFridgesField" style="display:none;">
       <label class="lbl">เลือกตู้เย็น (<span id="fridgeCountStatus">กรอกแล้ว 0 จาก 4 ตู้</span>)</label>
@@ -195,51 +193,7 @@ var activeWarehouseFridge = "T31";
 var S={zone:ZONES[0],round:"am"};
 var $=function(i){return document.getElementById(i)};
 
-function loadRemoteLogs(){
-  fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
-    if(Array.isArray(data)){
-      window.remoteLogs = data;
-      if($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
-      drawRounds();
-    }
-  }).catch(function(e){console.error(e);});
-}
-function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
-function thDateShort(s){
-  if(!s) return s;
-  var p=s.split("-");
-  if(p.length===3){
-    var y = parseInt(p[0]) + 543;
-    var shortY = String(y).slice(2);
-    return shortY + "-" + p[1] + "-" + p[2];
-  }
-  return s;
-}
-if($("date")){
-  $("date").value=iso(new Date());
-  $("date").max=iso(new Date());
-}
-function showDate(){
-  if(!$("date") \vert{}\vert{} !$("dateShown")) return;
-  var p = $("date").value.split("-");
-  if(p.length===3){
-    var y = parseInt(p[0]) + 543;
-    $("dateShown").textContent = (String(y).slice(2)) + "-" + p[1] + "-" + p[2];
-  } else {
-    $("dateShown").textContent = $("date").value;
-  }
-}
-if($("date")){
-  $("date").addEventListener("change",function(){showDate();drawRounds()});
-  showDate();
-}
-
-function getActiveRounds(){
-  if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
-  if(S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
-  return ROUNDS_DEFAULT;
-}
-
+// วาดปุ่มโซนทันที ป้องกันปุ่มหาย
 function drawZones(){
   var h=$("zones");if(!h)return;h.innerHTML="";
   ZONES.forEach(function(z){
@@ -255,6 +209,30 @@ function drawZones(){
       updateWhoField();
       drawRounds();
     };
+    h.appendChild(b);
+  });
+}
+
+function getActiveRounds(){
+  if(S.zone==="ห้องยาตึกใหม่") return ROUNDS_NEW;
+  if(S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
+  return ROUNDS_DEFAULT;
+}
+
+function drawRounds(){
+  var h=$("rounds");if(!h)return;h.innerHTML="";
+  var activeRounds = getActiveRounds();
+  activeRounds.forEach(function(r){
+    var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
+    var remote = window.remoteLogs || [];
+    var done = remote.some(function(m){
+      var itemLoc = m.subLocation || m.location;
+      return m.date===$("date").value && itemLoc===currentLoc && m.round.includes(r.n);
+    });
+    var b=document.createElement("button");b.type="button";b.className=done?"done":"";
+    b.setAttribute("aria-pressed",r.id===S.round);
+    b.innerHTML="<b>"+r.n+"</b><span>"+(done?"✓ บันทึกแล้ว":r.t)+"</span>";
+    b.onclick=function(){S.round=r.id;drawRounds()};
     h.appendChild(b);
   });
 }
@@ -362,34 +340,47 @@ function updateWhoField(){
   }
 }
 
-function drawRounds(){
-  var h=$("rounds");if(!h)return;h.innerHTML="";
-  var activeRounds = getActiveRounds();
-  activeRounds.forEach(function(r){
-    var currentLoc = S.zone.includes("ห้องผลิต") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
-    var remote = window.remoteLogs || [];
-    var done = remote.some(function(m){
-      var itemLoc = m.subLocation || m.location;
-      return m.date===$("date").value && itemLoc===currentLoc && m.round.includes(r.n);
-    });
-    var b=document.createElement("button");b.type="button";b.className=done?"done":"";
-    b.setAttribute("aria-pressed",r.id===S.round);
-    b.innerHTML="<b>"+r.n+"</b><span>"+(done?"✓ บันทึกแล้ว":r.t)+"</span>";
-    b.onclick=function(){S.round=r.id;drawRounds()};
-    h.appendChild(b);
-  });
-}
-
+// เริ่มต้นวาดหน้าจอทันทีตั้งแต่โหลดสคริปต์
 drawZones();
 updateSubZoneField();
 updateWarehouseField();
 updateWhoField();
 drawRounds();
+
+function loadRemoteLogs(){
+  fetch(WEB_APP_URL).then(function(res){return res.json()}).then(function(data){
+    if(Array.isArray(data)){
+      window.remoteLogs = data;
+      if($("historyCount")) $("historyCount").textContent = `ประวัติ (${data.length})`;
+      drawRounds();
+    }
+  }).catch(function(e){console.error(e);});
+}
 loadRemoteLogs();
+
+function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
+if($("date")){
+  $("date").value=iso(new Date());
+  $("date").max=iso(new Date());
+}
+function showDate(){
+  if(!$("date") \vert{}\vert{} !$("dateShown")) return;
+  var p = $("date").value.split("-");
+  if(p.length===3){
+    var y = parseInt(p[0]) + 543;
+    $("dateShown").textContent = (String(y).slice(2)) + "-" + p[1] + "-" + p[2];
+  } else {
+    $("dateShown").textContent = $("date").value;
+  }
+}
+if($("date")){
+  $("date").addEventListener("change",function(){showDate();drawRounds()});
+  showDate();
+}
 
 if($("historyBtn")) {
   $("historyBtn").addEventListener("click", function(){
-    window.open("https://docs.google.com/spreadsheets/d/15rUo5w85X... (หรือลิงก์ชีทของคุณ)", "_blank");
+    window.open(WEB_APP_URL, "_blank");
   });
 }
 
