@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- โหลดไลบรารีพลุ (Canvas Confetti) -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 :root{--bg:#0F4C3A;--card:rgba(255,255,255,.92);--solid:#fff;--ink:#0A3633;--sub:#4A7C75;--line:rgba(10,54,51,.1);--brand:#0A7A59;--brand2:#0E8A5B;--brand-ink:#fff;--ok:#0E8A5B;--ok-bg:rgba(20,184,120,.14);--warn:#9A6200;--warn-bg:rgba(255,184,0,.18);--bad:#C4261E;--bad-bg:rgba(255,69,58,.14);--band:rgba(14,138,91,.25);--field:#fff;--glow:rgba(14,138,91,.25);
@@ -91,8 +93,8 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 .save{width:100%;font:inherit;font-size:17px;font-weight:700;border:0;border-radius:999px;min-height:58px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:var(--brand-ink);cursor:pointer;box-shadow:0 12px 30px -6px var(--glow);transition:transform .15s}
 .save:active{transform:scale(.98)}
 
-/* จัด Toast ให้อยู่กึ่งกลางหน้าจอพอดี */
-.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:rgba(10,54,51,0.95);color:#fff;padding:18px 28px;border-radius:20px;font-weight:600;font-size:16px;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
+/* Toast แสดงผลบรรทัดเดียวตรงกลางจอ พร้อมความโค้งมนสวยงาม */
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:rgba(10,54,51,0.95);color:#fff;padding:16px 26px;border-radius:20px;font-weight:600;font-size:15px;white-space:nowrap;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.3);backdrop-filter:blur(10px)}
 .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -497,7 +499,23 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   ["fridge", "fridgeHum", "hum", "room"].forEach(function(i) { if ($(i)) { $(i).addEventListener("input", function() { live(); if ($(i + "Err")) $(i + "Err").classList.remove("show"); }); } });
 
-  var tt; function toast(t) { var e = $("toast"); if (!e) return; e.textContent = t; e.classList.add("show"); clearTimeout(tt); tt = setTimeout(function() { e.classList.remove("show"); }, 2500); }
+  var tt; function toast(t) { 
+    var e = $("toast"); if (!e) return; 
+    e.textContent = t; 
+    e.classList.add("show"); 
+    
+    // ยิงเอฟเฟกต์พลุเฉลิมฉลอง
+    if (typeof confetti === "function") {
+      confetti({
+        particleCount: 100,
+        spread: 80,
+        origin: { y: 0.5 }
+      });
+    }
+
+    clearTimeout(tt); 
+    tt = setTimeout(function() { e.classList.remove("show"); }, 2500); 
+  }
 
   if ($("save")) {
     $("save").addEventListener("click", function() {
