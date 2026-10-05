@@ -62,7 +62,7 @@
     <form id="tempForm">
         <div class="form-group">
             <label>วันที่</label>
-            <input type="date" id="date" required>
+            <input type="text" id="date" required>
         </div>
         <div class="form-group">
             <label>ห้อง / โซน (Location)</label>
@@ -119,8 +119,12 @@
     // เชื่อมต่อกับ Google Apps Script Web App URL ล่าสุดของคุณ
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhpIFeil5EDBn5NQkKkQkW31aJy7c1Guju0tx9TpzPP6WomDxOnKqVb3KSmdqNRvTtNQ/exec";
 
-    // ตั้งค่าวันที่ปัจจุบันเป็นค่าเริ่มต้น
-    document.getElementById('date').valueAsDate = new Date();
+    // กำหนดวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD อัตโนมัติ
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    document.getElementById('date').value = `${year}-${month}-${day}`;
 
     document.getElementById('tempForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -151,7 +155,7 @@
             if(result.status === "success") {
                 alert("บันทึกข้อมูลสำเร็จ!");
                 document.getElementById('tempForm').reset();
-                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('date').value = `${year}-${month}-${day}`;
             } else {
                 alert("เกิดข้อผิดพลาด: " + result.message);
             }
