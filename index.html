@@ -1,170 +1,612 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกอุณหภูมิตู้เย็น</title>
-    <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>บันทึกอุณหภูมิตู้เย็นยาและวัคซีน</title>
+<link rel="apple-touch-icon" href="pharmaTemp-new.jpg">
+<link rel="icon" type="image/jpeg" href="pharmaTemp-new.jpg">
+<meta name="apple-mobile-web-app-title" content="PharmaTemp">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root{--bg:#0F4C3A;--card:rgba(255,255,255,.92);--solid:#fff;--ink:#0A3633;--sub:#4A7C75;--line:rgba(10,54,51,.1);--brand:#0A7A59;--brand2:#0E8A5B;--brand-ink:#fff;--ok:#0E8A5B;--ok-bg:rgba(20,184,120,.14);--warn:#9A6200;--warn-bg:rgba(255,184,0,.18);--bad:#C4261E;--bad-bg:rgba(255,69,58,.14);--band:rgba(14,138,91,.25);--field:#fff;--glow:rgba(14,138,91,.25);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;color:#fff;font-family:"Anuphan","IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%;background:var(--bg);background-attachment:fixed}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 130px}
+header{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 18px;position:relative}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:52px;height:52px;border-radius:18px;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
+h1{font-size:20px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em;color:#fff}
+header p{margin:2px 0 0;font-size:13px;color:rgba(255,255,255,.8)}
+.history-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 14px;border-radius:999px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px)}
+.rules{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;margin-bottom:14px}
+.rules div{background:rgba(255,255,255,.12);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:12px 14px}
+.rules small{display:block;font-size:12px;color:rgba(255,255,255,.8)}
+.rules b{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.01em;color:#fff}
+section.card{background:var(--card);color:var(--ink);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-radius:28px;padding:20px;border:1px solid var(--line);margin-bottom:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 32px -16px rgba(10,54,51,.25)}
+h2{font-size:17px;margin:0 0 16px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+label,.lbl{display:block;font-size:14px;font-weight:600;margin:0 0 8px;color:var(--sub)}
+.field{margin-bottom:14px}.field:last-child{margin-bottom:0}
+.hint{font-size:13px;color:var(--sub);font-weight:400}
+input,select,textarea{width:100%;max-width:100%;font:inherit;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:50px;-webkit-appearance:none;appearance:none;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--brand);box-shadow:0 0 0 4px var(--glow)}
+button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.datebox{position:relative}
+.datebox input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.datebox .shown{display:flex;justify-content:space-between;align-items:center;min-height:50px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--field);font-weight:600;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--field);color:var(--ink);border-radius:999px;padding:10px 16px;font:inherit;font-size:15px;min-height:46px;cursor:pointer;transition:all .18s}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:var(--brand-ink);font-weight:600;box-shadow:0 6px 18px var(--glow)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--field);padding:6px;border-radius:18px;border:1px solid var(--line)}
+.seg button{font:inherit;text-align:left;border:1.5px solid var(--line);background:var(--field);color:var(--ink);border-radius:14px;padding:12px 14px;min-height:60px;cursor:pointer;transition:all .2s}
+.seg button b{display:block;font-size:16px}
+.seg button span{font-size:13px;color:var(--sub)}
+.seg button.done span{color:var(--ok);font-weight:600}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;color:var(--brand-ink);box-shadow:0 6px 18px var(--glow)}
+.seg button[aria-pressed="true"] span{color:rgba(255,255,255,.9)}
+.seg button[aria-pressed="true"].done span{color:#fff}
+.fridge-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fridge-card{border:1.5px solid var(--line);background:var(--field);border-radius:14px;padding:12px;cursor:pointer;position:relative;transition:all .2s}
+.fridge-card[aria-pressed="true"]{background:linear-gradient(135deg,rgba(10,122,89,.12),rgba(14,138,91,.18));border-color:var(--brand);box-shadow:0 4px 14px var(--glow)}
+.fridge-card .f-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15px}
+.fridge-card .f-status{font-size:12px;color:var(--sub);margin-top:4px}
+.fridge-card.filled .f-status{color:var(--ok);font-weight:600}
+
+.sub-card{border:1.5px solid #bce3d6;background:rgba(240,247,244,.6);border-radius:20px;padding:16px;margin-bottom:14px}
+.sub-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(10,54,51,.08)}
+.sub-card-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--ink)}
+.sub-card-title i{font-size:18px;color:var(--brand)}
+.sub-card-badge{font-size:12px;background:rgba(10,122,89,.1);color:var(--brand);padding:4px 10px;border-radius:999px;font-weight:600}
+
+.num-box{position:relative}
+.num-box input{font-size:22px;font-weight:700;padding-right:45px;min-height:50px;font-variant-numeric:tabular-nums}
+.num-box em{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--sub);font-size:15px;font-weight:600}
+
+.gauge{margin-top:12px}
+.track{position:relative;height:10px;border-radius:5px;background:var(--line)}
+.band{position:absolute;top:0;bottom:0;left:calc(2/12*100%);width:calc(6/12*100%);background:var(--band);border-radius:5px}
+.pin{position:absolute;top:-5px;width:6px;height:20px;border-radius:3px;background:var(--ink);border:1.5px solid var(--solid);transform:translateX(-50%);transition:left .25s cubic-bezier(.3,1.4,.5,1);display:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:6px;position:relative;height:14px}
+.scale span{position:absolute;transform:translateX(-50%)}
+
+.badge{display:none;margin-top:10px;padding:8px 12px;border-radius:12px;font-size:13px;font-weight:600}
+.badge.ok{display:block;background:var(--ok-bg);color:var(--ok)}
+.badge.warn{display:block;background:var(--warn-bg);color:var(--warn)}
+.badge.bad{display:block;background:var(--bad-bg);color:var(--bad)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.err{color:var(--bad);font-size:12px;margin-top:4px;display:none}
+.err.show{display:block}
+
+.bar{position:fixed;left:0;right:0;bottom:0;padding:24px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 40%,transparent);pointer-events:none;z-index:40}
+.bar>div{max-width:560px;margin:0 auto;pointer-events:auto}
+.save{width:100%;font:inherit;font-size:17px;font-weight:700;border:0;border-radius:999px;min-height:58px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:var(--brand-ink);cursor:pointer;box-shadow:0 12px 30px -6px var(--glow);transition:transform .15s}
+.save:active{transform:scale(.98)}
+
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);background:#ffffff;color:#0F4C3A;padding:16px 26px;border-radius:20px;font-weight:700;font-size:15px;white-space:nowrap;opacity:0;transition:all .25s ease;pointer-events:none;text-align:center;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.25);border:2px solid rgba(10,76,89,0.15)}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <div class="header-left">
+      <div class="logo" aria-hidden="true"><i class="fa-solid fa-hospital"></i></div>
+      <div><h1>โรงพยาบาลจัตุรัส</h1><p>บันทึกอุณหภูมิและความชื้น ตู้แช่ยาและวัคซีน</p></div>
+    </div>
+    <button class="history-btn" id="historyBtn" type="button"><i class="fa-solid fa-clock-rotate-left"></i> <span id="historyCount">ประวัติ</span></button>
+  </header>
 
-<div class="container">
-    <h2>บันทึกอุณหภูมิ</h2>
-    <form id="tempForm">
-        <div class="form-group">
-            <label>วันที่</label>
-            <input type="text" id="date" required>
+  <div class="rules" aria-label="เกณฑ์มาตรฐาน">
+    <div><small>ตู้เย็น</small><b>2.0–8.0 °C</b></div>
+    <div><small>อุณหภูมิห้องยา</small><b>&lt; 30.0 °C</b></div>
+    <div><small>ความชื้นสัมพัทธ์</small><b>30–70 %RH</b></div>
+    <div><small>รอบบันทึกประจำวัน</small><b>09:00 / 14:30</b></div>
+  </div>
+
+  <section class="card">
+    <h2>ข้อมูลการบันทึก</h2>
+    <div class="field">
+      <span class="lbl">วันที่บันทึก</span>
+      <div class="datebox">
+        <div class="shown"><span id="dateShown"></span><span aria-hidden="true">📅</span></div>
+        <input type="date" id="date" aria-label="เลือกวันที่บันทึก">
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="zl">สถานที่ / โซนพื้นที่</span>
+      <div class="chips" id="zones" role="group" aria-labelledby="zl"></div>
+    </div>
+    <div class="field" id="subZoneField" style="display:none;">
+      <label for="subZoneSelect" id="subZoneLabel">ระบุประเภทย่อย</label>
+      <select id="subZoneSelect"></select>
+    </div>
+    <div class="field" id="warehouseFridgesField" style="display:none;">
+      <label class="lbl">เลือกตู้เย็น (<span id="fridgeCountStatus">กรอกแล้ว 0 จาก 4 ตู้</span>)</label>
+      <div class="fridge-grid" id="warehouseFridges"></div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="rl">รอบเวลา</span>
+      <div class="seg" id="rounds" role="group" aria-labelledby="rl"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span id="measuredTitle">ค่าที่วัดได้</span></h2>
+    
+    <div class="sub-card" id="fridgeCardSection">
+      <div class="sub-card-header">
+        <div class="sub-card-title"><i class="fa-solid fa-snowflake"></i> <span id="fridgeCardTitle">ตู้เย็น</span></div>
+        <div class="sub-card-badge">เกณฑ์ 2–8 °C</div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="fridge">อุณหภูมิ</label>
+          <div class="num-box"><input id="fridge" inputmode="decimal" placeholder="5.2" autocomplete="off"><em>°C</em></div>
+          <div class="err" id="fridgeErr">กรอกตัวเลข</div>
         </div>
-        <div class="form-group">
-            <label>ห้อง / โซน (Location)</label>
-            <input type="text" id="location" value="ห้องยาตึกเก่า" required>
+        <div class="field">
+          <label for="fridgeHum">ความชื้น</label>
+          <div class="num-box"><input id="fridgeHum" inputmode="decimal" placeholder="60" autocomplete="off"><em>%</em></div>
+          <div class="err" id="fridgeHumErr">กรอกตัวเลข</div>
         </div>
-        <div class="form-group">
-            <label>จุดย่อย (Sub Location)</label>
-            <input type="text" id="subLocation" placeholder="เช่น ตู้เย็นช่อง 1">
+      </div>
+      <div class="gauge" aria-hidden="true">
+        <div class="track"><div class="band"></div><div class="pin" id="pin"></div></div>
+        <div class="scale"><span style="left:0">0</span><span style="left:16.66%">2</span><span style="left:66.66%">8</span><span style="left:100%">12</span></div>
+      </div>
+      <div class="badge" id="fridgeBadge" role="status"></div>
+    </div>
+
+    <div class="sub-card" id="roomCardSection" style="border-color:#e6d5b8; background:rgba(255,252,247,.7);">
+      <div class="sub-card-header" style="border-bottom-color:rgba(154,98,0,.1);">
+        <div class="sub-card-title" style="color:#7A4E00;"><i class="fa-solid fa-house-medical" style="color:#C48200;"></i> <span id="roomCardTitle">ห้องยา</span></div>
+        <div class="sub-card-badge" style="background:rgba(255,184,0,.15); color:#9A6200;">อุณหภูมิและความชื้นในห้อง</div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <label for="room">อุณหภูมิ</label>
+          <div class="num-box"><input id="room" inputmode="decimal" placeholder="25.0" autocomplete="off"><em>°C</em></div>
+          <div class="err" id="roomErr">กรอกตัวเลข</div>
         </div>
-        <div class="form-group">
-            <label>รอบการบันทึก</label>
-            <select id="round">
-                <option value="รอบเช้า (09:00 น.)">รอบเช้า (09:00 น.)</option>
-                <option value="รอบบ่าย (14:30 น.)">รอบบ่าย (14:30 น.)</option>
-                <option value="รอบค่ำ (20:30 น.)">รอบค่ำ (20:30 น.)</option>
-            </select>
+        <div class="field">
+          <label for="hum">ความชื้น</label>
+          <div class="num-box"><input id="hum" inputmode="decimal" placeholder="55" autocomplete="off"><em>%</em></div>
+          <div class="err" id="humErr">กรอกตัวเลข</div>
         </div>
-        <div class="form-group">
-            <label>อุณหภูมิตู้เย็น (°C)</label>
-            <input type="number" step="0.1" id="fridgeTemp">
-        </div>
-        <div class="form-group">
-            <label>ความชื้นตู้เย็น (%)</label>
-            <input type="number" step="0.1" id="fridgeHumidity">
-        </div>
-        <div class="form-group">
-            <label>อุณหภูมิห้อง (°C)</label>
-            <input type="number" step="0.1" id="roomTemp">
-        </div>
-        <div class="form-group">
-            <label>ความชื้นห้อง (%)</label>
-            <input type="number" step="0.1" id="humidity">
-        </div>
-        <div class="form-group">
-            <label>สถานะ</label>
-            <select id="status">
-                <option value="ปกติ">ปกติ</option>
-                <option value="ผิดปกติ">ผิดปกติ</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>ผู้บันทึก</label>
-            <input type="text" id="recorder" required>
-        </div>
-        <div class="form-group">
-            <label>หมายเหตุ</label>
-            <textarea id="note" rows="2"></textarea>
-        </div>
-        <button type="submit">บันทึกข้อมูล</button>
-    </form>
+      </div>
+      <div class="badge" id="humBadge" role="status"></div>
+    </div>
+
+  </section>
+
+  <section class="card" id="noteCard">
+    <div class="field" id="whoContainer">
+      <label for="who">ผู้บันทึก</label>
+      <input id="who" placeholder="ชื่อ-นามสกุล" autocomplete="name">
+    </div>
+    <div class="field">
+      <label for="note">หมายเหตุ <span class="hint" id="noteHint">(ไม่บังคับ)</span></label>
+      <textarea id="note" rows="2" placeholder="เช่น ปรับอุณหภูมิ แจ้งหัวหน้าแล้ว"></textarea>
+      <div class="err" id="noteErr">ค่าอยู่นอกเกณฑ์ กรุณาระบุสิ่งที่ทำหรือแจ้งใคร</div>
+    </div>
+  </section>
 </div>
 
+<div class="bar"><div><button class="save" id="save" type="button">บันทึกข้อมูล</button></div></div>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
-    // เชื่อมต่อกับ Google Apps Script Web App URL ล่าสุดของคุณ
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhpIFeil5EDBn5NQkKkQkW31aJy7c1Guju0tx9TpzPP6WomDxOnKqVb3KSmdqNRvTtNQ/exec";
+document.addEventListener("DOMContentLoaded", function() {
+  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbywk1_-kam4ABbMVCYPW7XOSwWaWrmUKLlGd-kmm6696E60MuS4Tcq2svVT3PsT69rrjQ/exec";
+  var ZONES = ["ห้องยาตึกใหม่", "ห้องยาตึกเก่า", "คลังยา", "ห้องผลิตชั้นบน", "ห้องผลิตชั้นล่าง"];
+  var ROUNDS_DEFAULT = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"14:30 น."}];
+  var ROUNDS_NEW = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"14:30 น."}, {id:"eve", n:"เวรบ่าย", t:"20:30 น."}];
+  var ROUNDS_PROD = [{id:"am", n:"รอบเช้า", t:"09:00 น."}, {id:"pm", n:"รอบบ่าย", t:"16:00 น."}];
 
-    // กำหนดวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD อัตโนมัติ
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    document.getElementById('date').value = `${year}-${month}-${day}`;
+  var WAREHOUSE_FRIDGES = ["T31", "T32", "TH1", "TV1"];
+  var warehouseData = { 
+    "T31": {temp: "", hum: ""}, 
+    "T32": {temp: "", hum: ""}, 
+    "TH1": {temp: "", hum: ""}, 
+    "TV1": {temp: "", hum: ""} 
+  };
+  var activeWarehouseFridge = "T31";
 
-    document.getElementById('tempForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            date: document.getElementById('date').value,
-            location: document.getElementById('location').value,
-            subLocation: document.getElementById('subLocation').value,
-            round: document.getElementById('round').value,
-            fridgeTemp: document.getElementById('fridgeTemp').value,
-            fridgeHumidity: document.getElementById('fridgeHumidity').value,
-            roomTemp: document.getElementById('roomTemp').value,
-            humidity: document.getElementById('humidity').value,
-            status: document.getElementById('status').value,
-            recorder: document.getElementById('recorder').value,
-            note: document.getElementById('note').value
-        };
+  var S = { zone: ZONES[0], round: "am" };
+  var windowRemoteLogs = [];
 
-        try {
-            let response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify(formData),
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-            });
-            let result = await response.json();
-            if(result.status === "success") {
-                alert("บันทึกข้อมูลสำเร็จ!");
-                document.getElementById('tempForm').reset();
-                document.getElementById('date').value = `${year}-${month}-${day}`;
-            } else {
-                alert("เกิดข้อผิดพลาด: " + result.message);
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
-        }
+  function $(i) { return document.getElementById(i); }
+
+  function getActiveRounds() {
+    if (S.zone === "ห้องยาตึกใหม่") return ROUNDS_NEW;
+    if (S.zone.includes("ห้องผลิต")) return ROUNDS_PROD;
+    return ROUNDS_DEFAULT;
+  }
+
+  function drawZones() {
+    var h = $("zones"); if (!h) return; h.innerHTML = "";
+    ZONES.forEach(function(z) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = z;
+      b.setAttribute("aria-pressed", z === S.zone);
+      b.onclick = function() {
+        S.zone = z;
+        var rList = getActiveRounds();
+        if (!rList.some(function(r) { return r.id === S.round; })) { S.round = rList[0].id; }
+        drawZones();
+        updateSubZoneField();
+        updateWarehouseField();
+        updateWhoField();
+        updateFormVisibility();
+        drawRounds();
+      };
+      h.appendChild(b);
     });
-</script>
+  }
 
+  function updateFormVisibility() {
+    var subSel = $("subZoneSelect");
+    var isSubStock = subSel && subSel.value.includes("substock");
+    var fridgeCard = $("fridgeCardSection");
+    var roomCard = $("roomCardSection");
+    var whoSelect = $("who");
+    var selectedWho = whoSelect ? whoSelect.value : "";
+
+    if (S.zone === "ห้องยาตึกใหม่" && selectedWho) {
+      if (selectedWho === "ภัทราภรณ์") {
+        if (fridgeCard) fridgeCard.style.display = "block";
+        if (roomCard) roomCard.style.display = "none";
+        if ($("measuredTitle")) $("measuredTitle").textContent = "ค่าที่วัดได้ (เฉพาะตู้เย็น)";
+      } else if (selectedWho === "ณัชชา" || selectedWho === "เพ็ญลักษณ์") {
+        if (fridgeCard) fridgeCard.style.display = "none";
+        if (roomCard) roomCard.style.display = "block";
+        if ($("measuredTitle")) $("measuredTitle").textContent = isSubStock ? "ค่าที่วัดได้ (ห้อง Substock)" : "ค่าที่วัดได้ (ห้องยา)";
+      }
+    } else {
+      if (isSubStock) {
+        if (fridgeCard) fridgeCard.style.display = "none";
+        if (roomCard) roomCard.style.display = "block";
+        if ($("measuredTitle")) $("measuredTitle").textContent = "ค่าที่วัดได้ (ห้อง Substock)";
+      } else {
+        if (fridgeCard) fridgeCard.style.display = "block";
+        if (roomCard) roomCard.style.display = "block";
+        if ($("measuredTitle")) $("measuredTitle").textContent = "ค่าที่วัดได้";
+      }
+    }
+  }
+
+  function drawRounds() {
+    var h = $("rounds"); if (!h) return; h.innerHTML = "";
+    var activeRounds = getActiveRounds();
+    activeRounds.forEach(function(r) {
+      var currentLoc = S.zone.includes("ห้องผลิต") || S.zone.includes("ห้องยา") && $("subZoneSelect") ? $("subZoneSelect").value : S.zone;
+      var done = windowRemoteLogs.some(function(m) {
+        var itemLoc = m.subLocation || m.location;
+        return m.date === $("date").value && itemLoc === currentLoc && m.round && m.round.includes(r.n);
+      });
+      var b = document.createElement("button"); b.type = "button"; b.className = done ? "done" : "";
+      b.setAttribute("aria-pressed", r.id === S.round);
+      b.innerHTML = "<b>" + r.n + "</b><span>" + (done ? "✓ บันทึกแล้ว" : r.t) + "</span>";
+      b.onclick = function() { S.round = r.id; drawRounds(); };
+      h.appendChild(b);
+    });
+  }
+
+  function updateSubZoneField() {
+    var wrap = $("subZoneField");
+    var sel = $("subZoneSelect");
+    if (!wrap || !sel) return;
+    sel.innerHTML = "";
+    
+    if (S.zone.includes("ห้องผลิต")) {
+      wrap.style.display = "block";
+      if ($("subZoneLabel")) $("subZoneLabel").textContent = "ระบุหมายเลขห้องผลิต";
+      var rooms = S.zone === "ห้องผลิตชั้นบน" ? ['1', '2', '3', '4', '5', '6'] : ['1', '2', '3'];
+      rooms.forEach(function(r) {
+        var opt = document.createElement("option");
+        opt.value = S.zone + " ห้องที่ " + r;
+        opt.textContent = "ห้องที่ " + r;
+        sel.appendChild(opt);
+      });
+    } else if (S.zone === "ห้องยาตึกใหม่" || S.zone === "ห้องยาตึกเก่า") {
+      wrap.style.display = "block";
+      if ($("subZoneLabel")) $("subZoneLabel").textContent = "เลือกพื้นที่ใน" + S.zone;
+      var optMain = document.createElement("option");
+      optMain.value = S.zone;
+      optMain.textContent = S.zone + " (หลัก)";
+      sel.appendChild(optMain);
+      var optSub = document.createElement("option");
+      optSub.value = S.zone + " (substock)";
+      optSub.textContent = S.zone + " - substock";
+      sel.appendChild(optSub);
+    } else {
+      wrap.style.display = "none";
+    }
+    updateFormVisibility();
+  }
+
+  function updateWarehouseField() {
+    var wrap = $("warehouseFridgesField");
+    if (!wrap) return;
+    if (S.zone === "คลังยา") {
+      wrap.style.display = "block";
+      drawWarehouseFridges();
+    } else {
+      wrap.style.display = "none";
+    }
+  }
+
+  function drawWarehouseFridges() {
+    var grid = $("warehouseFridges");
+    if (!grid) return;
+    grid.innerHTML = "";
+    var filledCount = 0;
+    
+    WAREHOUSE_FRIDGES.forEach(function(fName) {
+      var data = warehouseData[fName];
+      var isFilled = data.temp !== "" && !isNaN(data.temp);
+      if (isFilled) filledCount++;
+      
+      var card = document.createElement("div");
+      card.className = "fridge-card" + (isFilled ? " filled" : "");
+      card.setAttribute("aria-pressed", fName === activeWarehouseFridge);
+      card.innerHTML = '<div class="f-top"><span>' + fName + '</span><i class="fa-solid ' + (isFilled ? 'fa-circle-check' : 'fa-circle-dot') + '"></i></div>' +
+                       '<div class="f-status">' + (isFilled ? data.temp + ' °C' : 'ยังไม่กรอก') + '</div>';
+      card.onclick = function() {
+        saveCurrentFridgeInputs();
+        activeWarehouseFridge = fName;
+        drawWarehouseFridges();
+        loadActiveFridgeInputs();
+        if ($("fridgeCardTitle")) $("fridgeCardTitle").textContent = "ตู้เย็น " + activeWarehouseFridge;
+        live();
+      };
+      grid.appendChild(card);
+    });
+    if ($("fridgeCountStatus")) $("fridgeCountStatus").textContent = "กรอกแล้ว " + filledCount + " จาก 4 ตู้";
+  }
+
+  function saveCurrentFridgeInputs() {
+    if (S.zone === "คลังยา") {
+      warehouseData[activeWarehouseFridge].temp = $("fridge") ? $("fridge").value : "";
+      warehouseData[activeWarehouseFridge].hum = $("fridgeHum") ? $("fridgeHum").value : "";
+    }
+  }
+
+  function loadActiveFridgeInputs() {
+    if (S.zone === "คลังยา") {
+      if ($("fridge")) $("fridge").value = warehouseData[activeWarehouseFridge].temp;
+      if ($("fridgeHum")) $("fridgeHum").value = warehouseData[activeWarehouseFridge].hum;
+    }
+  }
+
+  function updateWhoField() {
+    var c = $("whoContainer");
+    if (!c) return;
+    if (S.zone === "ห้องยาตึกใหม่") {
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="ภัทราภรณ์">ภัทราภรณ์</option><option value="ณัชชา">ณัชชา</option><option value="เพ็ญลักษณ์">เพ็ญลักษณ์</option></select>';
+      var whoSel = $("who");
+      if (whoSel) {
+        whoSel.addEventListener("change", function() { updateFormVisibility(); });
+      }
+    } else if (S.zone === "ห้องยาตึกเก่า") {
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="ระพีพรรณ">ระพีพรรณ</option><option value="รณชัย">รณชัย</option><option value="ปริยฉัตร">ปริยฉัตร</option><option value="ดาราณี">ดาราณี</option></select>';
+    } else if (S.zone === "คลังยา") {
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><select id="who" required><option value="" disabled selected>-- เลือกชื่อผู้บันทึก --</option><option value="พงศ์พันธ์">พงศ์พันธ์</option><option value="นาวิน">นาวิน</option></select>';
+    } else {
+      c.innerHTML = '<label for="who">ผู้บันทึก</label><input id="who" placeholder="ชื่อ-นามสกุล / ตำแหน่ง" autocomplete="name">';
+    }
+    updateFormVisibility();
+  }
+
+  drawZones();
+  updateSubZoneField();
+  updateWarehouseField();
+  updateWhoField();
+  drawRounds();
+
+  function loadRemoteLogs() {
+    try {
+      fetch(WEB_APP_URL)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (Array.isArray(data)) {
+            windowRemoteLogs = data;
+            if ($("historyCount")) $("historyCount").textContent = "ประวัติ (" + data.length + ")";
+            drawRounds();
+          }
+        })
+        .catch(function(e) { console.log("Offline mode or fetch error", e); });
+    } catch(err) { console.log(err); }
+  }
+  loadRemoteLogs();
+
+  function iso(d) { var m = d.getMonth() + 1, x = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (x < 10 ? "0" : "") + x; }
+  if ($("date")) {
+    $("date").value = iso(new Date());
+    $("date").max = iso(new Date());
+  }
+  function showDate() {
+    if (!$("date") || !$("dateShown")) return;
+    var p = $("date").value.split("-");
+    if (p.length === 3) {
+      var y = parseInt(p[0]) + 543;
+      $("dateShown").textContent = p[2] + "/" + p[1] + "/" + (String(y).slice(2));
+    } else {
+      $("dateShown").textContent = $("date").value;
+    }
+  }
+  if ($("date")) {
+    $("date").addEventListener("change", function() { showDate(); drawRounds(); });
+    showDate();
+  }
+
+  if ($("historyBtn")) {
+    $("historyBtn").addEventListener("click", function() { window.open("https://docs.google.com/spreadsheets/d/1OXD__jfv2o6cM8FyG5DzRFFqV3bajg5LoCEDnmjn1SA/view", "_blank"); });
+  }
+
+  if ($("subZoneSelect")) {
+    $("subZoneSelect").addEventListener("change", function() { updateFormVisibility(); drawRounds(); });
+  }
+
+  function num(v) { if (v === undefined || v === null) return null; var s = String(v).trim().replace(",", "."); if (s === "" || isNaN(s)) return null; return parseFloat(s); }
+  function fridgeStat(v) { if (v === null) return null; if (v < 2 || v > 8) return "bad"; if (v < 2.5 || v > 7.5) return "warn"; return "ok"; }
+  function humStat(v) { if (v === null) return null; return (v < 30 || v > 70) ? "bad" : (v < 35 || v > 65) ? "warn" : "ok"; }
+  var msg = { ok: "อยู่ในเกณฑ์ปกติ", warn: "ใกล้ขอบเกณฑ์ ควรเฝ้าระวัง", bad: "นอกเกณฑ์ ต้องแก้ไขและแจ้งหัวหน้า" };
+  function badge(el, st, txt) { if (!el) return; el.className = "badge" + (st ? " " + st : ""); el.textContent = st ? txt : ""; }
+
+  function live() {
+    var f = num($("fridge") ? $("fridge").value : null), st = fridgeStat(f), pin = $("pin");
+    saveCurrentFridgeInputs();
+    if (S.zone === "คลังยา") drawWarehouseFridges();
+    if (pin) {
+      if (f === null) { pin.style.display = "none"; } else { pin.style.display = "block"; pin.style.left = Math.max(0, Math.min(12, f)) / 12 * 100 + "%"; }
+    }
+    if ($("fridge") && $("fridge").parentNode) $("fridge").parentNode.dataset.st = st || "";
+    badge($("fridgeBadge"), st, msg[st] + (st === "bad" ? (f < 2 ? " (ต่ำกว่า 2.0)" : " (สูงกว่า 8.0)") : ""));
+    var h = num($("hum") ? $("hum").value : null), hs = humStat(h);
+    if ($("hum") && $("hum").parentNode) $("hum").parentNode.dataset.st = hs || "";
+    badge($("humBadge"), hs, "ความชื้นห้องยา" + msg[hs]);
+    var need = st === "bad" || hs === "bad";
+    if ($("noteHint")) $("noteHint").textContent = need ? "(จำเป็น เพราะค่านอกเกณฑ์)" : "(ไม่บังคับ)";
+  }
+  ["fridge", "fridgeHum", "hum", "room"].forEach(function(i) { if ($(i)) { $(i).addEventListener("input", function() { live(); if ($(i + "Err")) $(i + "Err").classList.remove("show"); }); } });
+
+  var tt; function toast(t) { 
+    var e = $("toast"); if (!e) return; 
+    e.textContent = t; 
+    e.classList.add("show"); 
+    if (typeof confetti === "function") {
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+    }
+    clearTimeout(tt); 
+    tt = setTimeout(function() { e.classList.remove("show"); }, 2500); 
+  }
+
+  if ($("save")) {
+    $("save").addEventListener("click", function() {
+      saveCurrentFridgeInputs();
+      var r = num($("room") ? $("room").value : null), h = num($("hum") ? $("hum").value : null), ok = true, first = null;
+      function bad(id) { if ($(id)) { $(id).classList.add("show"); } ok = false; if (!first) first = id.replace("Err", ""); }
+      
+      var subSel = $("subZoneSelect");
+      var isSubStock = subSel && subSel.value.includes("substock");
+      var whoSelect = $("who");
+      var selectedWho = whoSelect ? whoSelect.value : "";
+      var isPatraphon = (S.zone === "ห้องยาตึกใหม่" && selectedWho === "ภัทราภรณ์");
+      var isNatchaOrPhen = (S.zone === "ห้องยาตึกใหม่" && (selectedWho === "ณัชชา" || selectedWho === "เพ็ญลักษณ์"));
+
+      if (S.zone === "คลังยา") {
+        var missing = WAREHOUSE_FRIDGES.some(function(fName) { return num(warehouseData[fName].temp) === null; });
+        if (missing) {
+          alert("กรุณากรอกอุณหภูมิตู้เย็นให้ครบทั้ง 4 ตู้ (T31, T32, TH1, TV1)");
+          ok = false;
+          first = "fridge";
+        }
+      } else if (!isNatchaOrPhen && !isSubStock) {
+        var f = num($("fridge") ? $("fridge").value : null);
+        if (f === null) bad("fridgeErr");
+      }
+      
+      if (!isPatraphon) {
+        if (r === null) bad("roomErr"); 
+        if (h === null) bad("humErr");
+      }
+      
+      var hasBad = false;
+      if (S.zone === "คลังยา") {
+        WAREHOUSE_FRIDGES.forEach(function(fName) {
+          var val = num(warehouseData[fName].temp);
+          if (val < 2 || val > 8) hasBad = true;
+        });
+      } else if (!isNatchaOrPhen && !isSubStock) {
+        var f = num($("fridge") ? $("fridge").value : null);
+        if (f < 2 || f > 8) hasBad = true;
+      }
+      if (!isPatraphon) {
+        var hs = humStat(h);
+        if (hs === "bad") hasBad = true;
+      }
+
+      if (hasBad && $("note") && !$("note").value.trim()) { bad("noteErr"); if (first === null) first = "note"; }
+      if (!ok) { if (first && $(first)) { $(first).focus(); } return; }
+
+      var zoneVal = S.zone;
+      var subLocVal = (zoneVal.includes("ห้องผลิต") || zoneVal.includes("ห้องยา")) && $("subZoneSelect") ? $("subZoneSelect").value : zoneVal;
+      var targetTab = zoneVal.includes("ห้องผลิต") ? "ห้องผลิต" : zoneVal;
+      var activeRounds = getActiveRounds();
+      var roundObj = activeRounds.filter(function(x) { return x.id === S.round; })[0];
+      var roundText = roundObj ? (roundObj.n + " (" + roundObj.t + ")") : S.round;
+      var statusText = hasBad ? "ผิดปกติ" : "ปกติ";
+      var recorderVal = whoSelect ? whoSelect.value.trim() : "";
+
+      var payloads = [];
+      if (S.zone === "คลังยา") {
+        WAREHOUSE_FRIDGES.forEach(function(fName) {
+          payloads.push({
+            date: $("date") ? $("date").value : "",
+            location: targetTab,
+            subLocation: zoneVal + " (" + fName + ")",
+            round: roundText,
+            fridgeTemp: num(warehouseData[fName].temp),
+            fridgeHumidity: num(warehouseData[fName].hum),
+            roomTemp: r,
+            humidity: h,
+            status: (num(warehouseData[fName].temp) < 2 || num(warehouseData[fName].temp) > 8 || humStat(h) === "bad") ? "ผิดปกติ" : "ปกติ",
+            recorder: recorderVal,
+            note: $("note") ? $("note").value.trim() : ""
+          });
+        });
+      } else {
+        payloads.push({
+          date: $("date") ? $("date").value : "",
+          location: targetTab,
+          subLocation: subLocVal,
+          round: roundText,
+          fridgeTemp: (isNatchaOrPhen || isSubStock) ? null : num($("fridge") ? $("fridge").value : null),
+          fridgeHumidity: (isNatchaOrPhen || isSubStock) ? null : num($("fridgeHum") ? $("fridgeHum").value : null),
+          roomTemp: isPatraphon ? null : r,
+          humidity: isPatraphon ? null : h,
+          status: statusText,
+          recorder: recorderVal,
+          note: $("note") ? $("note").value.trim() : ""
+        });
+      }
+
+      toast("ขอบคุณที่ให้ความร่วมมือจ้า");
+      
+      if (S.zone === "คลังยา") {
+        warehouseData = { "T31": {temp: "", hum: ""}, "T32": {temp: "", hum: ""}, "TH1": {temp: "", hum: ""}, "TV1": {temp: "", hum: ""} };
+        drawWarehouseFridges();
+      }
+      ["fridge", "fridgeHum", "room", "hum", "note"].forEach(function(i) { if ($(i)) { $(i).value = ""; } });
+      live();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      drawRounds();
+
+      payloads.forEach(function(payload, idx) {
+        setTimeout(function() {
+          fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }).catch(function(err) { console.error(err); });
+        }, idx * 300);
+      });
+    });
+  }
+});
+</script>
 </body>
 </html>
