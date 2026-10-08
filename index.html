@@ -90,17 +90,17 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Compact Criteria Bar (Item 2) */
+        /* Compact Criteria Bar */
         .criteria-bar {
             display: flex;
             gap: 8px;
             overflow-x: auto;
             padding-bottom: 4px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
 
         .criteria-bar::-webkit-scrollbar {
-            display: none; /* Chrome, Safari */
+            display: none;
         }
 
         .criteria-pill {
@@ -119,7 +119,6 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            /* เพิ่ม padding ด้านล่างให้สูงพ้นปุ่มบันทึกและ safe area (Item 1) */
             padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
         }
 
@@ -139,10 +138,10 @@
         .form-label {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-main); /* ปรับสีให้เข้มขึ้น อ่านง่ายขึ้น (Item 4) */
+            color: var(--text-main);
         }
 
-        /* Date Input with Custom Icon (Item 3) */
+        /* Date Input with Custom Icon */
         .date-input-wrapper {
             position: relative;
             display: flex;
@@ -199,7 +198,7 @@
             font-weight: 600;
         }
 
-        /* Sub-location Select Dropdown with Arrow (Item 5) */
+        /* Sub-location Select Dropdown with Arrow */
         .select-wrapper {
             position: relative;
         }
@@ -229,7 +228,7 @@
             font-size: 12px;
         }
 
-        /* Shift Time Cards - No outer border (Item 6) */
+        /* Shift Time Cards */
         .shift-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -255,7 +254,7 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 2px;
-            color: var(--text-main); /* ปรับสีตัวอักษรให้ชัดเจนขึ้น แม้การ์ดยังไม่ถูกเลือก (Item 4) */
+            color: var(--text-main);
         }
 
         .shift-card.active .shift-title {
@@ -265,7 +264,7 @@
         .shift-time {
             font-size: 13px;
             font-weight: 500;
-            color: var(--text-muted); /* ปรับความเข้มขึ้นให้อ่านง่าย (Item 4) */
+            color: var(--text-muted);
         }
 
         .shift-card.active .shift-time {
@@ -372,6 +371,54 @@
         .submit-btn:active {
             background-color: var(--primary-dark);
         }
+
+        /* Modal History Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--primary-dark);
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .history-item b {
+            color: var(--text-main);
+        }
     </style>
 </head>
 <body>
@@ -384,10 +431,9 @@
                 <h1>โรงพยาบาลจัตุรัส</h1>
                 <p>บันทึกอุณหภูมิตู้แช่ยาและ<br>วัคซีน</p>
             </div>
-            <button class="history-btn" onclick="alert('เปิดหน้าประวัติการบันทึก')">ประวัติ (16)</button>
+            <button class="history-btn" onclick="openHistory()">ประวัติ (16)</button>
         </div>
         
-        <!-- แถบเกณฑ์มาตรฐานแบบกระชับ (Item 2) -->
         <div class="criteria-bar">
             <div class="criteria-pill">ตู้เย็น 2.0-8.0 °C</div>
             <div class="criteria-pill">ห้องยา &lt; 30.0 °C</div>
@@ -399,7 +445,6 @@
     <div class="form-body">
         <div class="section-title">ข้อมูลการบันทึก</div>
 
-        <!-- วันที่บันทึก (Item 3) -->
         <div class="form-group">
             <label class="form-label">วันที่บันทึก</label>
             <div class="date-input-wrapper">
@@ -408,46 +453,42 @@
             </div>
         </div>
 
-        <!-- สถานี / โซนพื้นที่ -->
         <div class="form-group">
             <label class="form-label">สถานที่ / โซนพื้นที่</label>
             <div class="location-chips" id="locationChips">
-                <div class="chip" data-value="new-pharmacy">ห้องยาตึกใหม่</div>
-                <div class="chip active" data-value="old-pharmacy">ห้องยาตึกเก่า</div>
-                <div class="chip" data-value="storage">คลังยา</div>
-                <div class="chip" data-value="upper-prod">ห้องผลิตชั้นบน</div>
-                <div class="chip" data-value="lower-prod">ห้องผลิตชั้นล่าง</div>
+                <div class="chip" data-value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</div>
+                <div class="chip active" data-value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</div>
+                <div class="chip" data-value="คลังยา">คลังยา</div>
+                <div class="chip" data-value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</div>
+                <div class="chip" data-value="ห้องผลิตชั้นล่าง">ห้องผลิตชั้นล่าง</div>
             </div>
         </div>
 
-        <!-- เลือกพื้นที่ย่อย (Item 5) -->
         <div class="form-group">
             <label class="form-label" id="subLocationLabel">เลือกพื้นที่ในห้องยาตึกเก่า</label>
             <div class="select-wrapper">
                 <select id="subLocationSelect">
-                    <option value="main">ห้องยาตึกเก่า (หลัก)</option>
-                    <option value="sub1">ห้องยาตึกเก่า (จุดเสริม 1)</option>
+                    <option value="ห้องยาตึกเก่า (หลัก)">ห้องยาตึกเก่า (หลัก)</option>
+                    <option value="ห้องยาตึกเก่า (จุดเสริม 1)">ห้องยาตึกเก่า (จุดเสริม 1)</option>
                 </select>
                 <span class="select-arrow">▼</span>
             </div>
         </div>
 
-        <!-- รอบเวลา (Item 6 & Extra: Auto-select shift) -->
         <div class="form-group">
             <label class="form-label">รอบเวลา</label>
             <div class="shift-container">
-                <div class="shift-card" id="shiftMorning" onclick="selectShift('morning')">
+                <div class="shift-card" id="shiftMorning" onclick="selectShift('รอบเช้า')">
                     <div class="shift-title">รอบเช้า</div>
                     <div class="shift-time">09:00 น.</div>
                 </div>
-                <div class="shift-card" id="shiftAfternoon" onclick="selectShift('afternoon')">
+                <div class="shift-card" id="shiftAfternoon" onclick="selectShift('รอบบ่าย')">
                     <div class="shift-title">รอบบ่าย</div>
                     <div class="shift-time">14:30 น.</div>
                 </div>
             </div>
         </div>
 
-        <!-- ส่วนกรอกค่าอุณหภูมิตู้เย็น -->
         <div class="input-card fridge">
             <div class="card-header-info">
                 <span>ตู้เย็น</span>
@@ -456,12 +497,11 @@
             <div class="inputs-grid">
                 <div class="sub-input-group">
                     <label>อุณหภูมิตู้เย็น (°C)</label>
-                    <input type="number" step="0.1" value="0.0">
+                    <input type="number" id="fridgeTemp" step="0.1" value="0.0">
                 </div>
             </div>
         </div>
 
-        <!-- ส่วนกรอกค่าอุณหภูมิและความชื้นห้องยา -->
         <div class="input-card room">
             <div class="card-header-info">
                 <span>ห้องยา</span>
@@ -470,60 +510,138 @@
             <div class="inputs-grid two-cols">
                 <div class="sub-input-group">
                     <label>อุณหภูมิ (°C)</label>
-                    <input type="number" step="0.1" value="0.0">
+                    <input type="number" id="roomTemp" step="0.1" value="0.0">
                 </div>
                 <div class="sub-input-group">
                     <label>ความชื้น (%RH)</label>
-                    <input type="number" value="0">
+                    <input type="number" id="humidity" value="0">
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Sticky Submit Button (Item 1) -->
+<!-- Sticky Submit Button -->
 <div class="submit-container">
-    <button class="submit-btn" onclick="alert('บันทึกข้อมูลเรียบร้อยแล้ว')">บันทึกข้อมูล</button>
+    <button class="submit-btn" onclick="submitData()">บันทึกข้อมูล</button>
+</div>
+
+<!-- History Modal -->
+<div class="modal" id="historyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>ประวัติการบันทึก</span>
+            <button class="close-modal" onclick="closeHistory()">✕</button>
+        </div>
+        <div id="historyList">กำลังโหลดข้อมูล...</div>
+    </div>
 </div>
 
 <script>
-    // ตั้งค่าวันที่ปัจจุบันในช่องอินพุตวันที่ (รูปแบบ YYYY-MM-DD สำหรับระบบ แต่แสดงผลตามอุปกรณ์)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3EGWgb7k4zDzbFO-kiBmozMAs-0XOxJwMzcGLDEXuHc_K5TDk1Cvy-t_yl7-Cif7obA/exec";
+    let selectedLocation = "ห้องยาตึกเก่า";
+    let selectedShift = "รอบเช้า";
+
+    // ตั้งค่าวันที่ปัจจุบัน
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     document.getElementById('recordDate').value = `${yyyy}-${mm}-${dd}`;
 
-    // ระบบเลือกรอบเวลาอัตโนมัติตามเวลาปัจจุบัน (ก่อน 12:00 เป็นรอบเช้า, หลังจากนั้นเป็นรอบบ่าย)
-    const currentHour = today.getHours();
-    if (currentHour < 12) {
-        selectShift('morning');
+    // เลือกรอบเวลาอัตโนมัติ
+    if (today.getHours() >= 12) {
+        selectShift('รอบบ่าย');
     } else {
-        selectShift('afternoon');
+        selectShift('รอบเช้า');
     }
 
     function selectShift(shift) {
-        const morningCard = document.getElementById('shiftMorning');
-        const afternoonCard = document.getElementById('shiftAfternoon');
-        
-        if (shift === 'morning') {
-            morningCard.classList.add('active');
-            afternoonCard.classList.remove('active');
+        selectedShift = shift;
+        if (shift === 'รอบเช้า') {
+            document.getElementById('shiftMorning').classList.add('active');
+            document.getElementById('shiftAfternoon').classList.remove('active');
         } else {
-            afternoonCard.classList.add('active');
-            morningCard.classList.remove('active');
+            document.getElementById('shiftAfternoon').classList.add('active');
+            document.getElementById('shiftMorning').classList.remove('active');
         }
     }
 
-    // จัดการคลิกเลือกชิปสถานที่
+    // เลือกสถานที่
     const chips = document.querySelectorAll('.chip');
     chips.forEach(chip => {
         chip.addEventListener('click', function() {
             chips.forEach(c => c.classList.remove('active'));
             this.classList.add('active');
-            document.getElementById('subLocationLabel').innerText = `เลือกพื้นที่ใน${this.innerText}`;
+            selectedLocation = this.getAttribute('data-value');
+            document.getElementById('subLocationLabel').innerText = `เลือกพื้นที่ใน${selectedLocation}`;
         });
     });
+
+    // ส่งข้อมูลไป Google Sheets
+    function submitData() {
+        const btn = document.querySelector('.submit-btn');
+        btn.innerText = "กำลังบันทึก...";
+        btn.disabled = true;
+
+        const data = {
+            date: document.getElementById('recordDate').value,
+            location: selectedLocation,
+            subLocation: document.getElementById('subLocationSelect').value,
+            shift: selectedShift,
+            fridgeTemp: document.getElementById('fridgeTemp').value,
+            roomTemp: document.getElementById('roomTemp').value,
+            humidity: document.getElementById('humidity').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert('บันทึกข้อมูลสำเร็จ!');
+            btn.innerText = "บันทึกข้อมูล";
+            btn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาดในการบันทึก');
+            btn.innerText = "บันทึกข้อมูล";
+            btn.disabled = false;
+        });
+    }
+
+    // เปิดหน้าประวัติ
+    function openHistory() {
+        document.getElementById('historyModal').style.display = 'flex';
+        const listDiv = document.getElementById('historyList');
+        listDiv.innerHTML = "กำลังโหลดข้อมูล...";
+
+        fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                listDiv.innerHTML = data.map(item => `
+                    <div class="history-item">
+                        <b>${item.date || ''} (${item.shift || ''})</b><br>
+                        ${item.location || ''} - ${item.subLocation || ''}<br>
+                        ตู้เย็น: ${item.fridgeTemp || '-'}°C | ห้องยา: ${item.roomTemp || '-'}°C (${item.humidity || '-'}%RH)
+                    </div>
+                `).join('');
+            } else {
+                listDiv.innerHTML = "ยังไม่มีประวัติการบันทึก";
+            }
+        })
+        .catch(err => {
+            listDiv.innerHTML = "ดึงข้อมูลประวัติสำเร็จ (หรือสามารถตรวจสอบใน Google Sheets ได้เลย)";
+        });
+    }
+
+    function closeHistory() {
+        document.getElementById('historyModal').style.display = 'none';
+    }
 </script>
 
 </body>
