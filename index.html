@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PharmaTemp</title>
+<title>PharmaTemp - โรงพยาบาลจัตุรัส</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -33,32 +33,35 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 .top h1{margin:0;font-size:18px;font-weight:700;line-height:1.2}
 .top small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
 .sp{flex:1}
-.ib{flex:none;min-width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;font:inherit;font-size:15px;font-weight:600;padding:0 12px}
+.ib{flex:none;min-width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;font:inherit;font-size:15px;font-weight:600;padding:0 12px;cursor:pointer}
 .ico-sun{display:none}
 [data-theme="dark"] .ico-sun{display:block}
 [data-theme="dark"] .ico-moon{display:none}
+.nav-tabs{display:flex;gap:8px;margin-top:16px}
+.nav-tab{flex:1;height:46px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--muted);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.nav-tab.active{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
 .hero{position:relative;overflow:hidden;margin-top:16px;padding:18px;border-radius:26px;color:#fff;background:linear-gradient(135deg,var(--h1),var(--h2));box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .hero::after{content:"";position:absolute;right:-40px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.10)}
 .hero small{display:block;font-size:14px;opacity:.85}
 .hero b{display:block;font-size:22px;font-weight:700;line-height:1.25;margin-top:2px}
-.hero .chg{position:relative;display:inline-block;margin-top:10px;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.18);font-size:14px;font-weight:600}
-.hero .chg input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+.hero .chg{position:relative;display:inline-block;margin-top:10px;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.18);font-size:14px;font-weight:600;cursor:pointer}
+.hero .chg input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .ring{position:relative;z-index:1;flex:none;width:84px;height:84px}
 .ring svg{transform:rotate(-90deg)}
 .ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:18px;font-weight:700}
 .cap{margin:24px 2px 10px;font-size:15px;font-weight:600;color:var(--muted)}
 .seg{position:relative;display:grid;grid-template-columns:repeat(var(--n,2),1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px}
 .seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/var(--n,2));background:var(--acc);border-radius:14px;transition:transform .25s;transform:translateX(calc(var(--r,0)*100%))}
-.seg button{position:relative;z-index:1;height:54px;border:0;background:none;color:var(--muted);font:inherit;font-size:16px;font-weight:600;line-height:1.15}
+.seg button{position:relative;z-index:1;height:54px;border:0;background:none;color:var(--muted);font:inherit;font-size:16px;font-weight:600;line-height:1.15;cursor:pointer}
 .seg button small{display:block;font-size:12px;font-weight:500;opacity:.85}
 .seg button[aria-pressed=true]{color:var(--accInk)}
 .chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:46px;padding:0 16px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600}
+.chip{flex:none;min-height:46px;padding:0 16px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
 .ar{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .ar.on{display:grid}
-.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600}
+.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc)}
 .card{margin-bottom:12px;border-radius:22px;padding:14px;border:1.5px solid var(--cl);background:var(--cb);box-shadow:var(--shadow);transition:border-color .2s,background .2s}
 .card.f{--cb:var(--fb);--cl:var(--fl);--ca:var(--fa)}
@@ -89,7 +92,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .field:focus{outline:0;border-color:var(--acc)}
 .field::placeholder{color:var(--muted);opacity:.7}
 .people{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-.people button{min-height:56px;padding:6px 12px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;text-align:left;line-height:1.25}
+.people button{min-height:56px;padding:6px 12px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;text-align:left;line-height:1.25;cursor:pointer}
 .people button small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 .people button[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
 .people button[aria-pressed=true] small{color:var(--accInk);opacity:.85}
@@ -97,13 +100,17 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .hint.on{display:block}
 .hint.on+textarea{border-color:var(--bad)}
 .bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + var(--safe-b));background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
-.save{display:block;width:100%;max-width:448px;margin:0 auto;height:58px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;font:inherit;font-size:18px;font-weight:700;box-shadow:var(--shadow)}
+.save{display:block;width:100%;max-width:448px;margin:0 auto;height:58px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;font:inherit;font-size:18px;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
 .save:active{transform:scale(.985)}
-.save:disabled{background:var(--surface2);color:var(--muted);box-shadow:none;border:1px solid var(--line)}
+.save:disabled{background:var(--surface2);color:var(--muted);box-shadow:none;border:1px solid var(--line);cursor:not-allowed}
 .save.warn{background:var(--bad)}
 [data-theme="dark"] .save.warn{color:#2a0707}
-.toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,14px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-size:15px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,14px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-size:15px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;z-index:999}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+.history-container{display:none;margin-top:16px}
+.history-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.history-card h3{margin:0 0 6px;font-size:16px;color:var(--h1)}
+.history-card p{margin:4px 0;font-size:14px;color:var(--muted)}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -118,40 +125,58 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <svg class="ico-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       <svg class="ico-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
-    <button class="ib" type="button">16</button>
   </div>
 
-  <section class="hero">
-    <div style="position:relative;z-index:1">
-      <small id="rl"></small><b id="dv"></b>
-      <label class="chg">เปลี่ยนวัน<input type="date" id="date" aria-label="เปลี่ยนวันที่"></label>
+  <div class="nav-tabs">
+    <button class="nav-tab active" type="button" id="tab-record" onclick="switchTab('record')">บันทึกข้อมูล</button>
+    <button class="nav-tab" type="button" id="tab-history" onclick="switchTab('history')">ดูข้อมูลย้อนหลัง</button>
+  </div>
+
+  <div id="section-record">
+    <section class="hero">
+      <div style="position:relative;z-index:1">
+        <small id="rl"></small><b id="dv"></b>
+        <label class="chg">เปลี่ยนวัน<input type="date" id="date" aria-label="เปลี่ยนวันที่"></label>
+      </div>
+      <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
+    </section>
+
+    <p class="cap">รอบเวลา</p>
+    <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
+
+    <p class="cap">สถานที่</p>
+    <div class="chips" id="zones"></div>
+    <div class="ar" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+
+    <p class="cap">ค่าที่วัดได้</p>
+    <div id="list"></div>
+
+    <p class="cap">ผู้บันทึก</p>
+    <div class="people" id="people" role="group" aria-label="เลือกผู้บันทึก"></div>
+    <input class="field" id="who" type="text" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก">
+
+    <p class="cap">หมายเหตุ</p>
+    <p class="hint" id="hint">มีค่านอกเกณฑ์ ระบุสิ่งที่ทำหรือคนที่แจ้ง</p>
+    <textarea class="field" id="note" placeholder="หมายเหตุ (ถ้ามี)" aria-label="หมายเหตุ"></textarea>
+  </div>
+
+  <div id="section-history" class="history-container">
+    <p class="cap">ประวัติการบันทึกทั้งหมด</p>
+    <div style="margin-bottom: 12px;">
+      <button class="nav-tab active" type="button" onclick="loadHistory()" style="width: 100%;">🔄 โหลด/รีเฟรชข้อมูลใหม่</button>
     </div>
-    <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
-  </section>
-
-  <p class="cap">รอบเวลา</p>
-  <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
-
-  <p class="cap">สถานที่</p>
-  <div class="chips" id="zones"></div>
-  <div class="ar" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
-
-  <p class="cap">ค่าที่วัดได้</p>
-  <div id="list"></div>
-
-  <p class="cap">ผู้บันทึก</p>
-  <div class="people" id="people" role="group" aria-label="เลือกผู้บันทึก"></div>
-  <input class="field" id="who" type="text" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก">
-
-  <p class="cap">หมายเหตุ</p>
-  <p class="hint" id="hint">มีค่านอกเกณฑ์ ระบุสิ่งที่ทำหรือคนที่แจ้ง</p>
-  <textarea class="field" id="note" placeholder="หมายเหตุ (ถ้ามี)" aria-label="หมายเหตุ"></textarea>
+    <div id="history-list">
+      <p style="text-align:center; color:var(--muted);">กำลังโหลดข้อมูล...</p>
+    </div>
+  </div>
 </div>
 
-<div class="bar"><button class="save" type="button" id="save" disabled></button></div>
+<div class="bar" id="bar-save"><button class="save" type="button" id="save" disabled></button></div>
 <div class="toast" id="toast" role="status">บันทึกข้อมูลแล้ว</div>
 
 <script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzPHn2oZs-h5hqM4XsWpeaCZ1R8V21IycWhX_3B2UKJjTAoz9kKLzFn9q-ZQgjZZgZItQ/exec"; 
+
 const ZONES=[["ห้องยาตึกใหม่",["ห้องหลัก","Substock"]],["ห้องยาตึกเก่า",["ห้องหลัก","Substock"]],["คลังยา",["คลังยา (หลัก)"]],["ห้องผลิตชั้นบน",["ห้องผลิตชั้นบน"]],["ห้องผลิตชั้นล่าง",["ห้องผลิตชั้นล่าง"]]];
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
 let round=now.getHours()<12?0:now.getHours()<18?1:2, zone=0, area=0; const saved={};
@@ -161,6 +186,7 @@ $("#theme").addEventListener("click",()=>{
   root.setAttribute("data-theme",next);
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
+
 const STAFF={0:[["ภัทราภรณ์","เช็คตู้เย็น",null],["เพ็ญลักษณ์","ห้องหลัก",0],["ณัชชา","Substock",1]],1:[["ระพีพรรณ"],["รณชัย"]],2:[["พงศ์พันธ์"],["นาวิน"]]};
 let who="";
 const getWho=()=>STAFF[zone]?who:$("#who").value.trim();
@@ -249,12 +275,101 @@ document.addEventListener("input",e=>{if(e.target.matches(".m input,#who"))updat
 document.addEventListener("focusin",e=>{if(e.target.matches(".m input"))setTimeout(()=>e.target.scrollIntoView({block:"center",behavior:"smooth"}),250)});
 document.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.matches(".m input"))return;
   const a=[...document.querySelectorAll(".m input")],n=a[a.indexOf(e.target)+1];n?n.focus():e.target.blur()});
-$("#save").addEventListener("click",()=>{
-  try{localStorage.setItem("pt-who-"+zone,getWho())}catch(e){}
-  saved[key(zone,area)]=true;chips();areas();build();
-  const t=$("#toast");t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1800);scrollTo({top:0,behavior:"smooth"});
+
+function switchTab(tab) {
+  if(tab === 'record') {
+    $("#tab-record").classList.add("active");
+    $("#tab-history").classList.remove("active");
+    $("#section-record").style.display = "block";
+    $("#section-history").style.display = "none";
+    $("#bar-save").style.display = "block";
+  } else {
+    $("#tab-history").classList.add("active");
+    $("#tab-record").classList.remove("active");
+    $("#section-record").style.display = "none";
+    $("#section-history").style.display = "block";
+    $("#bar-save").style.display = "none";
+    loadHistory();
+  }
+}
+
+async function loadHistory() {
+  const historyList = $("#history-list");
+  historyList.innerHTML = `<p style="text-align:center; color:var(--muted);">กำลังโหลดข้อมูลจาก Google Sheets...</p>`;
+  try {
+    let response = await fetch(APPS_SCRIPT_URL);
+    let data = await response.json();
+    if(!data || data.length === 0) {
+      historyList.innerHTML = `<p style="text-align:center; color:var(--muted);">ยังไม่มีประวัติการบันทึกข้อมูล</p>`;
+      return;
+    }
+    historyList.innerHTML = data.map(item => `
+      <div class="history-card">
+        <h3>📍 ${item.location} (${item.subLocation || '-'})</h3>
+        <p><b>📅 วันที่:</b> ${item.date} | <b>⏰ รอบ:</b> ${item.shift}</p>
+        <p><b>🌡️ อุณหภูมิตู้เย็น:</b> ${item.fridgeTemp !== "" ? item.fridgeTemp + " °C" : "-"} | <b>🌡️ อุณหภูมิห้อง:</b> ${item.roomTemp !== "" ? item.roomTemp + " °C" : "-"} | <b>💧 ความชื้น:</b> ${item.humidity !== "" ? item.humidity + " %RH" : "-"}</p>
+        <p><b>✍️ ผู้บันทึก:</b> ${item.who || "-"} ${item.note ? `| <b>📝 หมายเหตุ:</b> ${item.note}` : ""}</p>
+      </div>
+    `).join("");
+  } catch (err) {
+    historyList.innerHTML = `<p style="text-align:center; color:var(--bad);">เกิดข้อผิดพลาดในการโหลดข้อมูล: ${err.message}</p>`;
+  }
+}
+
+$("#save").addEventListener("click", async ()=>{
+  const saveBtn = $("#save");
+  saveBtn.disabled = true;
+  saveBtn.textContent = "กำลังบันทึก...";
+
+  const inputs = document.querySelectorAll(".m");
+  let fridgeTemp = "", roomTemp = "", humidity = "";
+
+  inputs.forEach(m => {
+    const label = m.querySelector(".ml").textContent;
+    const val = m.querySelector("input").value;
+    if(label.includes("ตู้เย็น") || label.includes("ตู้ T") || label.includes("ตู้ TH") || label.includes("ตู้ TV")) {
+      fridgeTemp = val;
+    } else if(label.includes("อุณหภูมิ")) {
+      roomTemp = val;
+    } else if(label.includes("ความชื้น")) {
+      humidity = val;
+    }
+  });
+
+  const payload = {
+    date: $("#date").value,
+    location: ZONES[zone][0],
+    subLocation: ZONES[zone][1][area],
+    shift: rounds()[round][0],
+    fridgeTemp: fridgeTemp,
+    roomTemp: roomTemp,
+    humidity: humidity,
+    who: getWho(),
+    note: $("#note").value
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    try{localStorage.setItem("pt-who-"+zone,getWho())}catch(e){}
+    saved[key(zone,area)]=true; chips(); areas(); build();
+    
+    const t=$("#toast"); t.classList.add("on"); 
+    setTimeout(()=>t.classList.remove("on"),1800); 
+    scrollTo({top:0,behavior:"smooth"});
+  } catch(err) {
+    alert("บันทึกไม่สำเร็จ: " + err);
+  } finally {
+    update();
+  }
 });
-setRound(round);showDate();people();build();
+
+setRound(round); showDate(); people(); build();
 </script>
 </body>
 </html>
