@@ -3,7 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PharmaTemp - โรงพยาบาลจัตุรัส</title>
+<title>CTRH PharmaTemp</title>
+
+<!-- สำหรับ iOS (iPhone / iPad) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="บันทึกอุณหภูมิ">
+<link rel="apple-touch-icon" href="https://via.placeholder.png?text=Pharma">
+
+<!-- สำหรับ Android (PWA Manifest) -->
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%B8%9A%E0%B8%B9%E0%B8%99%E0%B8%AB%E0%B8%93%E0%B8%B0%E0%B8%A5%E0%B8%B8%E0%B8%A1%E0%B8%B4%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eef7f2%22%2C%22theme_color%22%3A%22%2312b07a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fvia.placeholder.png%3Ftext%3DPharma%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -430,8 +440,10 @@ $("#save").addEventListener("click", ()=>{
 
   inputs.forEach(m => {
     const label = m.querySelector(".ml").textContent;
+    const cardTitle = m.closest(".card") ? m.closest(".card").querySelector(".ch").textContent : "";
     const val = m.querySelector("input").value;
-    if(label.includes("ตู้เย็น") || label.includes("ตู้ T") || label.includes("ตู้ TH") || label.includes("ตู้ TV")) {
+
+    if(label.includes("ตู้เย็น") || cardTitle.includes("ตู้เย็น") || cardTitle.includes("ตู้ T") || cardTitle.includes("ตู้ TH") || cardTitle.includes("ตู้ TV")) {
       fridgeTemp = val;
     } else if(label.includes("อุณหภูมิ")) {
       roomTemp = val;
