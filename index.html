@@ -305,7 +305,7 @@ function build(){
   }
   const fr=name==="คลังยา"?["ตู้ T31","ตู้ T32","ตู้ TH1","ตู้ TV1"].map(fridge).join(""):fridge("ตู้เย็น");
   $("#list").innerHTML=fr+`<div class="card r"><div class="ch">${ICR}ห้องยา</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องยา")+metric(H,"ความชื้น","ห้องยา")}</div></div>`;
-  $("#note").value="";update();
+    $("#note").value="";update();
 }
 
 function update(){
