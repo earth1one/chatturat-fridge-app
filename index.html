@@ -31,4 +31,45 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        .header {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .title-group h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .title-group p {
+            font-size: 13px;
+            color: #d1d5db;
+            line-height: 1.4;
+        }
+
+        .history-btn
