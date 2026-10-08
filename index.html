@@ -2,74 +2,36 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>บันทึกอุณหภูมิตู้แช่ยาและวัคซีน - โรงพยาบาลจัตุรัส</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกอุณหภูมิโรงพยาบาลจัตุรัส</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #2b583f;
-            --primary-dark: #1e3e2b;
-            --primary-light: #437654;
-            --bg-color: #f4f7f5;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #4b5563;
-            --border-color: #d1d5db;
-        }
+        body { font-family: 'Prompt', sans-serif; background: #f4f7f5; margin: 0; padding: 12px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { font-size: 18px; color: #1e3e2b; margin-bottom: 4px; }
+        p { font-size: 13px; color: #4b5563; margin-bottom: 16px; }
+        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 14px; font-weight: 600; color: #1f2937; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; font-family: 'Prompt', sans-serif; }
+        .btn { width: 100%; background: #2b583f; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; font-family: 'Prompt', sans-serif; }
+    </style>
+</head>
+<body>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Prompt', sans-serif;
-        }
+<div class="container">
+    <h1>โรงพยาบาลจัตุรัส</h1>
+    <p>บันทึกอุณหภูมิตู้แช่ยาและวัคซีน</p>
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
+    <div class="form-group">
+        <label>วันที่บันทึก</label>
+        <input type="date" id="recordDate">
+    </div>
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: env(safe-area-inset-bottom, 20px);
-        }
-
-        .header {
-            background-color: var(--primary-dark);
-            color: white;
-            padding: 20px;
-            position: relative;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .title-group h1 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .title-group p {
-            font-size: 13px;
-            color: #d1d5db;
-            line-height: 1.4;
-        }
-
-        .history-btn
+    <div class="form-group">
+        <label>สถานที่</label>
+        <select id="locationSelect">
+            <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
+            <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
+            <option value="คลังยา">คลังยา</option>
+            <option value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</option>
+            <option value="ห้องผลิตชั้น
