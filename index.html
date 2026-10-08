@@ -8,11 +8,11 @@
 <!-- สำหรับ iOS (iPhone / iPad) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="บันทึกอุณหภูมิ">
-<link rel="apple-touch-icon" href="https://via.placeholder.png?text=Pharma">
+<meta name="apple-mobile-web-app-title" content="PharmaTemp">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2965/2965567.png">
 
 <!-- สำหรับ Android (PWA Manifest) -->
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E0%B8%9A%E0%B8%B9%E0%B8%99%E0%B8%AB%E0%B8%93%E0%B8%B0%E0%B8%A5%E0%B8%B8%E0%B8%A1%E0%B8%B4%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eef7f2%22%2C%22theme_color%22%3A%22%2312b07a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fvia.placeholder.png%3Ftext%3DPharma%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eef7f2%22%2C%22theme_color%22%3A%22%2312b07a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2965%2F2965567.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -108,7 +108,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + var(--safe-b));background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
 .save{display:block;width:100%;max-width:448px;margin:0 auto;height:58px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;font:inherit;font-size:18px;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
 .save:active{transform:scale(.985)}
-.save:disabled{background:var(--surface2);color:var(--muted);box-shadow:none;border:1px solid var(--line);cursor:not-allowed}
+.save:disabled{background:var(--acc);color:var(--accInk);box-shadow:var(--shadow);opacity:0.85;cursor:not-allowed}
 .save.warn{background:var(--bad)}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
