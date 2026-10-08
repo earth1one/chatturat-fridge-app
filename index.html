@@ -155,16 +155,17 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">รอบเวลา</p>
     <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
 
+    <!-- ย้ายผู้บันทึกมาไว้ใต้รอบเวลา -->
+    <p class="cap">ผู้บันทึก</p>
+    <div class="people" id="people" role="group" aria-label="เลือกผู้บันทึก"></div>
+    <input class="field" id="who" type="text" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก">
+
     <p class="cap">สถานที่</p>
     <div class="chips" id="zones"></div>
     <div class="ar" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
     <p class="cap">ค่าที่วัดได้</p>
     <div id="list"></div>
-
-    <p class="cap">ผู้บันทึก</p>
-    <div class="people" id="people" role="group" aria-label="เลือกผู้บันทึก"></div>
-    <input class="field" id="who" type="text" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก">
 
     <p class="cap">หมายเหตุ</p>
     <p class="hint" id="hint">มีค่านอกเกณฑ์ ระบุสิ่งที่ทำหรือคนที่แจ้ง</p>
@@ -207,28 +208,30 @@ $("#theme").addEventListener("click",()=>{
 });
 
 const STAFF={0:[["ภัทราภรณ์","เช็คตู้เย็น",null],["เพ็ญลักษณ์","ห้องหลัก",0],["ณัชชา","Substock",1]],1:[["ระพีพรรณ"],["รณชัย"]],2:[["พงศ์พันธ์"],["นาวิน"]]};
-let who="";
+let who="ภัทราภรณ์"; // ค่าเริ่มต้นเป็นภัทราภรณ์
+
 const getWho=()=>STAFF[zone]?who:$("#who").value.trim();
 function people(){
   const s=STAFF[zone], box=$("#people");
   box.style.display=s?"grid":"none";$("#who").style.display=s?"none":"block";
   let last="";try{last=localStorage.getItem("pt-who-"+zone)||""}catch(e){}
   if(!s){who="";$("#who").value=last;return}
-  who=s.some(p=>p[0]===last)?last:"";
+  if(!who && s.length>0) who = s[0][0]; // ตั้งค่าเริ่มต้นถ้ายังไม่มี
   box.innerHTML=s.map(p=>`<button type="button" data-n="${p[0]}" aria-pressed="${p[0]===who}">${p[0]}${p[1]?`<small>${p[1]}</small>`:""}</button>`).join("");
 }
+
 $("#people").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
-  const p=STAFF[zone].find(x=>x[0]===b.dataset.n);who=p[0];
-  const move=p[2]!=null&&p[2]!==area;
-  if(move){area=p[2];areas();build()}
-  people2();update();
+  who=b.dataset.n;
+  people2();
+  build();
+  update();
 });
 function people2(){$("#people").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.n===who))}
 
 $("#date").value=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
 const dstr=()=>new Date($("#date").value+"T00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
-const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
+const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+(zone===0?who:a);
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
@@ -241,13 +244,18 @@ function setRound(i){
   $("#rl").textContent=rs[i][0]+" · "+rs[i][1]+" น.";chips();areas()}
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
-function chips(){$("#zones").innerHTML=ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}${z[1].every((_,k)=>saved[key(i,k)])?" ✓":""}</button>`).join("")}
+function chips(){$("#zones").innerHTML=ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}${ZONES[i][1].every((_,k)=>saved[key(i,k)])?" ✓":""}</button>`).join("")}
 function areas(){
   const a=ZONES[zone][1], box=$("#areas");
-  box.classList.toggle("on",a.length>1);
+  box.classList.toggle("on",zone!==0 && a.length>1); // ถ้าเป็นโซน 0 จะซ่อนปุ่มพื้นที่ย่อยเพราะควบคุมด้วยชื่อผู้บันทึกแทน
   box.innerHTML=a.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}${saved[key(zone,k)]?" ✓":""}</button>`).join("");
 }
-$("#zones").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;zone=+b.dataset.i;area=0;setRound(round);people();build()});
+$("#zones").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  zone=+b.dataset.i;area=0;
+  if(zone===0 && STAFF[0]){ who = STAFF[0][0][0]; }
+  setRound(round);people();build();
+});
 $("#areas").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;area=+b.dataset.k;areas();build()});
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"< 30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
@@ -261,8 +269,24 @@ function metric(t,label,who){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+
 function build(){
   const name=ZONES[zone][0];
+  if(zone === 0){
+    // เงื่อนไขตามผู้บันทึกสำหรับห้องยาตึกใหม่
+    if(who === "ภัทราภรณ์"){
+      $("#list").innerHTML = fridge("ตู้เย็น");
+    } else if(who === "เพ็ญลักษณ์"){
+      $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}ห้องยาหลัก</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องหลัก")+metric(H,"ความชื้น","ห้องหลัก")}</div></div>`;
+    } else if(who === "ณัชชา"){
+      $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
+    } else {
+      $("#list").innerHTML = fridge("ตู้เย็น");
+    }
+    $("#note").value=""; update(); return;
+  }
+
+  // โซนอื่นๆ ปกติ
   if(zone===0&&area===1){
     $("#list").innerHTML=`<div class="card r"><div class="ch">${ICR}ห้องยา (Substock)</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
     $("#note").value="";update();return;
@@ -271,6 +295,7 @@ function build(){
   $("#list").innerHTML=fr+`<div class="card r"><div class="ch">${ICR}ห้องยา</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องยา")+metric(H,"ความชื้น","ห้องยา")}</div></div>`;
   $("#note").value="";update();
 }
+
 function update(){
   const ms=[...document.querySelectorAll(".m")];let n=0,out=0;
   ms.forEach(c=>{
@@ -382,7 +407,7 @@ $("#save").addEventListener("click", async ()=>{
   const payload = {
     date: $("#date").value,
     location: ZONES[zone][0],
-    subLocation: ZONES[zone][1][area],
+    subLocation: zone === 0 ? who : ZONES[zone][1][area],
     shift: rounds()[round][0],
     fridgeTemp: fridgeTemp,
     roomTemp: roomTemp,
