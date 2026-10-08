@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>บันทึกอุณหภูมิตู้แช่ยาและวัคซีน - โรงพยาบาลจัตุรัส</title>
-    <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -47,7 +46,6 @@
             margin-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* Header Styles */
         .header {
             background-color: var(--primary-dark);
             color: white;
@@ -58,4 +56,561 @@
         .header-top {
             display: flex;
             justify-content: space-between;
-            
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .title-group h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .title-group p {
+            font-size: 13px;
+            color: #d1d5db;
+            line-height: 1.4;
+        }
+
+        .history-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .criteria-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .criteria-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .criteria-pill {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            white-space: nowrap;
+            color: #e5e7eb;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .date-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            width: 100%;
+            padding: 12px 16px;
+            padding-right: 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            background: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .custom-calendar-icon {
+            position: absolute;
+            right: 14px;
+            color: var(--primary-color);
+            pointer-events: none;
+            font-size: 18px;
+        }
+
+        .location-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .chip.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 12px 16px;
+            padding-right: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            background: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 12px;
+        }
+
+        .shift-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .shift-card {
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .shift-card.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .shift-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: var(--text-main);
+        }
+
+        .shift-card.active .shift-title {
+            color: white;
+        }
+
+        .shift-time {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .shift-card.active .shift-time {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .input-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-card.fridge {
+            background-color: rgba(67, 118, 84, 0.08);
+            border-color: rgba(67, 118, 84, 0.2);
+        }
+
+        .input-card.room {
+            background-color: rgba(217, 119, 6, 0.06);
+            border-color: rgba(217, 119, 6, 0.2);
+        }
+
+        .card-header-info span:first-child {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .card-header-info span:last-child {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .inputs-grid.two-cols {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .sub-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sub-input-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .sub-input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: 600;
+            background: #fff;
+            color: var(--text-main);
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .submit-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px;
+            background: linear-gradient(to top, rgba(244, 247, 245, 0.95) 70%, rgba(244, 247, 245, 0));
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .submit-btn {
+            width: 100%;
+            max-width: 448px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(43, 88, 63, 0.25);
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--primary-dark);
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .history-item b {
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-top">
+            <div class="title-group">
+                <h1>โรงพยาบาลจัตุรัส</h1>
+                <p>บันทึกอุณหภูมิตู้แช่ยาและ<br>วัคซีน</p>
+            </div>
+            <button class="history-btn" onclick="openHistory()">ประวัติ (16)</button>
+        </div>
+        
+        <div class="criteria-bar">
+            <div class="criteria-pill">ตู้เย็น 2.0-8.0 °C</div>
+            <div class="criteria-pill">ห้องยา &lt; 30.0 °C</div>
+            <div class="criteria-pill">ความชื้น 30-70 %RH</div>
+        </div>
+    </div>
+
+    <div class="form-body">
+        <div class="section-title">ข้อมูลการบันทึก</div>
+
+        <div class="form-group">
+            <label class="form-label">วันที่บันทึก</label>
+            <div class="date-input-wrapper">
+                <input type="date" id="recordDate">
+                <span class="custom-calendar-icon">📅</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">สถานที่ / โซนพื้นที่</label>
+            <div class="location-chips" id="locationChips">
+                <div class="chip" data-value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</div>
+                <div class="chip active" data-value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</div>
+                <div class="chip" data-value="คลังยา">คลังยา</div>
+                <div class="chip" data-value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</div>
+                <div class="chip" data-value="ห้องผลิตชั้นล่าง">ห้องผลิตชั้นล่าง</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" id="subLocationLabel">เลือกพื้นที่ในห้องยาตึกเก่า</label>
+            <div class="select-wrapper">
+                <select id="subLocationSelect">
+                    <option value="ห้องยาตึกเก่า (หลัก)">ห้องยาตึกเก่า (หลัก)</option>
+                    <option value="ห้องยาตึกเก่า (จุดเสริม 1)">ห้องยาตึกเก่า (จุดเสริม 1)</option>
+                </select>
+                <span class="select-arrow">▼</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">รอบเวลา</label>
+            <div class="shift-container">
+                <div class="shift-card" id="shiftMorning" onclick="selectShift('รอบเช้า')">
+                    <div class="shift-title">รอบเช้า</div>
+                    <div class="shift-time">09:00 น.</div>
+                </div>
+                <div class="shift-card" id="shiftAfternoon" onclick="selectShift('รอบบ่าย')">
+                    <div class="shift-title">รอบบ่าย</div>
+                    <div class="shift-time">14:30 น.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-card fridge">
+            <div class="card-header-info">
+                <span>ตู้เย็น</span>
+                <span>ช่วงปกติ 2.0–8.0 °C</span>
+            </div>
+            <div class="inputs-grid">
+                <div class="sub-input-group">
+                    <label>อุณหภูมิตู้เย็น (°C)</label>
+                    <input type="number" id="fridgeTemp" step="0.1" value="0.0">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-card room">
+            <div class="card-header-info">
+                <span>ห้องยา</span>
+                <span>อุณหภูมิต่ำกว่า 30.0 °C · ความชื้น 30–70 %RH</span>
+            </div>
+            <div class="inputs-grid two-cols">
+                <div class="sub-input-group">
+                    <label>อุณหภูมิ (°C)</label>
+                    <input type="number" id="roomTemp" step="0.1" value="0.0">
+                </div>
+                <div class="sub-input-group">
+                    <label>ความชื้น (%RH)</label>
+                    <input type="number" id="humidity" value="0">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="submit-container">
+    <button class="submit-btn" onclick="submitData()">บันทึกข้อมูล</button>
+</div>
+
+<div class="modal" id="historyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>ประวัติการบันทึก</span>
+            <button class="close-modal" onclick="closeHistory()">✕</button>
+        </div>
+        <div id="historyList">กำลังโหลดข้อมูล...</div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5dVBNqQLwdBZtLd3-eTqisiEuNivOnO7krcLNSO7TKJw2Dnji-3CwgxtTlF0X77Eh5A/exec";
+    let selectedLocation = "ห้องยาตึกเก่า";
+    let selectedShift = "รอบเช้า";
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('recordDate').value = `${yyyy}-${mm}-${dd}`;
+
+    if (today.getHours() >= 12) {
+        selectShift('รอบบ่าย');
+    } else {
+        selectShift('รอบเช้า');
+    }
+
+    function selectShift(shift) {
+        selectedShift = shift;
+        if (shift === 'รอบเช้า') {
+            document.getElementById('shiftMorning').classList.add('active');
+            document.getElementById('shiftAfternoon').classList.remove('active');
+        } else {
+            document.getElementById('shiftAfternoon').classList.add('active');
+            document.getElementById('shiftMorning').classList.remove('active');
+        }
+    }
+
+    const chips = document.querySelectorAll('.chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            chips.forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            selectedLocation = this.getAttribute('data-value');
+            document.getElementById('subLocationLabel').innerText = `เลือกพื้นที่ใน${selectedLocation}`;
+        });
+    });
+
+    function submitData() {
+        const btn = document.querySelector('.submit-btn');
+        btn.innerText = "กำลังบันทึก...";
+        btn.disabled = true;
+
+        const data = {
+            date: document.getElementById('recordDate').value,
+            location: selectedLocation,
+            subLocation: document.getElementById('subLocationSelect').value,
+            shift: selectedShift,
+            fridgeTemp: document.getElementById('fridgeTemp').value,
+            roomTemp: document.getElementById('roomTemp').value,
+            humidity: document.getElementById('humidity').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            alert('บันทึกข้อมูลสำเร็จ!');
+            btn.innerText = "บันทึกข้อมูล";
+            btn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาดในการบันทึก');
+            btn.innerText = "บันทึกข้อมูล";
+            btn.disabled = false;
+        });
+    }
+
+    function openHistory() {
+        document.getElementById('historyModal').style.display = 'flex';
+        const listDiv = document.getElementById('historyList');
+        listDiv.innerHTML = "กำลังโหลดข้อมูล...";
+
+        fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                listDiv.innerHTML = data.map(item => `
+                    <div class="history-item">
+                        <b>${item.date || ''} (${item.shift || ''})</b><br>
+                        ${item.location || ''} - ${item.subLocation || ''}<br>
+                        ตู้เย็น: ${item.fridgeTemp || '-'}°C | ห้องยา: ${item.roomTemp || '-'}°C (${item.humidity || '-'}%RH)
+                    </div>
+                `).join('');
+            } else {
+                listDiv.innerHTML = "ยังไม่มีประวัติการบันทึก";
+            }
+        })
+        .catch(err => {
+            listDiv.innerHTML = "ไม่สามารถดึงข้อมูลประวัติได้ กรุณาลองใหม่อีกครั้ง";
+        });
+    }
+
+    function closeHistory() {
+        document.getElementById('historyModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
