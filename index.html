@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกอุณหภูมิโรงพยาบาลจัตุรัส</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background: #f0f4f8; margin: 0; padding: 12px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { font-size: 18px; color: #1e3a8a; margin-bottom: 4px; }
+        p { font-size: 13px; color: #4b5563; margin-bottom: 16px; }
+        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 14px; font-weight: 600; color: #1f2937; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-family: 'Prompt', sans-serif; }
+        .btn { width: 100%; background: #1d4ed8; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; font-family: 'Prompt', sans-serif; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>โรงพยาบาลจัตุรัส</h1>
+    <p>บันทึกอุณหภูมิตู้แช่ยาและวัคซีน</p>
+
+    <div class="form-group">
+        <label>วันที่บันทึก</label>
+        <input type="date" id="recordDate">
+    </div>
+
+    <div class="form-group">
+        <label>สถานที่</label>
+        <select id="locationSelect">
+            <option value="ห้องยาตึกเก่า">ห้องยาตึกเก่า</option>
+            <option value="ห้องยาตึกใหม่">ห้องยาตึกใหม่</option>
+            <option value="คลังยา">คลังยา</option>
+            <option value="ห้องผลิตชั้นบน">ห้องผลิตชั้นบน</option>
+            <option value="ห้องผลิตชั้นล่าง">ห้องผลิตชั้นล่าง</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>เลือกพื้นที่ย่อย</label>
+        <select id="subLocationSelect">
+            <option value="ห้องยาตึกเก่า (หลัก)">ห้องยาตึกเก่า (หลัก)</option>
+            <option value="substock">substock</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>รอบเวลา</label>
+        <select id="shiftSelect">
+            <option value="รอบเช้า">รอบเช้า (09:00 น.)</option>
+            <option value="รอบบ่าย">รอบบ่าย (14:30 น.)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>อุณหภูมิตู้เย็น (°C)</label>
+        <input type="number" id="fridgeTemp" step="0.1" inputmode="decimal" value="0.0">
+    </div>
+
+    <div class="form-group">
+        <label>ความชื้นตู้เย็น (%RH)</label>
+        <input type="number" id="fridgeHumidity" inputmode="decimal" value="0">
+    </div>
+
+    <div class="form-group">
+        <label>อุณหภูมิห้องยา (°C)</label>
+        <input type="number" id="roomTemp" step="0.1" inputmode="decimal" value="0.0">
+    </div>
+
+    <div class="form-group">
+        <label>ความชื้นห้องยา (%RH)</label>
+        <input type="number" id="humidity" inputmode="decimal" value="0">
+    </div>
+
+    <button class="btn" onclick="submitData()">บันทึกข้อมูล</button>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5dVBNqQLwdBZtLd3-eTqisiEuNivOnO7krcLNSO7TKJw2Dnji-3CwgxtTlF0X77Eh5A/exec";
+    
+    const today = new Date();
+    document.getElementById('recordDate').value = today.toISOString().split('T')[0];
+
+    function submitData() {
+        const data = {
+            date: document.getElementById('recordDate').value,
+            location: document.getElementById('locationSelect').value,
+            subLocation: document.getElementById('subLocationSelect').value,
+            shift: document.getElementById('shiftSelect').value,
+            fridgeTemp: document.getElementById('fridgeTemp').value,
+            fridgeHumidity: document.getElementById('fridgeHumidity').value,
+            roomTemp: document.getElementById('roomTemp').value,
+            humidity: document.getElementById('humidity').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(() => alert('บันทึกข้อมูลสำเร็จ!'))
+        .catch(() => alert('เกิดข้อผิดพลาด'));
+    }
+</script>
+
+</body>
+</html>
