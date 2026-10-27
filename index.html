@@ -289,7 +289,7 @@ function metric(t,label,whoLabel){
   const p=v=>(v-t.min)/(t.max-t.min)*100;
   return `<div class="m" data-lo="${t.lo}" data-hi="${t.hi}" data-min="${t.min}" data-max="${t.max}">
   <span class="ml">${label}<small>${t.r} ${t.u}</small></span>
-  <div class="v"><input inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
+  <div class="v"><input type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
@@ -321,8 +321,9 @@ function build(){
 function update(){
   const ms=[...document.querySelectorAll(".m")];let n=0,out=0;
   ms.forEach(c=>{
-    const v=parseFloat(c.querySelector("input").value.replace(",","."));
-    const has=!isNaN(v), lo=+c.dataset.lo, hi=+c.dataset.hi, mn=+c.dataset.min, mx=+c.dataset.max;
+    const rawVal = c.querySelector("input").value.replace(",", ".");
+    const v = parseFloat(rawVal);
+    const has=!isNaN(v) && rawVal.trim() !== "", lo=+c.dataset.lo, hi=+c.dataset.hi, mn=+c.dataset.min, mx=+c.dataset.max;
     const low=has&&v<lo&&lo>mn, high=has&&v>hi, bad=low||high;
     c.classList.toggle("has",has);c.classList.toggle("out",bad);c.classList.toggle("ok",has&&!bad);
     const st=c.querySelector(".st");
@@ -441,7 +442,7 @@ $("#save").addEventListener("click", ()=>{
   inputs.forEach(m => {
     const label = m.querySelector(".ml").textContent;
     const cardTitle = m.closest(".card") ? m.closest(".card").querySelector(".ch").textContent : "";
-    const val = m.querySelector("input").value;
+    const val = m.querySelector("input").value.trim();
 
     if(label.includes("ตู้เย็น") || cardTitle.includes("ตู้เย็น") || cardTitle.includes("ตู้ T") || cardTitle.includes("ตู้ TH") || cardTitle.includes("ตู้ TV")) {
       fridgeTemp = val;
