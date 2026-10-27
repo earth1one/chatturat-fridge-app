@@ -280,7 +280,7 @@ $("#zones").addEventListener("click",e=>{
   zone=+b.dataset.i;area=0;who="";
   setRound(round);people();build();
 });
-$("#areas").addEventListener("click",e=>{const b=e.target.closest("button");if(b)return;area=+b.dataset.k;areas();build()});
+$("#areas").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;area=+b.dataset.k;areas();build()});
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"< 30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
@@ -292,7 +292,7 @@ function metric(t,label,whoLabel){
   <div class="v"><input type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
 
 function build(){
   const name=ZONES[zone][0];
@@ -315,7 +315,7 @@ function build(){
   }
   const fr=name==="คลังยา"?["ตู้ T31","ตู้ T32","ตู้ TH1","ตู้ TV1"].map(fridge).join(""):fridge("ตู้เย็น");
   $("#list").innerHTML=fr+`<div class="card r"><div class="ch">${ICR}ห้องยา</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องยา")+metric(H,"ความชื้น","ห้องยา")}</div></div>`;
-    $("#note").value="";update();
+  $("#note").value="";update();
 }
 
 function update(){
@@ -442,13 +442,10 @@ $("#save").addEventListener("click", ()=>{
 
   inputs.forEach(m => {
     const label = m.querySelector(".ml").textContent;
-    const cardTitle = m.closest(".card") ? m.closest(".card").querySelector(".ch").textContent : "";
+    const card = m.closest(".card");
     let val = m.querySelector("input").value.trim().replace(",", ".");
 
-    if(label.includes("ความชื้น")) {
-      let num = parseFloat(val);
-      humidity = !isNaN(num) ? num.toFixed(1) : val;
-    } else if(cardTitle.includes("ตู้เย็น") || cardTitle.includes("ตู้ T") || cardTitle.includes("ตู้ TH") || cardTitle.includes("ตู้ TV") || (zone === 0 && who === "ภัทราภรณ์")) {
+    if(card && card.classList.contains("f")) {
       let num = parseFloat(val);
       if(!isNaN(num) && num > 12 && num <= 100) {
         num = num / 10;
@@ -457,9 +454,14 @@ $("#save").addEventListener("click", ()=>{
         val = num.toFixed(1);
       }
       fridgeTemp = val;
-    } else if(label.includes("อุณหภูมิ")) {
-      let num = parseFloat(val);
-      roomTemp = !isNaN(num) ? num.toFixed(1) : val;
+    } else {
+      if(label.includes("ความชื้น")) {
+        let num = parseFloat(val);
+        humidity = !isNaN(num) ? num.toFixed(1) : val;
+      } else if(label.includes("อุณหภูมิ")) {
+        let num = parseFloat(val);
+        roomTemp = !isNaN(num) ? num.toFixed(1) : val;
+      }
     }
   });
 
