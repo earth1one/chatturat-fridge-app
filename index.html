@@ -304,7 +304,7 @@ function build(){
     } else if(who === "ณัชชา"){
       $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
     } else {
-      $("#list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">กรุณาเลือกผู้บันทึกด้านบนก่อน</p>`;
+      $("#list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">กรุณาเลือกชื่อผู้บันทึกด้านบนก่อน</p>`;
     }
     $("#note").value=""; update(); return;
   }
@@ -449,13 +449,17 @@ $("#save").addEventListener("click", ()=>{
       let num = parseFloat(val);
       if(!isNaN(num) && num > 12 && num <= 100) {
         num = num / 10;
-        val = num.toString();
+        val = num.toFixed(1);
+      } else if(!isNaN(num)) {
+        val = num.toFixed(1);
       }
       fridgeTemp = val;
     } else if(label.includes("อุณหภูมิ")) {
-      roomTemp = val;
+      let num = parseFloat(val);
+      roomTemp = !isNaN(num) ? num.toFixed(1) : val;
     } else if(label.includes("ความชื้น")) {
-      humidity = val;
+      let num = parseFloat(val);
+      humidity = !isNaN(num) ? num.toFixed(1) : val;
     }
   });
 
