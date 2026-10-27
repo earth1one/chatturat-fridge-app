@@ -445,7 +445,10 @@ $("#save").addEventListener("click", ()=>{
     const cardTitle = m.closest(".card") ? m.closest(".card").querySelector(".ch").textContent : "";
     let val = m.querySelector("input").value.trim().replace(",", ".");
 
-    if(label.includes("ตู้เย็น") || cardTitle.includes("ตู้เย็น") || cardTitle.includes("ตู้ T") || cardTitle.includes("ตู้ TH") || cardTitle.includes("ตู้ TV")) {
+    if(label.includes("ความชื้น")) {
+      let num = parseFloat(val);
+      humidity = !isNaN(num) ? num.toFixed(1) : val;
+    } else if(cardTitle.includes("ตู้เย็น") || cardTitle.includes("ตู้ T") || cardTitle.includes("ตู้ TH") || cardTitle.includes("ตู้ TV") || (zone === 0 && who === "ภัทราภรณ์")) {
       let num = parseFloat(val);
       if(!isNaN(num) && num > 12 && num <= 100) {
         num = num / 10;
@@ -457,9 +460,6 @@ $("#save").addEventListener("click", ()=>{
     } else if(label.includes("อุณหภูมิ")) {
       let num = parseFloat(val);
       roomTemp = !isNaN(num) ? num.toFixed(1) : val;
-    } else if(label.includes("ความชื้น")) {
-      let num = parseFloat(val);
-      humidity = !isNaN(num) ? num.toFixed(1) : val;
     }
   });
 
