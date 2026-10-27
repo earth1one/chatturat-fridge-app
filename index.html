@@ -292,7 +292,8 @@ function metric(t,label,whoLabel){
   <div class="v"><input type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
+// ปรับให้ตู้เย็นแสดงทั้งช่องอุณหภูมิและความชื้นเหมือนการ์ดห้องปกติ
+const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
   const name=ZONES[zone][0];
@@ -304,7 +305,7 @@ function build(){
     } else if(who === "ณัชชา"){
       $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
     } else {
-      $("#list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">กรุณาเลือกชื่อผู้บันทึกด้านบนก่อน</p>`;
+      $("#list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">กรุณาเลือกผู้บันทึกด้านบนก่อน</p>`;
     }
     $("#note").value=""; update(); return;
   }
@@ -437,32 +438,35 @@ $("#save").addEventListener("click", ()=>{
   saveBtn.disabled = true;
   saveBtn.textContent = "กำลังบันทึก...";
 
-  const inputs = document.querySelectorAll(".m");
+  const cards = document.querySelectorAll(".card");
   let fridgeTemp = "", roomTemp = "", humidity = "";
 
-  inputs.forEach(m => {
-    const label = m.querySelector(".ml").textContent;
-    const card = m.closest(".card");
-    let val = m.querySelector("input").value.trim().replace(",", ".");
-
-    if(card && card.classList.contains("f")) {
-      let num = parseFloat(val);
-      if(!isNaN(num) && num > 12 && num <= 100) {
-        num = num / 10;
-        val = num.toFixed(1);
-      } else if(!isNaN(num)) {
-        val = num.toFixed(1);
-      }
-      fridgeTemp = val;
-    } else {
-      if(label.includes("ความชื้น")) {
+  cards.forEach(card => {
+    const title = card.querySelector(".ch").textContent;
+    const inputs = card.querySelectorAll("input");
+    
+    inputs.forEach(inp => {
+      let val = inp.value.trim().replace(",", ".");
+      let label = inp.getAttribute("aria-label") || "";
+      
+      if(label.includes("อุณหภูมิ")) {
         let num = parseFloat(val);
-        humidity = !isNaN(num) ? num.toFixed(1) : val;
-      } else if(label.includes("อุณหภูมิ")) {
+        if(!isNaN(num)) {
+          // ถ้าเป็นช่องอุณหภูมิตู้เย็น
+          if(title.includes("ตู้") || card.classList.contains("f")) {
+            if(num > 12 && num <= 100) num = num / 10;
+            fridgeTemp = num.toFixed(1);
+          } else {
+            roomTemp = num.toFixed(1);
+          }
+        }
+      } else if(label.includes("ความชื้น")) {
         let num = parseFloat(val);
-        roomTemp = !isNaN(num) ? num.toFixed(1) : val;
+        if(!isNaN(num)) {
+          humidity = num.toFixed(1);
+        }
       }
-    }
+    });
   });
 
   const payload = {
