@@ -120,6 +120,9 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .success-modal p{margin:0;font-size:16px;color:var(--ink);font-weight:600}
 
 .history-container{display:none;margin-top:16px}
+.history-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.history-btn{min-height:75px;border:1.5px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:8px;text-align:center}
+.history-btn[aria-pressed=true]{border-color:var(--acc);background:var(--acc);color:var(--accInk)}
 .history-filter{display:flex;gap:8px;margin-bottom:12px}
 .history-filter input{flex:1;height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px}
 .history-card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);font-size:14px}
@@ -190,13 +193,22 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
   </div>
 
   <div id="section-history" class="history-container">
-    <p class="cap">ประวัติการบันทึกย้อนหลัง</p>
+    <p class="cap">เลือกสถานที่เพื่อดูประวัติ</p>
+    <div class="history-grid" id="historyZoneButtons">
+      <button class="history-btn" type="button" data-loc="ห้องยาตึกใหม่" onclick="selectHistoryZone('ห้องยาตึกใหม่')">🏢<span>ห้องยาตึกใหม่</span></button>
+      <button class="history-btn" type="button" data-loc="ห้องยาตึกเก่า" onclick="selectHistoryZone('ห้องยาตึกเก่า')">🏥<span>ห้องยาตึกเก่า</span></button>
+      <button class="history-btn" type="button" data-loc="คลังยา" onclick="selectHistoryZone('คลังยา')">📦<span>คลังยา</span></button>
+      <button class="history-btn" type="button" data-loc="ห้องผลิตชั้นบน" onclick="selectHistoryZone('ห้องผลิตชั้นบน')">⬆️<span>ห้องผลิตชั้นบน</span></button>
+      <button class="history-btn" type="button" data-loc="ห้องผลิตชั้นล่าง" onclick="selectHistoryZone('ห้องผลิตชั้นล่าง')">⬇️<span>ห้องผลิตชั้นล่าง</span></button>
+      <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone('ทั้งหมด')">🗂️<span>ดูทั้งหมด</span></button>
+    </div>
+
     <div class="history-filter">
-      <input type="text" id="searchKeyword" placeholder="🔍 ค้นหาตามชื่อ, สถานที่, หมายเหตุ..." oninput="filterHistory()">
+      <input type="text" id="searchKeyword" placeholder="🔍 ค้นหาตามชื่อ, หมายเหตุ..." oninput="filterHistory()">
       <button class="nav-tab active" type="button" onclick="loadHistory()" style="flex:none; width:auto; padding:0 14px;">🔄 โหลด</button>
     </div>
     <div id="history-list">
-      <p style="text-align:center; color:var(--muted);">กดปุ่มโหลดเพื่อดึงข้อมูล...</p>
+      <p style="text-align:center; color:var(--muted); padding: 20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>
     </div>
   </div>
 </div>
@@ -211,7 +223,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoOtpvJZphzwqxPQ40qiBNvb9XA_EzTsnUmIvOFSezCxw5g4vzMF-hZ6w/exec"; 
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy6-_AJ12huC3Wq-aSXPHeY_JhGJidXIvts7VZj6Fb9XTX18Y0be-ST0u5UALLV2rjTg/exec"; 
 
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
@@ -224,6 +236,7 @@ const ZONES = [
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
 let round=0, zone=0, mainCatIndex=0, area=0; const saved={};
 let cachedHistory = [];
+let selectedHistoryLoc = "";
 let customWho = "";
 
 $("#theme").addEventListener("click",()=>{
@@ -435,20 +448,29 @@ function switchTab(tab) {
   } else {
     $("#tab-history").classList.add("active"); $("#tab-record").classList.remove("active");
     $("#section-record").style.display = "none"; $("#section-history").style.display = "block";
-    $("#bar-save").style.display = "none"; loadHistory();
+    $("#bar-save").style.display = "none";
+    if(cachedHistory.length === 0) loadHistory();
   }
 }
 
 async function loadHistory() {
   const historyList = $("#history-list");
-  historyList.innerHTML = `<p style="text-align:center; color:var(--muted);">กำลังโหลดข้อมูล...</p>`;
+  historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กำลังโหลดข้อมูล...</p>`;
   try {
     let response = await fetch(APPS_SCRIPT_URL);
     cachedHistory = await response.json();
-    renderHistory(cachedHistory);
+    filterHistory();
   } catch (err) {
-    historyList.innerHTML = `<p style="text-align:center; color:var(--bad);">โหลดไม่สำเร็จ: ${err.message}</p>`;
+    historyList.innerHTML = `<p style="text-align:center; color:var(--bad); padding:20px 0;">โหลดไม่สำเร็จ: ${err.message}</p>`;
   }
+}
+
+function selectHistoryZone(loc) {
+  selectedHistoryLoc = loc;
+  document.querySelectorAll(".history-btn").forEach(btn => {
+    btn.setAttribute("aria-pressed", btn.dataset.loc === loc ? "true" : "false");
+  });
+  filterHistory();
 }
 
 function formatDateShort(dateStr) {
@@ -466,20 +488,24 @@ function formatDateShort(dateStr) {
 
 function renderHistory(data) {
   const historyList = $("#history-list");
+  if(!selectedHistoryLoc) {
+    historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
+    return;
+  }
   if(!data || data.length === 0) {
-    historyList.innerHTML = `<p style="text-align:center; color:var(--muted);">ไม่พบประวัติการบันทึกข้อมูล</p>`;
+    historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">ไม่พบประวัติการบันทึกข้อมูลของสถานที่นี้</p>`;
     return;
   }
   historyList.innerHTML = data.map(item => `
     <div class="history-card">
       <div class="h-header">
-        <span>📅 ${formatDateShort(item.date)} - ${item.location} (${item.subLocation || '-'})</span>
+        <span>📅 ${formatDateShort(item.date)} - ${item.location} ${item.subLocation ? `(${item.subLocation})` : ""}</span>
         <span style="font-size:12px; font-weight:500; color:var(--muted);">${item.shift || ''}</span>
       </div>
       <div class="h-vals">
-        ${item.fridgeTemp !== "" ? `<span>❄️ อุณหภูมิตู้: ${item.fridgeTemp}°C</span>` : ""}
-        ${item.roomTemp !== "" ? `<span>🌡️ อุณหภูมิห้อง: ${item.roomTemp}°C</span>` : ""}
-        ${item.humidity !== "" ? `<span>💧 ความชื้น: ${item.humidity}%</span>` : ""}
+        ${item.fridgeTemp !== "" && item.fridgeTemp !== null && item.fridgeTemp !== undefined ? `<span>❄️ อุณหภูมิตู้: ${item.fridgeTemp}°C</span>` : ""}
+        ${item.roomTemp !== "" && item.roomTemp !== null && item.roomTemp !== undefined ? `<span>🌡️ อุณหภูมิห้อง: ${item.roomTemp}°C</span>` : ""}
+        ${item.humidity !== "" && item.humidity !== null && item.humidity !== undefined ? `<span>💧 ความชื้น: ${item.humidity}%</span>` : ""}
       </div>
       <div class="h-sub">✍️ <b>ผู้บันทึก:</b> ${item.who || "-"} ${item.note ? `| 📝 <b>หมายเหตุ:</b> ${item.note}` : ""}</div>
     </div>
@@ -487,14 +513,22 @@ function renderHistory(data) {
 }
 
 function filterHistory() {
+  if(!selectedHistoryLoc) {
+    $("#history-list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
+    return;
+  }
   const keyword = $("#searchKeyword").value.toLowerCase();
-  renderHistory(cachedHistory.filter(item => 
-    (item.location && item.location.toLowerCase().includes(keyword)) ||
-    (item.subLocation && item.subLocation.toLowerCase().includes(keyword)) ||
-    (item.who && item.who.toLowerCase().includes(keyword)) ||
-    (item.date && item.date.toLowerCase().includes(keyword)) ||
-    (item.note && item.note.toLowerCase().includes(keyword))
-  ));
+  let filtered = cachedHistory.filter(item => {
+    let matchLoc = selectedHistoryLoc === "ทั้งหมด" || (item.location && item.location.trim() === selectedHistoryLoc);
+    let matchKeyword = !keyword || 
+      (item.location && item.location.toLowerCase().includes(keyword)) ||
+      (item.subLocation && item.subLocation.toLowerCase().includes(keyword)) ||
+      (item.who && item.who.toLowerCase().includes(keyword)) ||
+      (item.date && item.date.toLowerCase().includes(keyword)) ||
+      (item.note && item.note.toLowerCase().includes(keyword));
+    return matchLoc && matchKeyword;
+  });
+  renderHistory(filtered);
 }
 
 $("#save").addEventListener("click", ()=>{
