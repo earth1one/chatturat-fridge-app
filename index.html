@@ -18,6 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 (function(){var t=null;try{t=localStorage.getItem("pt-theme")}catch(e){}
 if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}
@@ -123,6 +124,8 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .history-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .history-btn{min-height:75px;border:1.5px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:8px;text-align:center}
 .history-btn[aria-pressed=true]{border-color:var(--acc);background:var(--acc);color:var(--accInk)}
+.chart-card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.chart-card h3{margin:0 0 12px;font-size:16px;color:var(--h1);text-align:center}
 .history-card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);font-size:14px}
 .history-card .h-header{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--h1);margin-bottom:4px}
 .history-card .h-sub{font-size:13px;color:var(--muted);margin-bottom:6px}
@@ -201,6 +204,18 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone('ทั้งหมด')">🗂️<span>ดูทั้งหมด</span></button>
     </div>
 
+    <!-- ส่วนแสดงกราฟ -->
+    <div id="chartContainer" style="display:none;">
+      <div class="chart-card">
+        <h3>📈 กราฟแนวโน้มอุณหภูมิ (°C)</h3>
+        <canvas id="tempChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>📊 กราฟแนวโน้มความชื้น (%RH)</h3>
+        <canvas id="humidityChart"></canvas>
+      </div>
+    </div>
+
     <div id="history-list">
       <p style="text-align:center; color:var(--muted); padding: 20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>
     </div>
@@ -233,11 +248,14 @@ let round=0, zone=0, mainCatIndex=0, area=0; const saved={};
 let cachedHistory = [];
 let selectedHistoryLoc = "";
 let customWho = "";
+let tempChartInstance = null;
+let humidityChartInstance = null;
 
 $("#theme").addEventListener("click",()=>{
   const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
   root.setAttribute("data-theme",next);
   try{localStorage.setItem("pt-theme",next)}catch(e){}
+  if(selectedHistoryLoc) renderCharts(cachedHistory.filter(item => item.location && item.location.trim() === selectedHistoryLoc));
 });
 
 function getStaffList() {
@@ -444,7 +462,7 @@ function switchTab(tab) {
     $("#tab-history").classList.add("active"); $("#tab-record").classList.remove("active");
     $("#section-record").style.display = "none"; $("#section-history").style.display = "block";
     $("#bar-save").style.display = "none";
-    if(cachedHistory.length === 0) loadHistory();
+    loadHistory();
   }
 }
 
@@ -454,7 +472,11 @@ async function loadHistory() {
   try {
     let response = await fetch(APPS_SCRIPT_URL);
     cachedHistory = await response.json();
-    filterHistory();
+    if(selectedHistoryLoc) {
+      filterHistory();
+    } else {
+      historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
+    }
   } catch (err) {
     historyList.innerHTML = `<p style="text-align:center; color:var(--bad); padding:20px 0;">โหลดไม่สำเร็จ: ${err.message}</p>`;
   }
@@ -483,6 +505,91 @@ function formatDateShort(dateStr) {
     }
     return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(-2)}`;
   } catch (e) { return dateStr; }
+}
+
+function renderCharts(data) {
+  const chartContainer = $("#chartContainer");
+  if(!data || data.length === 0) {
+    chartContainer.style.display = "none";
+    return;
+  }
+  chartContainer.style.display = "block";
+
+  // เรียงลำดับตามวันที่เก่าไปใหม่เพื่อให้กราฟแสดงผลถูกต้อง
+  let sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  let labels = sortedData.map(item => `${formatDateShort(item.date)} (${item.shift || ''})`);
+  let fridgeTemps = sortedData.map(item => item.fridgeTemp !== "" && item.fridgeTemp !== null && item.fridgeTemp !== undefined ? parseFloat(item.fridgeTemp) : null);
+  let roomTemps = sortedData.map(item => item.roomTemp !== "" && item.roomTemp !== null && item.roomTemp !== undefined ? parseFloat(item.roomTemp) : null);
+  let humidities = sortedData.map(item => item.humidity !== "" && item.humidity !== null && item.humidity !== undefined ? parseFloat(item.humidity) : null);
+
+  let isDark = root.getAttribute("data-theme") === "dark";
+  let textColor = isDark ? "#e6f5ec" : "#0b2a1f";
+  let gridColor = isDark ? "#1c3a2d" : "#d9ebe1";
+
+  // กราฟอุณหภูมิ
+  if (tempChartInstance) tempChartInstance.destroy();
+  let ctxTemp = document.getElementById('tempChart').getContext('2d');
+  tempChartInstance = new Chart(ctxTemp, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'อุณหภูมิตู้ (°C)',
+          data: fridgeTemps,
+          borderColor: '#0d8f86',
+          backgroundColor: '#0d8f86',
+          tension: 0.2,
+          spanGaps: true
+        },
+        {
+          label: 'อุณหภูมิห้อง (°C)',
+          data: roomTemps,
+          borderColor: '#b9770e',
+          backgroundColor: '#b9770e',
+          tension: 0.2,
+          spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: textColor, font: { family: 'Anuphan' } } } },
+      scales: {
+        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
+    }
+  });
+
+  // กราฟความชื้น
+  if (humidityChartInstance) humidityChartInstance.destroy();
+  let ctxHumidity = document.getElementById('humidityChart').getContext('2d');
+  humidityChartInstance = new Chart(ctxHumidity, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'ความชื้น (%RH)',
+          data: humidities,
+          borderColor: '#12b07a',
+          backgroundColor: '#12b07a',
+          tension: 0.2,
+          spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: textColor, font: { family: 'Anuphan' } } } },
+      scales: {
+        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
+    }
+  });
 }
 
 function renderHistory(data) {
@@ -519,6 +626,7 @@ function filterHistory() {
   let filtered = cachedHistory.filter(item => {
     return (item.location && item.location.trim() === selectedHistoryLoc);
   });
+  renderCharts(filtered);
   renderHistory(filtered);
 }
 
