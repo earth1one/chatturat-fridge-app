@@ -162,7 +162,12 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <div class="chips" id="zones"></div>
 
     <!-- 2. พื้นที่ย่อย / จุดวัด -->
-    <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
+    <div id="subCategorySection" style="display:none;">
+      <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
+      <div class="ar on" id="mainCategories" role="group" aria-label="หมวดหมู่หลัก"></div>
+    </div>
+
+    <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
     <!-- 3. รอบเวลา -->
@@ -211,13 +216,13 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoO
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
   ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
-  ["คลังยา", ["ตู้ T31", "ตู้ T32", "ตู้ TH1", "ตู้ TV1", "คลังยา (หลัก)"]],
+  ["คลังยา", [["ตู้เย็น", ["ตู้ T31", "ตู้ T32", "ตู้ TH1", "ตู้ TV1"]], ["อุณหภูมิห้อง", ["R1", "R2", "R3", "R4"]]]],
   ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
   ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
 ];
 
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
-let round=0, zone=0, area=0; const saved={};
+let round=0, zone=0, mainCatIndex=0, area=0; const saved={};
 let cachedHistory = [];
 let customWho = "";
 
@@ -244,7 +249,7 @@ function renderPeople() {
   const defaultName = staffList[0];
   
   let last = ""; 
-  try { last = localStorage.getItem("pt-who-"+zone+"-"+area) || defaultName; } catch(e){ last = defaultName; }
+  try { last = localStorage.getItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area) || defaultName; } catch(e){ last = defaultName; }
 
   box.style.display = "block";
   box.innerHTML = `
@@ -283,7 +288,7 @@ document.addEventListener("change", e => {
     } else {
       textInput.style.display = "none";
       customWho = val;
-      try{localStorage.setItem("pt-who-"+zone+"-"+area, val)}catch(err){}
+      try{localStorage.setItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area, val)}catch(err){}
     }
     update();
   }
@@ -293,15 +298,15 @@ document.addEventListener("input", e => {
   if(e.target.matches(".m input")) update();
   if(e.target.id === "who") {
     customWho = e.target.value.trim();
-    try{localStorage.setItem("pt-who-"+zone+"-"+area, customWho)}catch(err){}
+    try{localStorage.setItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area, customWho)}catch(err){}
     update();
   }
 });
 
 $("#date").value=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
 const dstr=()=>new Date($("#date").value+"T00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
-const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
-function showDate(){$("#dv").textContent=dstr();chips();areas()}
+const key=(z,mc,a)=>$("#date").value+"|"+round+"|"+z+"|"+mc+"|"+a;
+function showDate(){$("#dv").textContent=dstr();chips();mainCategories();areas()}
 $("#date").addEventListener("change",showDate);
 
 const R2 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"]];
@@ -329,16 +334,37 @@ function chips(){
   $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}</button>`).join("");
 }
 
+function mainCategories(){
+  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const sec = $("#subCategorySection");
+  sec.style.display = isKlangYa ? "block" : "none";
+  if(isKlangYa){
+    const cats = ZONES[zone][1];
+    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${c[0]}<small>${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
+    $("#subAreaTitle").textContent = "เลือกตู้ / ห้อง";
+  } else {
+    $("#subAreaTitle").textContent = "2. พื้นที่ย่อย / จุดวัด";
+  }
+}
+
 function areas(){
-  const a = ZONES[zone][1], box = $("#areas");
-  box.classList.toggle("on", a.length > 0);
-  box.innerHTML = a.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const listItems = isKlangYa ? ZONES[zone][1][mainCatIndex][1] : ZONES[zone][1];
+  const box = $("#areas");
+  box.classList.toggle("on", listItems.length > 0);
+  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
 }
 
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
-  zone = +b.dataset.i; area = 0;
-  chips(); areas(); setRound(round); renderPeople(); build();
+  zone = +b.dataset.i; mainCatIndex = 0; area = 0;
+  chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
+});
+
+$("#mainCategories").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b)return;
+  mainCatIndex = +b.dataset.mc; area = 0;
+  mainCategories(); areas(); renderPeople(); build();
 });
 
 $("#areas").addEventListener("click", e => {
@@ -346,7 +372,7 @@ $("#areas").addEventListener("click", e => {
   area = +b.dataset.k; areas(); renderPeople(); build();
 });
 
-const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"< 30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
+const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
 const ICR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
 
@@ -362,14 +388,11 @@ const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class=
 const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
-  const subName = ZONES[zone][1][area];
+  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const subName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
   
-  if(subName.includes("ตู้")) {
+  if(subName.includes("ตู้") || (isKlangYa && mainCatIndex === 0)) {
     $("#list").innerHTML = fridge(subName);
-  } else if(subName === "ห้องยาหลัก" || subName === "ห้องหลัก" || subName === "คลังยา (หลัก)") {
-    $("#list").innerHTML = roomCard(subName);
-  } else if(subName === "Substock") {
-    $("#list").innerHTML = roomCard("Substock");
   } else {
     $("#list").innerHTML = roomCard(subName);
   }
@@ -490,7 +513,7 @@ $("#save").addEventListener("click", ()=>{
       if(label.includes("อุณหภูมิ")) {
         let num = parseFloat(val);
         if(!isNaN(num)) {
-          if(title.includes("ตู้") || card.classList.contains("f")) {
+          if(card.classList.contains("f")) {
             if(num > 12 && num <= 100) num = num / 10;
             fridgeTemp = num.toFixed(1);
           } else {
@@ -504,10 +527,13 @@ $("#save").addEventListener("click", ()=>{
     });
   });
 
+  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const subLocName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
+
   const payload = {
     date: $("#date").value,
     location: ZONES[zone][0],
-    subLocation: ZONES[zone][1][area],
+    subLocation: subLocName,
     shift: getRounds()[round][0],
     fridgeTemp: fridgeTemp,
     roomTemp: roomTemp,
@@ -523,7 +549,7 @@ $("#save").addEventListener("click", ()=>{
     body: JSON.stringify(payload)
   }).catch(err => console.error(err));
 
-  saved[key(zone,area)]=true; chips(); areas(); build();
+  saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   
   const overlay = $("#successOverlay");
@@ -535,7 +561,7 @@ $("#save").addEventListener("click", ()=>{
 });
 
 // เริ่มต้นโหลดหน้าเว็บ
-chips(); areas(); setRound(round); showDate(); renderPeople(); build();
+chips(); mainCategories(); areas(); setRound(round); showDate(); renderPeople(); build();
 </script>
 </body>
 </html>
