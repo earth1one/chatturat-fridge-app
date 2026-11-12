@@ -482,7 +482,7 @@ $("#save").addEventListener("click", ()=>{
       if(label.includes("อุณหภูมิ")) {
         let num = parseFloat(val);
         if(!isNaN(num)) {
-          if(title.includes("ตู้") || card.classList.5(f)) { // Adjusted for safety
+          if(title.includes("ตู้") || card.classList.contains("f")) {
             if(num > 12 && num <= 100) num = num / 10;
             fridgeTemp = num.toFixed(1);
           } else {
