@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/canvas-confetti.browser.min.js"></script>
 <script>
 (function(){var t=null;try{t=localStorage.getItem("pt-theme")}catch(e){}
 if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}
@@ -33,7 +33,7 @@ document.documentElement.setAttribute("data-theme",t)})();
   color-scheme:light; box-sizing:border-box; padding-top:var(--safe-t);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#06130d;--surface:#0e2119;--surface2:#13291f;--line:#1c3a2d;--ink:#e6f5ec;--muted:#8db1a0;--acc:#34d399;--accInk:#032416;--h1:#0f7a56;--h2:#06352a;--bad:#ff7b7b;--badbg:#3a1a1a;--fb:#0d2a2a;--fl:#1f5a57;--fa:#3cd6c8;--rb:#2b2412;--rl:#5c4a1c;--ra:#f0b84d;--shadow:0 8px 24px rgba(0,0,0,.35);--glass:rgba(6,19,13,.82);color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#06130d;--surface:#0e2119;--surface2:#13291f;--line:#1c3a2d;--ink:#e6f5ec;--muted:#8db1a0;--acc:#34d399;--accInk:#032416;--h1:#0f7a56;--h2:#06352a;--bad:#ff7b7b;--badbg:#3a1a1a;--fb:#0d2a2a;--fl:#1f5a57;--fa:#3cd6c8;--rb:#2b2412;--rl:#5c4a1c;--ra:#f0b84d;--shadow:0 8px 24px rgba(0,0,0,.35);--glass:rgba(6,19,13,.82);color-scheme:dark}
+:root[data-theme="dark"]{--bg:#06130d;--surface:#0e2119;--surface2:#13291f;--line:#1c3a2d;--ink:#e6f5ec;--muted:#8db1a0;--acc:#34d399;--accInk:#032416;--h1:#0f7a56;--h2:#06352a;--bad:#ff7b7b;--badbg:#3a1a1a;--shadow:0 8px 24px rgba(0,0,0,.35);--glass:rgba(6,19,13,.82);color-scheme:dark}
 :root[data-theme="light"]{color-scheme:light}
 html{scroll-padding-top:var(--safe-t)}
 *,*::before,*::after{box-sizing:inherit}
@@ -157,20 +157,25 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
     </section>
 
-    <p class="cap">รอบเวลา</p>
-    <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
-
-    <p class="cap">ผู้บันทึก</p>
-    <div id="peopleContainer"></div>
-    <input class="field" id="who" type="text" autocomplete="name" placeholder="ชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก" style="display:none;">
-
-    <p class="cap">สถานที่</p>
+    <!-- 1. เลือกสถานที่ก่อน -->
+    <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
     <div class="ar" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <p class="cap">ค่าที่วัดได้</p>
+    <!-- 2. เลือกผู้บันทึก -->
+    <p class="cap">2. ผู้บันทึก</p>
+    <div id="peopleContainer"></div>
+    <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก" style="display:none; margin-top:6px;">
+
+    <!-- 3. เลือกรอบเวลา -->
+    <p class="cap">3. รอบเวลา</p>
+    <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
+
+    <!-- 4. ค่าที่วัดได้ -->
+    <p class="cap">4. ค่าที่วัดได้</p>
     <div id="list"></div>
 
+    <!-- หมายเหตุ -->
     <p class="cap">หมายเหตุ</p>
     <p class="hint" id="hint">มีค่านอกเกณฑ์ ระบุสิ่งที่ทำหรือคนที่แจ้ง</p>
     <textarea class="field" id="note" placeholder="หมายเหตุ (ถ้ามี)" aria-label="หมายเหตุ"></textarea>
@@ -200,10 +205,18 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoOtpvJZphzwqxPQ40qiBNvb9XA_EzTsnUmIvOFSezCxw5g4vzMF-hZ6w/exec"; 
 
-const ZONES=[["ห้องยาตึกใหม่",["ห้องหลัก","Substock"]],["ห้องยาตึกเก่า",["ห้องหลัก","Substock"]],["คลังยา",["คลังยา (หลัก)"]],["ห้องผลิตชั้นบน",["ห้องผลิตชั้นบน"]],["ห้องผลิตชั้นล่าง",["ห้องผลิตชั้นล่าง"]]];
+const ZONES=[
+  ["ห้องยาตึกใหม่",["ห้องหลัก","Substock"]],
+  ["ห้องยาตึกเก่า",["ห้องหลัก","Substock"]],
+  ["คลังยา",["คลังยา (หลัก)"]],
+  ["ห้องผลิตชั้นบน",["ห้องผลิตชั้นบน"]],
+  ["ห้องผลิตชั้นล่าง",["ห้องผลิตชั้นล่าง"]]
+];
+
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
 let round=now.getHours()<12?0:now.getHours()<18?1:2, zone=0, area=0; const saved={};
 let cachedHistory = [];
+let customWho = "";
 
 $("#theme").addEventListener("click",()=>{
   const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
@@ -211,76 +224,121 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-const STAFF={
-  0:[["ภัทราภรณ์"],["ณัชชา"],["เพ็ญลักษณ์"]],
-  1:[["ระพีพรรณ"],["รณชัย"]],
-  2:[["พงศ์พันธ์"],["นาวิน"]]
-};
-let who="";
-
-const getWho=()=>STAFF[zone]?who:$("#who").value.trim();
-
-function people(){
-  const s=STAFF[zone], box=$("#peopleContainer");
-  const textInput=$("#who");
-  if(!s){
-    box.style.display="none";
-    textInput.style.display="block";
-    let last="";try{last=localStorage.getItem("pt-who-"+zone)||""}catch(e){}
-    who="";textInput.value=last;
-    return;
-  }
-  textInput.style.display="none";
-  box.style.display="block";
-  let last="";try{last=localStorage.getItem("pt-who-"+zone)||""}catch(e){}
-  if(!s.some(p=>p[0]===last)) last="";
-  who=last;
-
-  let opts=`<option value="" disabled ${!who?"selected":""}>-- กรุณาเลือกผู้บันทึก --</option>`;
-  opts+=s.map(p=>`<option value="${p[0]}" ${p[0]===who?"selected":""}>${p[0]}</option>`).join("");
+// กำหนดผู้บันทึกตามเงื่อนไขสถานที่
+function getAssignedStaff() {
+  const currentZoneName = ZONES[zone][0];
+  const currentSubName = ZONES[zone][1][area] || "";
   
-  box.innerHTML=`<select class="field" id="peopleSelect" aria-label="ผู้บันทึก">${opts}</select>`;
+  // ตรวจสอบเงื่อนไข Substock -> ณัชชา
+  if(currentSubName.includes("Substock")) {
+    return { name: "ณัชชา", fixed: true };
+  }
+  // ตรวจสอบเงื่อนไข ตู้เย็น / ห้องหลัก / อื่นๆ ตามโจทย์
+  // ตู้เย็น (ในห้องยาตึกใหม่/เก่า หรือ คลังยา) -> ภัทราภรณ์
+  if(currentZoneName.includes("ห้องยา") && currentSubName === "ห้องหลัก") {
+    return { name: "เพ็ญลักษณ์", fixed: true };
+  }
+  
+  // หากเป็นคลังยาหรือจุดอื่นๆ สามารถเลือกหรือเพิ่มช่องอื่นๆ ได้
+  return { name: "ภัทราภรณ์", fixed: false };
 }
 
-document.addEventListener("change",e=>{
-  if(e.target.id==="peopleSelect"){
-    who=e.target.value;
-    try{localStorage.setItem("pt-who-"+zone,who)}catch(err){}
-    build();
+function renderPeople() {
+  const box = $("#peopleContainer");
+  const textInput = $("#who");
+  const staffInfo = getAssignedStaff();
+
+  if (staffInfo.fixed) {
+    box.style.display = "block";
+    textInput.style.display = "none";
+    box.innerHTML = `<input class="field" type="text" value="${staffInfo.name}" disabled style="background:var(--surface2); font-weight:600;">`;
+    customWho = staffInfo.name;
+  } else {
+    // เปิดให้เลือกชื่อมาตรฐาน หรือเลือก "อื่นๆ" เพื่อพิมพ์เอง
+    box.style.display = "block";
+    let last = ""; try { last = localStorage.getItem("pt-who-"+zone) || "ภัทราภรณ์"; } catch(e){}
+    if(!last) last = "ภัทราภรณ์";
+    
+    box.innerHTML = `
+      <select class="field" id="peopleSelect" aria-label="ผู้บันทึก">
+        <option value="ภัทราภรณ์" ${last==="ภัทราภรณ์"?"selected":""}>ภัทราภรณ์</option>
+        <option value="ณัชชา" ${last==="ณัชชา"?"selected":""}>ณัชชา</option>
+        <option value="เพ็ญลักษณ์" ${last==="เพ็ญลักษณ์"?"selected":""}>เพ็ญลักษณ์</option>
+        <option value="อื่นๆ">✏️ ระบุชื่ออื่นๆ...</option>
+      </select>
+    `;
+    
+    const sel = $("#peopleSelect");
+    if(sel.value === "อื่นๆ") {
+      textInput.style.display = "block";
+      customWho = textInput.value.trim();
+    } else {
+      textInput.style.display = "none";
+      customWho = sel.value;
+    }
+  }
+  update();
+}
+
+document.addEventListener("change", e => {
+  if(e.target.id === "peopleSelect") {
+    const val = e.target.value;
+    const textInput = $("#who");
+    if(val === "อื่นๆ") {
+      textInput.style.display = "block";
+      textInput.focus();
+      customWho = textInput.value.trim();
+    } else {
+      textInput.style.display = "none";
+      customWho = val;
+      try{localStorage.setItem("pt-who-"+zone, val)}catch(err){}
+    }
     update();
   }
-  if(e.target.id==="who"){
+});
+
+document.addEventListener("input", e => {
+  if(e.target.matches(".m input")) update();
+  if(e.target.id === "who") {
+    customWho = e.target.value.trim();
     update();
   }
 });
 
 $("#date").value=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
 const dstr=()=>new Date($("#date").value+"T00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
-const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+(zone===0?who:a);
+const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
 const R2=[["รอบเช้า","09:00"],["รอบบ่าย","14:30"]], R3=[...R2,["รอบเย็น","20:30"]];
-const rounds=()=>zone===0?R3:R2;
+const rounds=()=>ZONES[zone][0].includes("คลังยา")?R3:R2; // หรือปรับตามเงื่อนไขรอบเวลาเดิม
+
 function setRound(i){
-  const rs=rounds();i=Math.min(i,rs.length-1);round=i;
-  const sg=$("#seg");sg.style.setProperty("--n",rs.length);sg.style.setProperty("--r",i);
+  const rs=rounds(); i=Math.min(i,rs.length-1); round=i;
+  const sg=$("#seg"); sg.style.setProperty("--n",rs.length); sg.style.setProperty("--r",i);
   sg.innerHTML="<i></i>"+rs.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
-  $("#rl").textContent=rs[i][0]+" · "+rs[i][1]+" น.";chips();areas()}
+  $("#rl").textContent=rs[i][0]+" · "+rs[i][1]+" น.";
+}
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
 function chips(){$("#zones").innerHTML=ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}${ZONES[i][1].every((_,k)=>saved[key(i,k)])?" ✓":""}</button>`).join("")}
 function areas(){
   const a=ZONES[zone][1], box=$("#areas");
-  box.classList.toggle("on",zone!==0 && a.length>1);
+  box.classList.toggle("on",a.length>1);
   box.innerHTML=a.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}${saved[key(zone,k)]?" ✓":""}</button>`).join("");
 }
+
 $("#zones").addEventListener("click",e=>{
-  const b=e.target.closest("button");if(!b)return;
-  zone=+b.dataset.i;area=0;who="";
-  setRound(round);people();build();
+  const b=e.target.closest("button"); if(!b)return;
+  zone=+b.dataset.i; area=0;
+  chips(); areas(); setRound(round); renderPeople(); build();
 });
-$("#areas").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;area=+b.dataset.k;areas();build()});
+
+$("#areas").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  area=+b.dataset.k; areas(); renderPeople(); build();
+});
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"< 30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
@@ -292,74 +350,63 @@ function metric(t,label,whoLabel){
   <div class="v"><input type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
-// ปรับให้ตู้เย็นแสดงทั้งช่องอุณหภูมิและความชื้นเหมือนการ์ดห้องปกติ
 const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
-  const name=ZONES[zone][0];
-  if(zone === 0){
-    if(who === "ภัทราภรณ์"){
-      $("#list").innerHTML = fridge("ตู้เย็น");
-    } else if(who === "เพ็ญลักษณ์"){
-      $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}ห้องยาหลัก</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องยาหลัก")+metric(H,"ความชื้น","ห้องยาหลัก")}</div></div>`;
-    } else if(who === "ณัชชา"){
-      $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
-    } else {
-      $("#list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px;">กรุณาเลือกผู้บันทึกด้านบนก่อน</p>`;
-    }
-    $("#note").value=""; update(); return;
+  const name = ZONES[zone][0];
+  const subName = ZONES[zone][1][area];
+  
+  if(name === "คลังยา") {
+    let fr = ["ตู้ T31","ตู้ T32","ตู้ TH1","ตู้ TV1"].map(fridge).join("");
+    $("#list").innerHTML = fr + `<div class="card r"><div class="ch">${ICR}คลังยา</div><div class="ms">${metric(R,"อุณหภูมิ","คลังยา")+metric(H,"ความชื้น","คลังยา")}</div></div>`;
+  } else if(subName.includes("Substock")) {
+    $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
+  } else if(name.includes("ห้องผลิต")) {
+    $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}${name}</div><div class="ms">${metric(R,"อุณหภูมิ",name)+metric(H,"ความชื้น",name)}</div></div>`;
+  } else {
+    // ห้องยาหลัก / ตู้เย็น
+    $("#list").innerHTML = fridge("ตู้เย็น") + `<div class="card r"><div class="ch">${ICR}${name}</div><div class="ms">${metric(R,"อุณหภูมิ",name)+metric(H,"ความชื้น",name)}</div></div>`;
   }
-
-  if(zone===0&&area===1){
-    $("#list").innerHTML=`<div class="card r"><div class="ch">${ICR}ห้องยา (Substock)</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
-    $("#note").value="";update();return;
-  }
-  const fr=name==="คลังยา"?["ตู้ T31","ตู้ T32","ตู้ TH1","ตู้ TV1"].map(fridge).join(""):fridge("ตู้เย็น");
-  $("#list").innerHTML=fr+`<div class="card r"><div class="ch">${ICR}ห้องยา</div><div class="ms">${metric(R,"อุณหภูมิ","ห้องยา")+metric(H,"ความชื้น","ห้องยา")}</div></div>`;
-  $("#note").value="";update();
+  $("#note").value=""; update();
 }
 
 function update(){
-  const ms=[...document.querySelectorAll(".m")];let n=0,out=0;
+  const ms=[...document.querySelectorAll(".m")]; let n=0,out=0;
   ms.forEach(c=>{
     let rawVal = c.querySelector("input").value.replace(",", ".").trim();
     let v = parseFloat(rawVal);
     const has=!isNaN(v) && rawVal !== ""; 
     const lo=+c.dataset.lo, hi=+c.dataset.hi, mn=+c.dataset.min, mx=+c.dataset.max;
     const low=has&&v<lo&&lo>mn, high=has&&v>hi, bad=low||high;
-    c.classList.toggle("has",has);c.classList.toggle("out",bad);c.classList.toggle("ok",has&&!bad);
+    c.classList.toggle("has",has); c.classList.toggle("out",bad); c.classList.toggle("ok",has&&!bad);
     const st=c.querySelector(".st");
     if(has){n++;if(bad)out++;c.querySelector("u").style.left=Math.max(0,Math.min(100,(v-mn)/(mx-mn)*100))+"%";
       st.textContent=bad?(low?"ต่ำกว่าเกณฑ์":"สูงกว่าเกณฑ์"):"ปกติ"}else st.textContent="";
   });
   document.querySelectorAll(".card").forEach(c=>c.classList.toggle("out",!!c.querySelector(".m.out")));
-  const miss=ms.length-n, w=getWho();
+  const miss=ms.length-n, w=customWho;
   $("#prog").textContent=n+"/"+ms.length;
   $("#arc").style.strokeDashoffset=213.6*(1-n/ms.length);
   $("#hint").classList.toggle("on",out>0);
-  const b=$("#save");b.disabled=miss>0||!w || (zone===0 && !who); b.classList.toggle("warn",miss===0&&!!w&&out>0);
-  b.textContent= !who && zone===0 ? "กรุณาเลือกผู้บันทึก" : miss>0?`กรอกอีก ${miss} ช่อง`:!w?(STAFF[zone]?"เลือกผู้บันทึก":"ใส่ชื่อผู้บันทึก"):out>0?`บันทึก (มีค่านอกเกณฑ์ ${out} ช่อง)`:"บันทึกข้อมูล";
+  const b=$("#save"); 
+  b.disabled = miss>0 || !w; 
+  b.classList.toggle("warn", miss===0 && !!w && out>0);
+  b.textContent = miss>0 ? `กรอกอีก ${miss} ช่อง` : !w ? "กรุณาระบุชื่อผู้บันทึก" : out>0 ? `บันทึก (มีค่านอกเกณฑ์ ${out} ช่อง)` : "บันทึกข้อมูล";
 }
 
-document.addEventListener("input",e=>{if(e.target.matches(".m input,#who"))update()});
 document.addEventListener("focusin",e=>{if(e.target.matches(".m input"))setTimeout(()=>e.target.scrollIntoView({block:"center",behavior:"smooth"}),250)});
 document.addEventListener("keydown",e=>{if(e.key!=="Enter"||!e.target.matches(".m input"))return;
   const a=[...document.querySelectorAll(".m input")],n=a[a.indexOf(e.target)+1];n?n.focus():e.target.blur()});
 
 function switchTab(tab) {
   if(tab === 'record') {
-    $("#tab-record").classList.add("active");
-    $("#tab-history").classList.remove("active");
-    $("#section-record").style.display = "block";
-    $("#section-history").style.display = "none";
+    $("#tab-record").classList.add("active"); $("#tab-history").classList.remove("active");
+    $("#section-record").style.display = "block"; $("#section-history").style.display = "none";
     $("#bar-save").style.display = "block";
   } else {
-    $("#tab-history").classList.add("active");
-    $("#tab-record").classList.remove("active");
-    $("#section-record").style.display = "none";
-    $("#section-history").style.display = "block";
-    $("#bar-save").style.display = "none";
-    loadHistory();
+    $("#tab-history").classList.add("active"); $("#tab-record").classList.remove("active");
+    $("#section-record").style.display = "none"; $("#section-history").style.display = "block";
+    $("#bar-save").style.display = "none"; loadHistory();
   }
 }
 
@@ -381,19 +428,11 @@ function formatDateShort(dateStr) {
     let d = new Date(dateStr);
     if (isNaN(d.getTime())) {
       let parts = dateStr.split("-");
-      if (parts.length === 3) {
-        let yr = parts[0].slice(-2);
-        return `${parseInt(parts[2])}/${parseInt(parts[1])}/${yr}`;
-      }
+      if (parts.length === 3) return `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0].slice(-2)}`;
       return dateStr;
     }
-    let day = d.getDate();
-    let month = d.getMonth() + 1;
-    let year = String(d.getFullYear()).slice(-2);
-    return `${day}/${month}/${year}`;
-  } catch (e) {
-    return dateStr;
-  }
+    return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(-2)}`;
+  } catch (e) { return dateStr; }
 }
 
 function renderHistory(data) {
@@ -402,35 +441,31 @@ function renderHistory(data) {
     historyList.innerHTML = `<p style="text-align:center; color:var(--muted);">ไม่พบประวัติการบันทึกข้อมูล</p>`;
     return;
   }
-  historyList.innerHTML = data.map(item => {
-    let shortDate = formatDateShort(item.date);
-    return `
-      <div class="history-card">
-        <div class="h-header">
-          <span>📅 ${shortDate} - ${item.location} (${item.subLocation || '-'})</span>
-          <span style="font-size:12px; font-weight:500; color:var(--muted);">${item.shift || ''}</span>
-        </div>
-        <div class="h-vals">
-          ${item.fridgeTemp !== "" ? `<span>❄️ ตู้เย็น: ${item.fridgeTemp}°C</span>` : ""}
-          ${item.roomTemp !== "" ? `<span>🌡️ ห้อง: ${item.roomTemp}°C</span>` : ""}
-          ${item.humidity !== "" ? `<span>💧 ความชื้น: ${item.humidity}%</span>` : ""}
-        </div>
-        <div class="h-sub">✍️ <b>ผู้บันทึก:</b> ${item.who || "-"} ${item.note ? `| 📝 <b>หมายเหตุ:</b> ${item.note}` : ""}</div>
+  historyList.innerHTML = data.map(item => `
+    <div class="history-card">
+      <div class="h-header">
+        <span>📅 ${formatDateShort(item.date)} - ${item.location} (${item.subLocation || '-'})</span>
+        <span style="font-size:12px; font-weight:500; color:var(--muted);">${item.shift || ''}</span>
       </div>
-    `;
-  }).join("");
+      <div class="h-vals">
+        ${item.fridgeTemp !== "" ? `<span>❄️ ตู้เย็น: ${item.fridgeTemp}°C</span>` : ""}
+        ${item.roomTemp !== "" ? `<span>🌡️ ห้อง: ${item.roomTemp}°C</span>` : ""}
+        ${item.humidity !== "" ? `<span>💧 ความชื้น: ${item.humidity}%</span>` : ""}
+      </div>
+      <div class="h-sub">✍️ <b>ผู้บันทึก:</b> ${item.who || "-"} ${item.note ? `| 📝 <b>หมายเหตุ:</b> ${item.note}` : ""}</div>
+    </div>
+  `).join("");
 }
 
 function filterHistory() {
   const keyword = $("#searchKeyword").value.toLowerCase();
-  const filtered = cachedHistory.filter(item => 
+  renderHistory(cachedHistory.filter(item => 
     (item.location && item.location.toLowerCase().includes(keyword)) ||
     (item.subLocation && item.subLocation.toLowerCase().includes(keyword)) ||
     (item.who && item.who.toLowerCase().includes(keyword)) ||
     (item.date && item.date.toLowerCase().includes(keyword)) ||
     (item.note && item.note.toLowerCase().includes(keyword))
-  );
-  renderHistory(filtered);
+  ));
 }
 
 $("#save").addEventListener("click", ()=>{
@@ -443,16 +478,12 @@ $("#save").addEventListener("click", ()=>{
 
   cards.forEach(card => {
     const title = card.querySelector(".ch").textContent;
-    const inputs = card.querySelectorAll("input");
-    
-    inputs.forEach(inp => {
+    card.querySelectorAll("input").forEach(inp => {
       let val = inp.value.trim().replace(",", ".");
       let label = inp.getAttribute("aria-label") || "";
-      
       if(label.includes("อุณหภูมิ")) {
         let num = parseFloat(val);
         if(!isNaN(num)) {
-          // ถ้าเป็นช่องอุณหภูมิตู้เย็น
           if(title.includes("ตู้") || card.classList.contains("f")) {
             if(num > 12 && num <= 100) num = num / 10;
             fridgeTemp = num.toFixed(1);
@@ -462,9 +493,7 @@ $("#save").addEventListener("click", ()=>{
         }
       } else if(label.includes("ความชื้น")) {
         let num = parseFloat(val);
-        if(!isNaN(num)) {
-          humidity = num.toFixed(1);
-        }
+        if(!isNaN(num)) humidity = num.toFixed(1);
       }
     });
   });
@@ -472,12 +501,12 @@ $("#save").addEventListener("click", ()=>{
   const payload = {
     date: $("#date").value,
     location: ZONES[zone][0],
-    subLocation: zone === 0 ? who : ZONES[zone][1][area],
+    subLocation: ZONES[zone][1][area],
     shift: rounds()[round][0],
     fridgeTemp: fridgeTemp,
     roomTemp: roomTemp,
     humidity: humidity,
-    who: getWho(),
+    who: customWho,
     note: $("#note").value
   };
 
@@ -488,9 +517,7 @@ $("#save").addEventListener("click", ()=>{
     body: JSON.stringify(payload)
   }).catch(err => console.error(err));
 
-  try{localStorage.setItem("pt-who-"+zone,getWho())}catch(e){}
   saved[key(zone,area)]=true; chips(); areas(); build();
-  
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   
   const overlay = $("#successOverlay");
@@ -501,7 +528,8 @@ $("#save").addEventListener("click", ()=>{
   update();
 });
 
-setRound(round); showDate(); people(); build();
+// เริ่มต้นโหลดหน้าเว็บ
+chips(); areas(); setRound(round); showDate(); renderPeople(); build();
 </script>
 </body>
 </html>
