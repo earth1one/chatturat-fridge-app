@@ -165,16 +165,16 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- ส่วนที่ 5: ผู้บันทึก (ปรับเปลี่ยนตามสถานที่และจุดย่อย) -->
+    <!-- ส่วนที่ 5: ผู้บันทึก -->
     <p class="cap">5. ผู้บันทึก</p>
     <div id="peopleContainer"></div>
     <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
 
-    <!-- ส่วนที่ 3: รอบเวลา (09:00, 14:30, 20:30) -->
+    <!-- ส่วนที่ 3: รอบเวลา -->
     <p class="cap">3. รอบเวลา</p>
     <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
 
-    <!-- ส่วนที่ 4: ค่าที่วัดได้ (อุณหภูมิ, ความชื้น) -->
+    <!-- ส่วนที่ 4: ค่าที่วัดได้ -->
     <p class="cap">4. ค่าที่วัดได้</p>
     <div id="list"></div>
 
@@ -227,13 +227,12 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดรายชื่อตัวเลือกใน Dropdown ผู้บันทึกตามสถานที่
+// กำหนดรายชื่อผู้บันทึกตามสถานที่
 function getStaffList() {
   const currentZoneName = ZONES[zone][0];
   if (currentZoneName === "ห้องยาตึกเก่า") {
     return ["ระพีพรรณ", "รณชัย"];
   }
-  // ห้องยาตึกใหม่ หรือสถานที่อื่นๆ
   return ["ภัทราภรณ์", "ณัชชา", "เพ็ญลักษณ์"];
 }
 
@@ -304,14 +303,19 @@ const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
+// กำหนดรอบเวลาตามสถานที่ (ห้องยาตึกเก่ามี 2 รอบ, อื่นๆ มี 3 รอบ)
+const R2 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"]];
 const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
+const getRounds = () => ZONES[zone][0] === "ห้องยาตึกเก่า" ? R2 : R3;
+
 function setRound(i){
-  i = Math.min(i, R3.length-1); round = i;
+  const rs = getRounds();
+  i = Math.min(i, rs.length-1); round = i;
   const sg = $("#seg"); 
-  sg.style.setProperty("--n", R3.length); 
+  sg.style.setProperty("--n", rs.length); 
   sg.style.setProperty("--r", i);
-  sg.innerHTML = "<i></i>" + R3.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
-  $("#rl").textContent = R3[i][0] + " · " + R3[i][1] + " น.";
+  sg.innerHTML = "<i></i>" + rs.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
+  $("#rl").textContent = rs[i][0] + " · " + rs[i][1] + " น.";
 }
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
@@ -328,7 +332,7 @@ function areas(){
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   zone = +b.dataset.i; area = 0;
-  chips(); areas(); renderPeople(); build();
+  chips(); areas(); setRound(round); renderPeople(); build();
 });
 
 $("#areas").addEventListener("click", e => {
@@ -498,7 +502,7 @@ $("#save").addEventListener("click", ()=>{
     date: $("#date").value,
     location: ZONES[zone][0],
     subLocation: ZONES[zone][1][area],
-    shift: R3[round][0],
+    shift: getRounds()[round][0],
     fridgeTemp: fridgeTemp,
     roomTemp: roomTemp,
     humidity: humidity,
