@@ -204,20 +204,20 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone('ทั้งหมด')">🗂️<span>ดูทั้งหมด</span></button>
     </div>
 
-    <!-- ส่วนแสดงกราฟ -->
-    <div id="chartContainer" style="display:none;">
+    <!-- ส่วนแสดงกราฟภาพรวม (จะโชว์ขึ้นมาทันที) -->
+    <div id="chartContainer" style="display:none; margin-top: 16px;">
       <div class="chart-card">
-        <h3>📈 กราฟแนวโน้มอุณหภูมิ (°C)</h3>
+        <h3>📈 กราฟภาพรวมอุณหภูมิทุกสถานที่ (°C)</h3>
         <canvas id="tempChart"></canvas>
       </div>
       <div class="chart-card">
-        <h3>📊 กราฟแนวโน้มความชื้น (%RH)</h3>
+        <h3>📊 กราฟภาพรวมความชื้นทุกสถานที่ (%RH)</h3>
         <canvas id="humidityChart"></canvas>
       </div>
     </div>
 
-    <div id="history-list">
-      <p style="text-align:center; color:var(--muted); padding: 20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>
+    <div id="history-list" style="margin-top: 16px;">
+      <p style="text-align:center; color:var(--muted); padding: 20px 0;">กำลังโหลดข้อมูลภาพรวม...</p>
     </div>
   </div>
 </div>
@@ -255,7 +255,10 @@ $("#theme").addEventListener("click",()=>{
   const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
   root.setAttribute("data-theme",next);
   try{localStorage.setItem("pt-theme",next)}catch(e){}
-  if(selectedHistoryLoc) renderCharts(cachedHistory.filter(item => item.location && item.location.trim() === selectedHistoryLoc));
+  if(cachedHistory.length > 0) {
+    let targetData = selectedHistoryLoc ? cachedHistory.filter(item => item.location && item.location.trim() === selectedHistoryLoc) : cachedHistory;
+    renderCharts(targetData);
+  }
 });
 
 function getStaffList() {
@@ -472,11 +475,13 @@ async function loadHistory() {
   try {
     let response = await fetch(APPS_SCRIPT_URL);
     cachedHistory = await response.json();
-    if(selectedHistoryLoc) {
-      filterHistory();
-    } else {
-      historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
-    }
+    
+    // ตั้งค่าเริ่มต้นให้แสดงกราฟ "ภาพรวมทั้งหมด" ทันทีที่เปิดเข้ามา
+    selectedHistoryLoc = "";
+    document.querySelectorAll(".history-btn").forEach(btn => btn.setAttribute("aria-pressed", "false"));
+    
+    renderCharts(cachedHistory);
+    renderHistory(cachedHistory);
   } catch (err) {
     historyList.innerHTML = `<p style="text-align:center; color:var(--bad); padding:20px 0;">โหลดไม่สำเร็จ: ${err.message}</p>`;
   }
@@ -515,10 +520,9 @@ function renderCharts(data) {
   }
   chartContainer.style.display = "block";
 
-  // เรียงลำดับตามวันที่เก่าไปใหม่เพื่อให้กราฟแสดงผลถูกต้อง
   let sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
   
-  let labels = sortedData.map(item => `${formatDateShort(item.date)} (${item.shift || ''})`);
+  let labels = sortedData.map(item => `${formatDateShort(item.date)} (${item.location}${item.subLocation ? '/' + item.subLocation : ''})`);
   let fridgeTemps = sortedData.map(item => item.fridgeTemp !== "" && item.fridgeTemp !== null && item.fridgeTemp !== undefined ? parseFloat(item.fridgeTemp) : null);
   let roomTemps = sortedData.map(item => item.roomTemp !== "" && item.roomTemp !== null && item.roomTemp !== undefined ? parseFloat(item.roomTemp) : null);
   let humidities = sortedData.map(item => item.humidity !== "" && item.humidity !== null && item.humidity !== undefined ? parseFloat(item.humidity) : null);
@@ -527,7 +531,6 @@ function renderCharts(data) {
   let textColor = isDark ? "#e6f5ec" : "#0b2a1f";
   let gridColor = isDark ? "#1c3a2d" : "#d9ebe1";
 
-  // กราฟอุณหภูมิ
   if (tempChartInstance) tempChartInstance.destroy();
   let ctxTemp = document.getElementById('tempChart').getContext('2d');
   tempChartInstance = new Chart(ctxTemp, {
@@ -563,7 +566,6 @@ function renderCharts(data) {
     }
   });
 
-  // กราฟความชื้น
   if (humidityChartInstance) humidityChartInstance.destroy();
   let ctxHumidity = document.getElementById('humidityChart').getContext('2d');
   humidityChartInstance = new Chart(ctxHumidity, {
@@ -594,12 +596,8 @@ function renderCharts(data) {
 
 function renderHistory(data) {
   const historyList = $("#history-list");
-  if(!selectedHistoryLoc) {
-    historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
-    return;
-  }
   if(!data || data.length === 0) {
-    historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">ไม่พบประวัติการบันทึกข้อมูลของสถานที่นี้</p>`;
+    historyList.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">ไม่พบประวัติการบันทึกข้อมูล</p>`;
     return;
   }
   historyList.innerHTML = data.map(item => `
@@ -619,13 +617,10 @@ function renderHistory(data) {
 }
 
 function filterHistory() {
-  if(!selectedHistoryLoc) {
-    $("#history-list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
-    return;
+  let filtered = cachedHistory;
+  if (selectedHistoryLoc) {
+    filtered = cachedHistory.filter(item => item.location && item.location.trim() === selectedHistoryLoc);
   }
-  let filtered = cachedHistory.filter(item => {
-    return (item.location && item.location.trim() === selectedHistoryLoc);
-  });
   renderCharts(filtered);
   renderHistory(filtered);
 }
