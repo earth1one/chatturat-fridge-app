@@ -157,26 +157,26 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
     </section>
 
-    <!-- ส่วนที่ 1: เลือกสถานที่หลัก -->
+    <!-- 1. เลือกสถานที่ -->
     <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
 
-    <!-- ส่วนที่ 2: พื้นที่ย่อย / จุดวัด -->
+    <!-- 2. พื้นที่ย่อย / จุดวัด -->
     <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- ส่วนที่ 5: ผู้บันทึก -->
-    <p class="cap">5. ผู้บันทึก</p>
-    <div id="peopleContainer"></div>
-    <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
-
-    <!-- ส่วนที่ 3: รอบเวลา -->
+    <!-- 3. รอบเวลา -->
     <p class="cap">3. รอบเวลา</p>
     <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
 
-    <!-- ส่วนที่ 4: ค่าที่วัดได้ -->
+    <!-- 4. ค่าที่วัดได้ -->
     <p class="cap">4. ค่าที่วัดได้</p>
     <div id="list"></div>
+
+    <!-- 5. ผู้บันทึก -->
+    <p class="cap">5. ผู้บันทึก</p>
+    <div id="peopleContainer"></div>
+    <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
 
     <!-- หมายเหตุ -->
     <p class="cap">หมายเหตุ</p>
@@ -227,7 +227,6 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดรายชื่อผู้บันทึกตามสถานที่
 function getStaffList() {
   const currentZoneName = ZONES[zone][0];
   if (currentZoneName === "ห้องยาตึกเก่า") {
@@ -303,7 +302,6 @@ const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
-// กำหนดรอบเวลาตามสถานที่ (ห้องยาตึกเก่ามี 2 รอบ, อื่นๆ มี 3 รอบ)
 const R2 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"]];
 const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
 const getRounds = () => ZONES[zone][0] === "ห้องยาตึกเก่า" ? R2 : R3;
@@ -484,7 +482,7 @@ $("#save").addEventListener("click", ()=>{
       if(label.includes("อุณหภูมิ")) {
         let num = parseFloat(val);
         if(!isNaN(num)) {
-          if(title.includes("ตู้") || card.classList.contains("f")) {
+          if(title.includes("ตู้") || card.classList.5(f)) { // Adjusted for safety
             if(num > 12 && num <= 100) num = num / 10;
             fridgeTemp = num.toFixed(1);
           } else {
