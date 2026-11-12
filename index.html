@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/canvas-confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 (function(){var t=null;try{t=localStorage.getItem("pt-theme")}catch(e){}
 if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}
@@ -61,10 +61,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 .ring svg{transform:rotate(-90deg)}
 .ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:18px;font-weight:700}
 .cap{margin:24px 2px 10px;font-size:15px;font-weight:600;color:var(--muted)}
-.seg{position:relative;display:grid;grid-template-columns:repeat(var(--n,2),1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px}
-.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/var(--n,2));background:var(--acc);border-radius:14px;transition:transform .25s;transform:translateX(calc(var(--r,0)*100%))}
-.seg button{position:relative;z-index:1;height:54px;border:0;background:none;color:var(--muted);font:inherit;font-size:16px;font-weight:600;line-height:1.15;cursor:pointer}
-.seg button small{display:block;font-size:12px;font-weight:500;opacity:.85}
+.seg{position:relative;display:grid;grid-template-columns:repeat(var(--n,3),1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px}
+.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/var(--n,3));background:var(--acc);border-radius:14px;transition:transform .25s;transform:translateX(calc(var(--r,0)*100%))}
+.seg button{position:relative;z-index:1;height:54px;border:0;background:none;color:var(--muted);font:inherit;font-size:15px;font-weight:600;line-height:1.15;cursor:pointer}
+.seg button small{display:block;font-size:11px;font-weight:500;opacity:.85}
 .seg button[aria-pressed=true]{color:var(--accInk)}
 .chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -157,21 +157,24 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
     </section>
 
-    <!-- 1. เลือกสถานที่ก่อน -->
+    <!-- ส่วนที่ 1: เลือกสถานที่หลัก -->
     <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
-    <div class="ar" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- 2. เลือกผู้บันทึก -->
-    <p class="cap">2. ผู้บันทึก</p>
+    <!-- ส่วนที่ 2: Locations ย่อย (ห้องยาหลัก, Substock, ตู้เย็น) -->
+    <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
+    <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+
+    <!-- ส่วนที่ 5: ผู้บันทึก (เปลี่ยนตามเงื่อนไขที่เลือก) -->
+    <p class="cap">5. ผู้บันทึก</p>
     <div id="peopleContainer"></div>
     <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก" style="display:none; margin-top:6px;">
 
-    <!-- 3. เลือกรอบเวลา -->
+    <!-- ส่วนที่ 3: รอบเวลา (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30) -->
     <p class="cap">3. รอบเวลา</p>
     <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
 
-    <!-- 4. ค่าที่วัดได้ -->
+    <!-- ส่วนที่ 4: ค่าที่วัดได้ (อุณหภูมิ, ความชื้น) -->
     <p class="cap">4. ค่าที่วัดได้</p>
     <div id="list"></div>
 
@@ -205,16 +208,17 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoOtpvJZphzwqxPQ40qiBNvb9XA_EzTsnUmIvOFSezCxw5g4vzMF-hZ6w/exec"; 
 
-const ZONES=[
-  ["ห้องยาตึกใหม่",["ห้องหลัก","Substock"]],
-  ["ห้องยาตึกเก่า",["ห้องหลัก","Substock"]],
-  ["คลังยา",["คลังยา (หลัก)"]],
-  ["ห้องผลิตชั้นบน",["ห้องผลิตชั้นบน"]],
-  ["ห้องผลิตชั้นล่าง",["ห้องผลิตชั้นล่าง"]]
+// โครงสร้างหลัก: ส่วนที่ 1 และ ส่วนที่ 2 (locations ย่อย)
+const ZONES = [
+  ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
+  ["ห้องยาตึกเก่า", ["ห้องหลัก", "Substock"]],
+  ["คลังยา", ["คลังยา (หลัก)"]],
+  ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
+  ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
 ];
 
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
-let round=now.getHours()<12?0:now.getHours()<18?1:2, zone=0, area=0; const saved={};
+let round=0, zone=0, area=0; const saved={};
 let cachedHistory = [];
 let customWho = "";
 
@@ -224,22 +228,18 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดผู้บันทึกตามเงื่อนไขสถานที่
+// กำหนดผู้บันทึกตามเงื่อนไข (ส่วนที่ 1 และ 2)
 function getAssignedStaff() {
   const currentZoneName = ZONES[zone][0];
   const currentSubName = ZONES[zone][1][area] || "";
   
-  // ตรวจสอบเงื่อนไข Substock -> ณัชชา
-  if(currentSubName.includes("Substock")) {
-    return { name: "ณัชชา", fixed: true };
-  }
-  // ตรวจสอบเงื่อนไข ตู้เย็น / ห้องหลัก / อื่นๆ ตามโจทย์
-  // ตู้เย็น (ในห้องยาตึกใหม่/เก่า หรือ คลังยา) -> ภัทราภรณ์
-  if(currentZoneName.includes("ห้องยา") && currentSubName === "ห้องหลัก") {
-    return { name: "เพ็ญลักษณ์", fixed: true };
+  if (currentZoneName === "ห้องยาตึกใหม่") {
+    if (currentSubName === "ตู้เย็น") return { name: "ภัทราภรณ์", fixed: true };
+    if (currentSubName === "ห้องยาหลัก") return { name: "เพ็ญลักษณ์", fixed: true };
+    if (currentSubName === "Substock") return { name: "ณัชชา", fixed: true };
   }
   
-  // หากเป็นคลังยาหรือจุดอื่นๆ สามารถเลือกหรือเพิ่มช่องอื่นๆ ได้
+  // สำหรับสถานที่อื่นๆ เปิดให้เลือกหรือกรอกชื่อได้อิสระ
   return { name: "ภัทราภรณ์", fixed: false };
 }
 
@@ -254,11 +254,8 @@ function renderPeople() {
     box.innerHTML = `<input class="field" type="text" value="${staffInfo.name}" disabled style="background:var(--surface2); font-weight:600;">`;
     customWho = staffInfo.name;
   } else {
-    // เปิดให้เลือกชื่อมาตรฐาน หรือเลือก "อื่นๆ" เพื่อพิมพ์เอง
     box.style.display = "block";
     let last = ""; try { last = localStorage.getItem("pt-who-"+zone) || "ภัทราภรณ์"; } catch(e){}
-    if(!last) last = "ภัทราภรณ์";
-    
     box.innerHTML = `
       <select class="field" id="peopleSelect" aria-label="ผู้บันทึก">
         <option value="ภัทราภรณ์" ${last==="ภัทราภรณ์"?"selected":""}>ภัทราภรณ์</option>
@@ -267,14 +264,13 @@ function renderPeople() {
         <option value="อื่นๆ">✏️ ระบุชื่ออื่นๆ...</option>
       </select>
     `;
-    
     const sel = $("#peopleSelect");
-    if(sel.value === "อื่นๆ") {
+    if(sel && sel.value === "อื่นๆ") {
       textInput.style.display = "block";
       customWho = textInput.value.trim();
     } else {
       textInput.style.display = "none";
-      customWho = sel.value;
+      customWho = sel ? sel.value : "ภัทราภรณ์";
     }
   }
   update();
@@ -311,38 +307,43 @@ const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
-const R2=[["รอบเช้า","09:00"],["รอบบ่าย","14:30"]], R3=[...R2,["รอบเย็น","20:30"]];
-const rounds=()=>ZONES[zone][0].includes("คลังยา")?R3:R2; // หรือปรับตามเงื่อนไขรอบเวลาเดิม
-
+// ส่วนที่ 3: รอบเวลาทั้ง 3 รอบ (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30)
+const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
 function setRound(i){
-  const rs=rounds(); i=Math.min(i,rs.length-1); round=i;
-  const sg=$("#seg"); sg.style.setProperty("--n",rs.length); sg.style.setProperty("--r",i);
-  sg.innerHTML="<i></i>"+rs.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
-  $("#rl").textContent=rs[i][0]+" · "+rs[i][1]+" น.";
+  i = Math.min(i, R3.length-1); round = i;
+  const sg = $("#seg"); 
+  sg.style.setProperty("--n", R3.length); 
+  sg.style.setProperty("--r", i);
+  sg.innerHTML = "<i></i>" + R3.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
+  $("#rl").textContent = R3[i][0] + " · " + R3[i][1] + " น.";
 }
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
-function chips(){$("#zones").innerHTML=ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}${ZONES[i][1].every((_,k)=>saved[key(i,k)])?" ✓":""}</button>`).join("")}
-function areas(){
-  const a=ZONES[zone][1], box=$("#areas");
-  box.classList.toggle("on",a.length>1);
-  box.innerHTML=a.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}${saved[key(zone,k)]?" ✓":""}</button>`).join("");
+function chips(){
+  $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}</button>`).join("");
 }
 
-$("#zones").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b)return;
-  zone=+b.dataset.i; area=0;
-  chips(); areas(); setRound(round); renderPeople(); build();
+function areas(){
+  const a = ZONES[zone][1], box = $("#areas");
+  box.classList.toggle("on", a.length > 0);
+  box.innerHTML = a.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+}
+
+$("#zones").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b)return;
+  zone = +b.dataset.i; area = 0;
+  chips(); areas(); renderPeople(); build();
 });
 
-$("#areas").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b)return;
-  area=+b.dataset.k; areas(); renderPeople(); build();
+$("#areas").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b)return;
+  area = +b.dataset.k; areas(); renderPeople(); build();
 });
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"< 30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
 const ICR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
+
 function metric(t,label,whoLabel){
   const p=v=>(v-t.min)/(t.max-t.min)*100;
   return `<div class="m" data-lo="${t.lo}" data-hi="${t.hi}" data-min="${t.min}" data-max="${t.max}">
@@ -350,22 +351,22 @@ function metric(t,label,whoLabel){
   <div class="v"><input type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
+const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+
+// ส่วนที่ 4: ค่าที่วัดได้ (อุณหภูมิ, ความชื้น ตามที่เลือกในส่วนที่ 2)
 function build(){
-  const name = ZONES[zone][0];
   const subName = ZONES[zone][1][area];
   
-  if(name === "คลังยา") {
-    let fr = ["ตู้ T31","ตู้ T32","ตู้ TH1","ตู้ TV1"].map(fridge).join("");
-    $("#list").innerHTML = fr + `<div class="card r"><div class="ch">${ICR}คลังยา</div><div class="ms">${metric(R,"อุณหภูมิ","คลังยา")+metric(H,"ความชื้น","คลังยา")}</div></div>`;
-  } else if(subName.includes("Substock")) {
-    $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}Substock</div><div class="ms">${metric(R,"อุณหภูมิ","Substock")+metric(H,"ความชื้น","Substock")}</div></div>`;
-  } else if(name.includes("ห้องผลิต")) {
-    $("#list").innerHTML = `<div class="card r"><div class="ch">${ICR}${name}</div><div class="ms">${metric(R,"อุณหภูมิ",name)+metric(H,"ความชื้น",name)}</div></div>`;
+  if(subName === "ตู้เย็น") {
+    $("#list").innerHTML = fridge("ตู้เย็น");
+  } else if(subName === "ห้องยาหลัก") {
+    $("#list").innerHTML = roomCard("ห้องยาหลัก");
+  } else if(subName === "Substock") {
+    $("#list").innerHTML = roomCard("Substock");
   } else {
-    // ห้องยาหลัก / ตู้เย็น
-    $("#list").innerHTML = fridge("ตู้เย็น") + `<div class="card r"><div class="ch">${ICR}${name}</div><div class="ms">${metric(R,"อุณหภูมิ",name)+metric(H,"ความชื้น",name)}</div></div>`;
+    $("#list").innerHTML = roomCard(subName);
   }
   $("#note").value=""; update();
 }
@@ -448,8 +449,8 @@ function renderHistory(data) {
         <span style="font-size:12px; font-weight:500; color:var(--muted);">${item.shift || ''}</span>
       </div>
       <div class="h-vals">
-        ${item.fridgeTemp !== "" ? `<span>❄️ ตู้เย็น: ${item.fridgeTemp}°C</span>` : ""}
-        ${item.roomTemp !== "" ? `<span>🌡️ ห้อง: ${item.roomTemp}°C</span>` : ""}
+        ${item.fridgeTemp !== "" ? `<span>❄️ อุณหภูมิตู้: ${item.fridgeTemp}°C</span>` : ""}
+        ${item.roomTemp !== "" ? `<span>🌡️ อุณหภูมิห้อง: ${item.roomTemp}°C</span>` : ""}
         ${item.humidity !== "" ? `<span>💧 ความชื้น: ${item.humidity}%</span>` : ""}
       </div>
       <div class="h-sub">✍️ <b>ผู้บันทึก:</b> ${item.who || "-"} ${item.note ? `| 📝 <b>หมายเหตุ:</b> ${item.note}` : ""}</div>
@@ -502,7 +503,7 @@ $("#save").addEventListener("click", ()=>{
     date: $("#date").value,
     location: ZONES[zone][0],
     subLocation: ZONES[zone][1][area],
-    shift: rounds()[round][0],
+    shift: R3[round][0],
     fridgeTemp: fridgeTemp,
     roomTemp: roomTemp,
     humidity: humidity,
