@@ -165,10 +165,10 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- ส่วนที่ 5: ผู้บันทึก (ล็อคตามจุด หรือเลือก/พิมพ์ชื่ออื่นๆ ได้) -->
+    <!-- ส่วนที่ 5: ผู้บันทึก (ให้เลือกค่าเริ่มต้นตามจุด หรือเปลี่ยนเป็น "อื่นๆ" เพื่อพิมพ์เองได้) -->
     <p class="cap">5. ผู้บันทึก</p>
     <div id="peopleContainer"></div>
-    <!-- ช่องกรอกชื่ออื่นๆ ใต้ผู้บันทึก -->
+    <!-- ช่องกรอกชื่ออื่นๆ ใต้ผู้บันทึก (จะแสดงเมื่อเลือก "อื่นๆ") -->
     <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
 
     <!-- ส่วนที่ 3: รอบเวลา (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30) -->
@@ -228,51 +228,50 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดผู้บันทึกตามเงื่อนไข (ห้องยาตึกใหม่) หรือเปิดให้เลือก/พิมพ์เองได้
-function getAssignedStaff() {
+// กำหนดชื่อเริ่มต้นตามจุดย่อย แต่เปิดให้เลือก "อื่นๆ" และพิมพ์เองได้
+function getDefaultStaff() {
   const currentZoneName = ZONES[zone][0];
   const currentSubName = ZONES[zone][1][area] || "";
   
   if (currentZoneName === "ห้องยาตึกใหม่") {
-    if (currentSubName === "ตู้เย็น") return { name: "ภัทราภรณ์", fixed: true };
-    if (currentSubName === "ห้องยาหลัก") return { name: "เพ็ญลักษณ์", fixed: true };
-    if (currentSubName === "Substock") return { name: "ณัชชา", fixed: true };
+    if (currentSubName === "ตู้เย็น") return "ภัทราภรณ์";
+    if (currentSubName === "ห้องยาหลัก") return "เพ็ญลักษณ์";
+    if (currentSubName === "Substock") return "ณัชชา";
   }
-  
-  return { name: "", fixed: false };
+  return "ภัทราภรณ์";
 }
 
 function renderPeople() {
   const box = $("#peopleContainer");
   const textInput = $("#who");
-  const staffInfo = getAssignedStaff();
+  const defaultName = getDefaultStaff();
+  
+  let last = ""; 
+  try { last = localStorage.getItem("pt-who-"+zone+"-"+area) || defaultName; } catch(e){ last = defaultName; }
 
-  if (staffInfo.fixed) {
-    // ล็อคชื่อตามเงื่อนไข (ตู้เย็น -> ภัทราภรณ์, ห้องยาหลัก -> เพ็ญลักษณ์, Substock -> ณัชชา) พร้อมซ่อนช่องพิมพ์เพิ่ม
-    box.style.display = "block";
-    textInput.style.display = "none";
-    box.innerHTML = `<input class="field" type="text" value="${staffInfo.name}" disabled style="background:var(--surface2); font-weight:600;">`;
-    customWho = staffInfo.name;
-  } else {
-    // กรณีสถานที่อื่น ให้มี Dropdown เลือก หรือเลือก "อื่นๆ" เพื่อพิมพ์เอง
-    box.style.display = "block";
-    let last = ""; try { last = localStorage.getItem("pt-who-"+zone) || "ภัทราภรณ์"; } catch(e){}
-    box.innerHTML = `
-      <select class="field" id="peopleSelect" aria-label="ผู้บันทึก">
-        <option value="ภัทราภรณ์" ${last==="ภัทราภรณ์"?"selected":""}>ภัทราภรณ์</option>
-        <option value="ณัชชา" ${last==="ณัชชา"?"selected":""}>ณัชชา</option>
-        <option value="เพ็ญลักษณ์" ${last==="เพ็ญลักษณ์"?"selected":""}>เพ็ญลักษณ์</option>
-        <option value="อื่นๆ">✏️ ระบุชื่ออื่นๆ...</option>
-      </select>
-    `;
-    const sel = $("#peopleSelect");
-    if(sel && sel.value === "อื่นๆ") {
-      textInput.style.display = "block";
-      customWho = textInput.value.trim();
+  box.style.display = "block";
+  box.innerHTML = `
+    <select class="field" id="peopleSelect" aria-label="ผู้บันทึก">
+      <option value="ภัทราภรณ์" ${last==="ภัทราภรณ์"?"selected":""}>ภัทราภรณ์</option>
+      <option value="ณัชชา" ${last==="ณัชชา"?"selected":""}>ณัชชา</option>
+      <option value="เพ็ญลักษณ์" ${last==="เพ็ญลักษณ์"?"selected":""}>เพ็ญลักษณ์</option>
+      <option value="อื่นๆ" ${["ภัทราภรณ์","ณัชชา","เพ็ญลักษณ์"].includes(last)?"" : "selected"}>✏️ ระบุชื่ออื่นๆ...</option>
+    </select>
+  `;
+
+  const sel = $("#peopleSelect");
+  if(sel.value === "อื่นๆ") {
+    textInput.style.display = "block";
+    if(["ภัทราภรณ์","ณัชชา","เพ็ญลักษณ์"].includes(last)) {
+      textInput.value = "";
+      customWho = "";
     } else {
-      textInput.style.display = "none";
-      customWho = sel ? sel.value : "ภัทราภรณ์";
+      textInput.value = last;
+      customWho = last;
     }
+  } else {
+    textInput.style.display = "none";
+    customWho = sel.value;
   }
   update();
 }
@@ -284,11 +283,12 @@ document.addEventListener("change", e => {
     if(val === "อื่นๆ") {
       textInput.style.display = "block";
       textInput.focus();
-      customWho = textInput.value.trim();
+      textInput.value = "";
+      customWho = "";
     } else {
       textInput.style.display = "none";
       customWho = val;
-      try{localStorage.setItem("pt-who-"+zone, val)}catch(err){}
+      try{localStorage.setItem("pt-who-"+zone+"-"+area, val)}catch(err){}
     }
     update();
   }
@@ -298,6 +298,7 @@ document.addEventListener("input", e => {
   if(e.target.matches(".m input")) update();
   if(e.target.id === "who") {
     customWho = e.target.value.trim();
+    try{localStorage.setItem("pt-who-"+zone+"-"+area, customWho)}catch(err){}
     update();
   }
 });
