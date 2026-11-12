@@ -161,17 +161,16 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
 
-    <!-- ส่วนที่ 2: Locations ย่อย (ห้องยาหลัก, Substock, ตู้เย็น) -->
+    <!-- ส่วนที่ 2: พื้นที่ย่อย / จุดวัด -->
     <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- ส่วนที่ 5: ผู้บันทึก (ให้เลือกค่าเริ่มต้นตามจุด หรือเปลี่ยนเป็น "อื่นๆ" เพื่อพิมพ์เองได้) -->
+    <!-- ส่วนที่ 5: ผู้บันทึก (ปรับเปลี่ยนตามสถานที่และจุดย่อย) -->
     <p class="cap">5. ผู้บันทึก</p>
     <div id="peopleContainer"></div>
-    <!-- ช่องกรอกชื่ออื่นๆ ใต้ผู้บันทึก (จะแสดงเมื่อเลือก "อื่นๆ") -->
     <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
 
-    <!-- ส่วนที่ 3: รอบเวลา (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30) -->
+    <!-- ส่วนที่ 3: รอบเวลา (09:00, 14:30, 20:30) -->
     <p class="cap">3. รอบเวลา</p>
     <div class="seg" id="seg" role="group" aria-label="รอบเวลา"></div>
 
@@ -211,7 +210,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoO
 
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
-  ["ห้องยาตึกเก่า", ["ห้องหลัก", "Substock"]],
+  ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
   ["คลังยา", ["คลังยา (หลัก)"]],
   ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
   ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
@@ -228,23 +227,21 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดชื่อเริ่มต้นตามจุดย่อย แต่เปิดให้เลือก "อื่นๆ" และพิมพ์เองได้
-function getDefaultStaff() {
+// กำหนดรายชื่อตัวเลือกใน Dropdown ผู้บันทึกตามสถานที่
+function getStaffList() {
   const currentZoneName = ZONES[zone][0];
-  const currentSubName = ZONES[zone][1][area] || "";
-  
-  if (currentZoneName === "ห้องยาตึกใหม่") {
-    if (currentSubName === "ตู้เย็น") return "ภัทราภรณ์";
-    if (currentSubName === "ห้องยาหลัก") return "เพ็ญลักษณ์";
-    if (currentSubName === "Substock") return "ณัชชา";
+  if (currentZoneName === "ห้องยาตึกเก่า") {
+    return ["ระพีพรรณ", "รณชัย"];
   }
-  return "ภัทราภรณ์";
+  // ห้องยาตึกใหม่ หรือสถานที่อื่นๆ
+  return ["ภัทราภรณ์", "ณัชชา", "เพ็ญลักษณ์"];
 }
 
 function renderPeople() {
   const box = $("#peopleContainer");
   const textInput = $("#who");
-  const defaultName = getDefaultStaff();
+  const staffList = getStaffList();
+  const defaultName = staffList[0];
   
   let last = ""; 
   try { last = localStorage.getItem("pt-who-"+zone+"-"+area) || defaultName; } catch(e){ last = defaultName; }
@@ -252,17 +249,15 @@ function renderPeople() {
   box.style.display = "block";
   box.innerHTML = `
     <select class="field" id="peopleSelect" aria-label="ผู้บันทึก">
-      <option value="ภัทราภรณ์" ${last==="ภัทราภรณ์"?"selected":""}>ภัทราภรณ์</option>
-      <option value="ณัชชา" ${last==="ณัชชา"?"selected":""}>ณัชชา</option>
-      <option value="เพ็ญลักษณ์" ${last==="เพ็ญลักษณ์"?"selected":""}>เพ็ญลักษณ์</option>
-      <option value="อื่นๆ" ${["ภัทราภรณ์","ณัชชา","เพ็ญลักษณ์"].includes(last)?"" : "selected"}>✏️ ระบุชื่ออื่นๆ...</option>
+      ${staffList.map(name => `<option value="${name}" ${last===name?"selected":""}>${name}</option>`).join("")}
+      <option value="อื่นๆ" ${staffList.includes(last)?"":"selected"}>✏️ ระบุชื่ออื่นๆ...</option>
     </select>
   `;
 
   const sel = $("#peopleSelect");
   if(sel.value === "อื่นๆ") {
     textInput.style.display = "block";
-    if(["ภัทราภรณ์","ณัชชา","เพ็ญลักษณ์"].includes(last)) {
+    if(staffList.includes(last)) {
       textInput.value = "";
       customWho = "";
     } else {
@@ -361,8 +356,8 @@ function build(){
   
   if(subName === "ตู้เย็น") {
     $("#list").innerHTML = fridge("ตู้เย็น");
-  } else if(subName === "ห้องยาหลัก") {
-    $("#list").innerHTML = roomCard("ห้องยาหลัก");
+  } else if(subName === "ห้องยาหลัก" || subName === "ห้องหลัก") {
+    $("#list").innerHTML = roomCard(subName);
   } else if(subName === "Substock") {
     $("#list").innerHTML = roomCard("Substock");
   } else {
