@@ -165,10 +165,11 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
     <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
-    <!-- ส่วนที่ 5: ผู้บันทึก (เปลี่ยนตามเงื่อนไขที่เลือก) -->
+    <!-- ส่วนที่ 5: ผู้บันทึก (ล็อคตามจุด หรือเลือก/พิมพ์ชื่ออื่นๆ ได้) -->
     <p class="cap">5. ผู้บันทึก</p>
     <div id="peopleContainer"></div>
-    <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่น" aria-label="ผู้บันทึก" style="display:none; margin-top:6px;">
+    <!-- ช่องกรอกชื่ออื่นๆ ใต้ผู้บันทึก -->
+    <input class="field" id="who" type="text" autocomplete="name" placeholder="ระบุชื่อ-นามสกุล หรือชื่อเล่นอื่นๆ..." aria-label="ผู้บันทึก" style="display:none; margin-top:8px;">
 
     <!-- ส่วนที่ 3: รอบเวลา (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30) -->
     <p class="cap">3. รอบเวลา</p>
@@ -208,7 +209,6 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoOtpvJZphzwqxPQ40qiBNvb9XA_EzTsnUmIvOFSezCxw5g4vzMF-hZ6w/exec"; 
 
-// โครงสร้างหลัก: ส่วนที่ 1 และ ส่วนที่ 2 (locations ย่อย)
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
   ["ห้องยาตึกเก่า", ["ห้องหลัก", "Substock"]],
@@ -228,7 +228,7 @@ $("#theme").addEventListener("click",()=>{
   try{localStorage.setItem("pt-theme",next)}catch(e){}
 });
 
-// กำหนดผู้บันทึกตามเงื่อนไข (ส่วนที่ 1 และ 2)
+// กำหนดผู้บันทึกตามเงื่อนไข (ห้องยาตึกใหม่) หรือเปิดให้เลือก/พิมพ์เองได้
 function getAssignedStaff() {
   const currentZoneName = ZONES[zone][0];
   const currentSubName = ZONES[zone][1][area] || "";
@@ -239,8 +239,7 @@ function getAssignedStaff() {
     if (currentSubName === "Substock") return { name: "ณัชชา", fixed: true };
   }
   
-  // สำหรับสถานที่อื่นๆ เปิดให้เลือกหรือกรอกชื่อได้อิสระ
-  return { name: "ภัทราภรณ์", fixed: false };
+  return { name: "", fixed: false };
 }
 
 function renderPeople() {
@@ -249,11 +248,13 @@ function renderPeople() {
   const staffInfo = getAssignedStaff();
 
   if (staffInfo.fixed) {
+    // ล็อคชื่อตามเงื่อนไข (ตู้เย็น -> ภัทราภรณ์, ห้องยาหลัก -> เพ็ญลักษณ์, Substock -> ณัชชา) พร้อมซ่อนช่องพิมพ์เพิ่ม
     box.style.display = "block";
     textInput.style.display = "none";
     box.innerHTML = `<input class="field" type="text" value="${staffInfo.name}" disabled style="background:var(--surface2); font-weight:600;">`;
     customWho = staffInfo.name;
   } else {
+    // กรณีสถานที่อื่น ให้มี Dropdown เลือก หรือเลือก "อื่นๆ" เพื่อพิมพ์เอง
     box.style.display = "block";
     let last = ""; try { last = localStorage.getItem("pt-who-"+zone) || "ภัทราภรณ์"; } catch(e){}
     box.innerHTML = `
@@ -307,7 +308,6 @@ const key=(z,a)=>$("#date").value+"|"+round+"|"+z+"|"+a;
 function showDate(){$("#dv").textContent=dstr();chips();areas()}
 $("#date").addEventListener("change",showDate);
 
-// ส่วนที่ 3: รอบเวลาทั้ง 3 รอบ (รอบเช้า 09:00, รอบบ่าย 14:30, รอบเย็น 20:30)
 const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
 function setRound(i){
   i = Math.min(i, R3.length-1); round = i;
@@ -355,7 +355,6 @@ function metric(t,label,whoLabel){
 const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
-// ส่วนที่ 4: ค่าที่วัดได้ (อุณหภูมิ, ความชื้น ตามที่เลือกในส่วนที่ 2)
 function build(){
   const subName = ZONES[zone][1][area];
   
