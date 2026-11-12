@@ -211,7 +211,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY2E26SM0Y-DoO
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
   ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
-  ["คลังยา", ["คลังยา (หลัก)"]],
+  ["คลังยา", ["ตู้ T31", "ตู้ T32", "ตู้ TH1", "ตู้ TV1", "คลังยา (หลัก)"]],
   ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
   ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
 ];
@@ -231,6 +231,8 @@ function getStaffList() {
   const currentZoneName = ZONES[zone][0];
   if (currentZoneName === "ห้องยาตึกเก่า") {
     return ["ระพีพรรณ", "รณชัย"];
+  } else if (currentZoneName === "คลังยา") {
+    return ["พงศ์พันธ์", "นาวิน"];
   }
   return ["ภัทราภรณ์", "ณัชชา", "เพ็ญลักษณ์"];
 }
@@ -304,7 +306,13 @@ $("#date").addEventListener("change",showDate);
 
 const R2 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"]];
 const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
-const getRounds = () => ZONES[zone][0] === "ห้องยาตึกเก่า" ? R2 : R3;
+const getRounds = () => {
+  const currentZoneName = ZONES[zone][0];
+  if (currentZoneName === "ห้องยาตึกเก่า" || currentZoneName === "คลังยา") {
+    return R2;
+  }
+  return R3;
+};
 
 function setRound(i){
   const rs = getRounds();
@@ -356,9 +364,9 @@ const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div cl
 function build(){
   const subName = ZONES[zone][1][area];
   
-  if(subName === "ตู้เย็น") {
-    $("#list").innerHTML = fridge("ตู้เย็น");
-  } else if(subName === "ห้องยาหลัก" || subName === "ห้องหลัก") {
+  if(subName.includes("ตู้")) {
+    $("#list").innerHTML = fridge(subName);
+  } else if(subName === "ห้องยาหลัก" || subName === "ห้องหลัก" || subName === "คลังยา (หลัก)") {
     $("#list").innerHTML = roomCard(subName);
   } else if(subName === "Substock") {
     $("#list").innerHTML = roomCard("Substock");
