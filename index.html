@@ -123,8 +123,6 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .history-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .history-btn{min-height:75px;border:1.5px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:8px;text-align:center}
 .history-btn[aria-pressed=true]{border-color:var(--acc);background:var(--acc);color:var(--accInk)}
-.history-filter{display:flex;gap:8px;margin-bottom:12px}
-.history-filter input{flex:1;height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px}
 .history-card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);font-size:14px}
 .history-card .h-header{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--h1);margin-bottom:4px}
 .history-card .h-sub{font-size:13px;color:var(--muted);margin-bottom:6px}
@@ -203,10 +201,6 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone('ทั้งหมด')">🗂️<span>ดูทั้งหมด</span></button>
     </div>
 
-    <div class="history-filter">
-      <input type="text" id="searchKeyword" placeholder="🔍 ค้นหาตามชื่อ, หมายเหตุ..." oninput="filterHistory()">
-      <button class="nav-tab active" type="button" onclick="loadHistory()" style="flex:none; width:auto; padding:0 14px;">🔄 โหลด</button>
-    </div>
     <div id="history-list">
       <p style="text-align:center; color:var(--muted); padding: 20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>
     </div>
@@ -224,6 +218,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy6-_AJ12huC3Wq-aSXPHeY_JhGJidXIvts7VZj6Fb9XTX18Y0be-ST0u5UALLV2rjTg/exec"; 
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1OXD__jfv2o6cM8FyG5DzRFFqV3bajg5LoCEDnmjn1SA/edit?usp=sharing";
 
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
@@ -466,6 +461,10 @@ async function loadHistory() {
 }
 
 function selectHistoryZone(loc) {
+  if (loc === "ทั้งหมด") {
+    window.open(GOOGLE_SHEET_URL, "_blank");
+    return;
+  }
   selectedHistoryLoc = loc;
   document.querySelectorAll(".history-btn").forEach(btn => {
     btn.setAttribute("aria-pressed", btn.dataset.loc === loc ? "true" : "false");
@@ -517,16 +516,8 @@ function filterHistory() {
     $("#history-list").innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p>`;
     return;
   }
-  const keyword = $("#searchKeyword").value.toLowerCase();
   let filtered = cachedHistory.filter(item => {
-    let matchLoc = selectedHistoryLoc === "ทั้งหมด" || (item.location && item.location.trim() === selectedHistoryLoc);
-    let matchKeyword = !keyword || 
-      (item.location && item.location.toLowerCase().includes(keyword)) ||
-      (item.subLocation && item.subLocation.toLowerCase().includes(keyword)) ||
-      (item.who && item.who.toLowerCase().includes(keyword)) ||
-      (item.date && item.date.toLowerCase().includes(keyword)) ||
-      (item.note && item.note.toLowerCase().includes(keyword));
-    return matchLoc && matchKeyword;
+    return (item.location && item.location.trim() === selectedHistoryLoc);
   });
   renderHistory(filtered);
 }
