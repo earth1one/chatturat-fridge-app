@@ -669,6 +669,7 @@ $("#save").addEventListener("click", async ()=>{
 
   const saveBtn = $("#save");
   saveBtn.disabled = true;
+  saveBtn.textContent = "กำลังบันทึก...";
 
   const base = {
     date: $("#date").value,
@@ -701,17 +702,17 @@ $("#save").addEventListener("click", async ()=>{
     return {...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity};
   });
 
-  for(let i=0; i<rows.length; i++){
-    saveBtn.textContent = rows.length>1 ? `กำลังบันทึก... (${i+1}/${rows.length})` : "กำลังบันทึก...";
-    try{
-      await fetch(APPS_SCRIPT_URL, {
+  // ใช้ Promise.all ส่งข้อมูลพร้อมกันทุกตู้/ทุกจุดทันที (เร็วขึ้นหลายเท่า)
+  try {
+    await Promise.all(rows.map(row => 
+      fetch(APPS_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(rows[i])
-      });
-    }catch(err){ console.error(err); }
-  }
+        body: JSON.stringify(row)
+      })
+    ));
+  } catch(err){ console.error(err); }
 
   saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
