@@ -205,14 +205,16 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
 
-    <!-- 2. พื้นที่ย่อย / จุดวัด -->
+    <!-- 2. พื้นที่ย่อย / จุดวัด (กรณีไม่ใช่คลังยา) -->
     <div id="subCategorySection" style="display:none;">
       <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
       <div class="ar on" id="mainCategories" role="group" aria-label="หมวดหมู่หลัก"></div>
     </div>
 
-    <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
-    <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+    <div id="standardAreaSection">
+      <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
+      <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+    </div>
 
     <!-- 3. รอบเวลา -->
     <p class="cap">3. รอบเวลา</p>
@@ -415,10 +417,16 @@ function mainCategories(){
 
 function areas(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const listItems = isKlangYa ? ZONES[zone][1][mainCatIndex][1] : ZONES[zone][1];
-  const box = $("#areas");
-  box.classList.toggle("on", listItems.length > 0);
-  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+  const stdSec = $("#standardAreaSection");
+  if(isKlangYa){
+    stdSec.style.display = "none";
+  } else {
+    stdSec.style.display = "block";
+    const listItems = ZONES[zone][1];
+    const box = $("#areas");
+    box.classList.toggle("on", listItems.length > 0);
+    box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+  }
 }
 
 $("#zones").addEventListener("click", e => {
@@ -450,18 +458,32 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-// เอาช่องความชื้นออกสำหรับตู้เย็น ให้เหลือแค่ช่องอุณหภูมิช่องเดียว (เพิ่มคลาส one)
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
-const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+const fridge=n=>`<div class="card f" data-subloc="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
+const roomCard=(n)=>`<div class="card r" data-subloc="${n}"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const subName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
-  
-  if(subName.includes("ตู้") || (isKlangYa && mainCatIndex === 0)) {
-    $("#list").innerHTML = fridge(subName);
+  if(isKlangYa){
+    // สำหรับคลังยา แสดงทุกตู้และทุกห้องพร้อมกันในหน้าเดียว
+    let html = "";
+    // หมวดตู้เย็นทั้งหมด
+    const fridges = ZONES[zone][1][0][1];
+    fridges.forEach(fName => {
+      html += fridge(fName);
+    });
+    // หมวดอุณหภูมิห้องทั้งหมด
+    const rooms = ZONES[zone][1][1][1];
+    rooms.forEach(rName => {
+      html += roomCard(rName);
+    });
+    $("#list").innerHTML = html;
   } else {
-    $("#list").innerHTML = roomCard(subName);
+    const subName = ZONES[zone][1][area];
+    if(subName.includes("ตู้")) {
+      $("#list").innerHTML = fridge(subName);
+    } else {
+      $("#list").innerHTML = roomCard(subName);
+    }
   }
   $("#note").value=""; update();
 }
@@ -629,51 +651,98 @@ $("#save").addEventListener("click", ()=>{
   saveBtn.disabled = true;
   saveBtn.textContent = "กำลังบันทึก...";
 
-  const cards = document.querySelectorAll(".card");
-  let fridgeTemp = "", roomTemp = "", humidity = "";
-
-  cards.forEach(card => {
-    card.querySelectorAll("input").forEach(inp => {
-      let val = inp.value.trim().replace(",", ".");
-      let label = inp.getAttribute("aria-label") || "";
-      if(label.includes("อุณหภูมิ")) {
-        let num = parseFloat(val);
-        if(!isNaN(num)) {
-          if(card.classList.contains("f")) {
-            if(num > 12 && num <= 100) num = num / 10;
-            fridgeTemp = num.toFixed(1);
-          } else {
-            roomTemp = num.toFixed(1);
-          }
-        }
-      } else if(label.includes("ความชื้น")) {
-        let num = parseFloat(val);
-        if(!isNaN(num)) humidity = num.toFixed(1);
-      }
-    });
-  });
-
   const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const subLocName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
+  const cards = document.querySelectorAll(".card");
 
-  const payload = {
-    date: $("#date").value,
-    location: ZONES[zone][0],
-    subLocation: subLocName,
-    shift: getRounds()[round][0],
-    fridgeTemp: fridgeTemp,
-    roomTemp: roomTemp,
-    humidity: humidity,
-    who: customWho,
-    note: $("#note").value
-  };
+  if(isKlangYa) {
+    // กรณีคลังยา: วนลูปส่งข้อมูลทุกตู้/ทุกห้องทีเดียวครบทุกรายการ
+    cards.forEach(card => {
+      let subLocName = card.getAttribute("data-subloc");
+      let fridgeTemp = "", roomTemp = "", humidity = "";
 
-  fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  }).catch(err => console.error(err));
+      card.querySelectorAll("input").forEach(inp => {
+        let val = inp.value.trim().replace(",", ".");
+        let label = inp.getAttribute("aria-label") || "";
+        if(label.includes("อุณหภูมิ")) {
+          let num = parseFloat(val);
+          if(!isNaN(num)) {
+            if(card.classList.contains("f")) {
+              if(num > 12 && num <= 100) num = num / 10;
+              fridgeTemp = num.toFixed(1);
+            } else {
+              roomTemp = num.toFixed(1);
+            }
+          }
+        } else if(label.includes("ความชื้น")) {
+          let num = parseFloat(val);
+          if(!isNaN(num)) humidity = num.toFixed(1);
+        }
+      });
+
+      const payload = {
+        date: $("#date").value,
+        location: ZONES[zone][0],
+        subLocation: subLocName,
+        shift: getRounds()[round][0],
+        fridgeTemp: fridgeTemp,
+        roomTemp: roomTemp,
+        humidity: humidity,
+        who: customWho,
+        note: $("#note").value
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error(err));
+    });
+
+  } else {
+    // กรณีสถานที่อื่นตามเดิม
+    let fridgeTemp = "", roomTemp = "", humidity = "";
+    cards.forEach(card => {
+      card.querySelectorAll("input").forEach(inp => {
+        let val = inp.value.trim().replace(",", ".");
+        let label = inp.getAttribute("aria-label") || "";
+        if(label.includes("อุณหภูมิ")) {
+          let num = parseFloat(val);
+          if(!isNaN(num)) {
+            if(card.classList.contains("f")) {
+              if(num > 12 && num <= 100) num = num / 10;
+              fridgeTemp = num.toFixed(1);
+            } else {
+              roomTemp = num.toFixed(1);
+            }
+          }
+        } else if(label.includes("ความชื้น")) {
+          let num = parseFloat(val);
+          if(!isNaN(num)) humidity = num.toFixed(1);
+        }
+      });
+    });
+
+    const subLocName = ZONES[zone][1][area];
+    const payload = {
+      date: $("#date").value,
+      location: ZONES[zone][0],
+      subLocation: subLocName,
+      shift: getRounds()[round][0],
+      fridgeTemp: fridgeTemp,
+      roomTemp: roomTemp,
+      humidity: humidity,
+      who: customWho,
+      note: $("#note").value
+    };
+
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error(err));
+  }
 
   saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
