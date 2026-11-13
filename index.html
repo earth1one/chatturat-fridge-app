@@ -42,7 +42,6 @@ document.documentElement.setAttribute("data-theme",t)})();
 :root[data-theme="dark"]{
   --bg:#06130d; --surface:#0e2119; --surface2:#13291f; --line:#1c3a2d; --ink:#e6f5ec; --muted:#8db1a0;
   --acc:#34d399; --accInk:#032416; --h1:#0f7a56; --h2:#06352a; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --fb:#0d2a2a; --fl:#1f5a57; --fa:#3cd6c8; --rb:#2b2412; --rl:#5c4a1c; --ra:#f0b84d;
   --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(6,19,13,.82); color-scheme:dark;
 }
 :root[data-theme="light"]{color-scheme:light}
@@ -451,7 +450,8 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms">${metric(F,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+// เอาช่องความชื้นออกสำหรับตู้เย็น ให้เหลือแค่ช่องอุณหภูมิช่องเดียว (เพิ่มคลาส one)
+const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
 const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
