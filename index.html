@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="./pharmatemp.PNG">
 
 <!-- ตั้งค่าสำหรับ Android (PWA Manifest) -->
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23eef7f2%22%2C%22theme_color%22%3A%22%2312b07a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2Fpharmatemp.PNG%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f4f9%22%2C%22theme_color%22%3A%22%231a56db%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2Fpharmatemp.PNG%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,23 +26,23 @@ document.documentElement.setAttribute("data-theme",t)})();
 </script>
 <style>
 :root{
-  --bg:#eef7f2; --surface:#fff; --surface2:#f4faf7; --line:#d9ebe1; --ink:#0b2a1f; --muted:#587367;
-  --acc:#0f9d6a; --accInk:#fff; --h1:#12b07a; --h2:#07674a; --bad:#d1383b; --badbg:#fdeaea;
-  --fb:#e4f5f3; --fl:#a6dcd6; --fa:#0d8f86; --rb:#fbf0da; --rl:#ecd29b; --ra:#b9770e;
-  --shadow:0 8px 24px rgba(15,100,70,.10); --glass:rgba(238,247,242,.82);
+  --bg:#f0f4f9; --surface:#fff; --surface2:#f4f7fb; --line:#d8e2ec; --ink:#102a43; --muted:#486581;
+  --acc:#1a56db; --accInk:#fff; --h1:#1e429f; --h2:#111827; --bad:#d1383b; --badbg:#fdeaea;
+  --fb:#e1effe; --fl:#c3ddfd; --fa:#1a56db; --rb:#fef08a; --rl:#fef08a; --ra:#854d0e;
+  --shadow:0 8px 24px rgba(26,86,219,.08); --glass:rgba(240,244,249,.82);
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light; box-sizing:border-box; padding-top:var(--safe-t);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#06130d; --surface:#0e2119; --surface2:#13291f; --line:#1c3a2d; --ink:#e6f5ec; --muted:#8db1a0;
-  --acc:#34d399; --accInk:#032416; --h1:#0f7a56; --h2:#06352a; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --fb:#0d2a2a; --fl:#1f5a57; --fa:#3cd6c8; --rb:#2b2412; --rl:#5c4a1c; --ra:#f0b84d;
-  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(6,19,13,.82); color-scheme:dark;
+  --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
+  --acc:#3b82f6; --accInk:#0f172a; --h1:#1d4ed8; --h2:#1e3a8a; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --fb:#172554; --fl:#1e40af; --fa:#60a5fa; --rb:#422006; --rl:#713f12; --ra:#fde047;
+  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#06130d; --surface:#0e2119; --surface2:#13291f; --line:#1c3a2d; --ink:#e6f5ec; --muted:#8db1a0;
-  --acc:#34d399; --accInk:#032416; --h1:#0f7a56; --h2:#06352a; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(6,19,13,.82); color-scheme:dark;
+  --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
+  --acc:#3b82f6; --accInk:#0f172a; --h1:#1d4ed8; --h2:#1e3a8a; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
 }
 :root[data-theme="light"]{color-scheme:light}
 html{scroll-padding-top:var(--safe-t)}
@@ -167,7 +167,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .h-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px 10px;margin-bottom:12px}
 .h-card h2{font-size:16px;margin:0 0 2px}
 .h-card p{margin:0 0 8px;font-size:12px;color:var(--muted)}
-.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(15,157,106,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
+.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(26,86,219,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
 .h-card p em{font-style:normal;color:var(--bad)}
 .cv{position:relative;height:200px}
 
@@ -292,13 +292,11 @@ const LOCS_HIST=[
 ];
 
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
-// [แก้ไข] mainCatIndex และ area เริ่มต้นเป็น -1 = ยังไม่ได้เลือก (ต้องกดเลือกก่อนถึงจะกรอกค่าได้)
 let round=0, zone=0, mainCatIndex=-1, area=-1; const saved={};
 let cachedHistory = [];
 let hLoc=0, hDays=30, charts=[];
 let customWho = "";
 
-// [เพิ่ม] คืนชื่อตู้/จุดวัดที่เลือกอยู่ ถ้ายังไม่ได้เลือกจะคืน null
 function getSubName(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
   if(isKlangYa){
@@ -309,7 +307,6 @@ function getSubName(){
   return ZONES[zone][1][area];
 }
 
-// [เพิ่ม] รายการที่ต้องกรอก: คลังยา = ทุกตู้/จุดวัดของหมวดที่กด (ตู้เย็น หรือ อุณหภูมิห้อง) / สถานที่อื่น = ตัวที่เลือก
 function getTargets(){
   if(ZONES[zone][0] === "คลังยา"){
     if(mainCatIndex < 0) return [];
@@ -451,8 +448,8 @@ function mainCategories(){
 
 function areas(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
-    let listItems = [];
-  if(!isKlangYa) listItems = ZONES[zone][1];   // คลังยา: กดหมวดแล้วขึ้นทุกรายการของหมวดนั้น ไม่ต้องเลือกทีละตู้
+  let listItems = [];
+  if(!isKlangYa) listItems = ZONES[zone][1];
   const box = $("#areas");
   box.classList.toggle("on", listItems.length > 0);
   $("#subAreaTitle").style.display = listItems.length > 0 ? "block" : "none";
@@ -461,7 +458,7 @@ function areas(){
 
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
-  zone = +b.dataset.i; mainCatIndex = -1; area = -1;   // เปลี่ยนสถานที่ = รีเซ็ตการเลือก
+  zone = +b.dataset.i; mainCatIndex = -1; area = -1;
   chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
 });
 
@@ -488,7 +485,6 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-// เอาช่องความชื้นออกสำหรับตู้เย็น ให้เหลือแค่ช่องอุณหภูมิช่องเดียว (เพิ่มคลาส one)
 const fridge=n=>{const t=n.includes("TH1 (บน)")?FZ:F;return `<div class="card f${t.neg?" fz":""}" data-sub="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(t,"อุณหภูมิ",n)}</div></div>`};
 const roomCard=(n)=>`<div class="card r" data-sub="${n}"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
@@ -497,11 +493,9 @@ function build(){
   const targets = getTargets();
 
   if(!targets.length){
-    // ยังไม่ได้เลือกตู้ / จุดวัด → ยังไม่แสดงช่องกรอก
     const msg = isKlangYa ? "กด “ตู้เย็น” หรือ “อุณหภูมิห้อง” ในข้อ 2 เพื่อกรอกค่าที่วัดได้" : "กดเลือกตู้ / จุดวัดในข้อ 2 เพื่อกรอกค่าที่วัดได้";
     $("#list").innerHTML = `<div class="empty"><b>ยังไม่ได้เลือกตู้ / จุดวัด</b>${msg}</div>`;
   } else if(isKlangYa){
-    // คลังยา: แสดงทุกการ์ดของหมวดที่กด (ตู้เย็น หรือ อุณหภูมิห้อง) กรอกครบแล้วบันทึกทีเดียว
     $("#list").innerHTML = targets.map(t=>t.fridge ? fridge(t.name) : roomCard(t.name)).join("");
   } else {
     const t = targets[0];
@@ -653,7 +647,7 @@ function renderHistoryView() {
 
   if(charts.length) charts.forEach(c=>c.destroy());
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
-  charts=[mk("c1","f",0,12,"#0f8f86","°C",filtered),mk("c2","r",15,30,"#c27a0a","°C",filtered),mk("c3","h",20,80,"#1d8fd1","%RH",filtered)];
+  charts=[mk("c1","f",0,12,"#1a56db","°C",filtered),mk("c2","r",15,30,"#d97706","°C",filtered),mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
   filtered.forEach(r=>{
@@ -671,7 +665,7 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(
 
 $("#save").addEventListener("click", async ()=>{
   const cards = [...document.querySelectorAll(".card")];
-  if(!cards.length) return;   // ยังไม่ได้เลือกตู้ / จุดวัด
+  if(!cards.length) return;
 
   const saveBtn = $("#save");
   saveBtn.disabled = true;
@@ -684,7 +678,6 @@ $("#save").addEventListener("click", async ()=>{
     note: $("#note").value
   };
 
-  // 1 การ์ด = 1 แถวในชีต
   const rows = cards.map(card => {
     let fridgeTemp = "", roomTemp = "", humidity = "";
     card.querySelectorAll("input").forEach(inp => {
@@ -708,7 +701,6 @@ $("#save").addEventListener("click", async ()=>{
     return {...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity};
   });
 
-  // ส่งทีละแถวตามลำดับ เพื่อไม่ให้ชีตเขียนทับกัน
   for(let i=0; i<rows.length; i++){
     saveBtn.textContent = rows.length>1 ? `กำลังบันทึก... (${i+1}/${rows.length})` : "กำลังบันทึก...";
     try{
