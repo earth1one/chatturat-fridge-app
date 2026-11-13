@@ -205,7 +205,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <p class="cap">1. เลือกสถานที่</p>
     <div class="chips" id="zones"></div>
 
-    <!-- 2. พื้นที่ย่อย / จุดวัด (ซ่อนเฉพาะคลังยา เพราะคลังยาแสดงรวบยอดทั้งหมดในหน้าเดียวแล้ว) -->
+    <!-- 2. พื้นที่ย่อย / จุดวัด -->
     <div id="subCategoryContainer">
       <div id="subCategorySection" style="display:none;">
         <p class="cap">2. พื้นที่ย่อย / จุดวัด</p>
@@ -460,13 +460,10 @@ function build(){
   const subContainer = $("#subCategoryContainer");
   
   if(currentZoneName === "คลังยา") {
-    // สำหรับคลังยา: แสดงทุกตู้และทุกห้องพร้อมกันในหน้าเดียว
     subContainer.style.display = "none";
     let html = "";
-    // ตู้เย็นทั้งหมด
     const fridges = ZONES[zone][1][0][1];
     fridges.forEach(fName => { html += fridge(fName); });
-    // อุณหภูมิห้องทั้งหมด
     const rooms = ZONES[zone][1][1][1];
     rooms.forEach(rName => { html += roomCard(rName); });
     
@@ -476,7 +473,6 @@ function build(){
     $("#peopleStepLabel").textContent = "4";
   } else {
     subContainer.style.display = "block";
-    const isKlangYa = false;
     const subName = ZONES[zone][1][area];
     
     if(subName.includes("ตู้")) {
@@ -637,7 +633,7 @@ function renderHistoryView() {
 
   const A=[];
   filtered.forEach(r=>{
-    [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity']].forEach(([k,n,u,val])=>{
+    [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
       let num = val !== "" && val != null ? parseFloat(val) : null;
       if(num !== null && badHist(k,num)) {
         A.push(`<div class="row"><div>${n=="ชื้น"?"ความชื้น":"อุณหภูมิ"+n}<span>${formatDateShort(r.date)} ${r.shift || ''} · ${r.who || "-"}</span></div><b>${num} ${u}</b></div>`);
@@ -661,7 +657,6 @@ $("#save").addEventListener("click", async ()=>{
   const noteVal = $("#note").value;
 
   if (currentZoneName === "คลังยา") {
-    // กรณีคลังยา: วนลูปบันทึกทีละตู้/ห้องที่กรอกข้อมูล
     const cards = document.querySelectorAll(".card");
     let promises = [];
 
@@ -688,7 +683,6 @@ $("#save").addEventListener("click", async ()=>{
         }
       });
 
-      // ถ้ามีการกรอกข้อมูลอย่างน้อยหนึ่งช่องในตู้/ห้องนั้น ให้ส่งข้อมูล
       if(fridgeTemp !== "" || roomTemp !== "" || humidity !== "") {
         const payload = {
           date: dateVal,
@@ -715,7 +709,6 @@ $("#save").addEventListener("click", async ()=>{
 
     await Promise.all(promises);
   } else {
-    // กรณีสถานที่อื่นๆ (บันทึกปกติ)
     const cards = document.querySelectorAll(".card");
     let fridgeTemp = "", roomTemp = "", humidity = "";
 
