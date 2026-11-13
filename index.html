@@ -87,8 +87,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 
 .ar{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .ar.on{display:grid}
-.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ar button small{font-size:12px;font-weight:500;color:var(--muted)}
 .ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc)}
+.ar button[aria-pressed=true] small{color:var(--acc)}
 
 .card{margin-bottom:12px;border-radius:22px;padding:14px;border:1.5px solid var(--cl);background:var(--cb);box-shadow:var(--shadow);transition:border-color .2s,background .2s}
 .card.f{--cb:var(--fb);--cl:var(--fl);--ca:var(--fa)}
@@ -211,8 +213,10 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <div class="ar on" id="mainCategories" role="group" aria-label="หมวดหมู่หลัก"></div>
     </div>
 
-    <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
-    <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+    <div id="standardAreaSection">
+      <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
+      <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
+    </div>
 
     <!-- 3. รอบเวลา -->
     <p class="cap">3. รอบเวลา</p>
@@ -220,7 +224,12 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 
     <!-- 4. ค่าที่วัดได้ -->
     <p class="cap">4. ค่าที่วัดได้</p>
-    <div id="list"></div>
+    <div id="list">
+      <div class="card" style="text-align:center; padding:30px; color:var(--muted);">
+        <p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p>
+        <p style="margin:0; font-size:14px;">กดเลือกพื้นที่ย่อยในข้อ 2 เพื่อกรอกค่า</p>
+      </div>
+    </div>
 
     <!-- 5. ผู้บันทึก -->
     <p class="cap">5. ผู้บันทึก</p>
@@ -251,11 +260,11 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <div class="h-card"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
     <div class="h-card"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
     <div class="h-card alerts"><h2>⚠️ รายการที่ควรตรวจสอบ</h2><div id="h-alerts"><p style="color:var(--muted)">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p></div></div>
-    <p class="note">● เช้า ■ Б่าย ◆ เย็น · แตะที่กราฟเพื่อดูรายละเอียด</p>
+    <p class="note">● เช้า ■ บ่าย ◆ เย็น · แตะที่กราฟเพื่อดูรายละเอียด</p>
   </div>
 </div>
 
-<div class="bar" id="bar-save"><button class="save" type="button" id="save" disabled></button></div>
+<div class="bar" id="bar-save"><button class="save" type="button" id="save" disabled>เลือกพื้นที่ย่อยก่อน</button></div>
 
 <div class="success-overlay" id="successOverlay">
   <div class="success-modal">
@@ -269,11 +278,11 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy6-_AJ12huC3W
 const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1OXD__jfv2o6cM8FyG5DzRFFqV3bajg5LoCEDnmjn1SA/edit?usp=sharing";
 
 const ZONES = [
-  ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
-  ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
+  ["ห้องยาตึกใหม่", [["ตู้เย็น", ["ตู้ T1", "ตู้ T2"]], ["ห้องยาหลัก", ["ห้องยาหลัก"]], ["Substock", ["Substock"]]]],
+  ["ห้องยาตึกเก่า", [["ตู้เย็น", ["ตู้ T1"]], ["ห้องหลัก", ["ห้องหลัก"]], ["Substock", ["Substock"]]]],
   ["คลังยา", [["ตู้เย็น", ["ตู้ T31", "ตู้ T32", "ตู้ TH1", "ตู้ TV1"]], ["อุณหภูมิห้อง", ["R1", "R2", "R3", "R4"]]]],
-  ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
-  ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
+  ["ห้องผลิตชั้นบน", [["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]]]],
+  ["ห้องผลิตชั้นล่าง", [["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]]]
 ];
 
 const LOCS_HIST=[
@@ -286,7 +295,7 @@ const LOCS_HIST=[
 ];
 
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
-let round=0, zone=0, mainCatIndex=0, area=0; const saved={};
+let round=0, zone=0, mainCatIndex=0, area=null; const saved={};
 let cachedHistory = [];
 let hLoc=0, hDays=30, charts=[];
 let customWho = "";
@@ -401,11 +410,10 @@ function chips(){
 }
 
 function mainCategories(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const cats = ZONES[zone][1];
   const sec = $("#subCategorySection");
-  sec.style.display = isKlangYa ? "block" : "none";
-  if(isKlangYa){
-    const cats = ZONES[zone][1];
+  sec.style.display = cats.length > 1 ? "block" : "none";
+  if(cats.length > 1){
     $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${c[0]}<small>${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
     $("#subAreaTitle").textContent = "เลือกตู้ / ห้อง";
   } else {
@@ -414,23 +422,28 @@ function mainCategories(){
 }
 
 function areas(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const listItems = isKlangYa ? ZONES[zone][1][mainCatIndex][1] : ZONES[zone][1];
+  const cats = ZONES[zone][1];
+  const activeCat = cats[mainCatIndex] || cats[0];
+  const listItems = activeCat[1];
   const box = $("#areas");
   box.classList.toggle("on", listItems.length > 0);
-  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${area !== null && k===area}">${n}</button>`).join("");
 }
 
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
-  zone = +b.dataset.i; mainCatIndex = 0; area = 0;
-  chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
+  zone = +b.dataset.i; mainCatIndex = 0; area = null;
+  chips(); mainCategories(); areas(); setRound(round); 
+  $("#list").innerHTML = `<div class="card" style="text-align:center; padding:30px; color:var(--muted);"><p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p><p style="margin:0; font-size:14px;">กดเลือกพื้นที่ย่อยในข้อ 2 เพื่อกรอกค่า</p></div>`;
+  update();
 });
 
 $("#mainCategories").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
-  mainCatIndex = +b.dataset.mc; area = 0;
-  mainCategories(); areas(); renderPeople(); build();
+  mainCatIndex = +b.dataset.mc; area = null;
+  mainCategories(); areas(); 
+  $("#list").innerHTML = `<div class="card" style="text-align:center; padding:30px; color:var(--muted);"><p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p><p style="margin:0; font-size:14px;">กดเลือกพื้นที่ย่อยในข้อ 2 เพื่อกรอกค่า</p></div>`;
+  update();
 });
 
 $("#areas").addEventListener("click", e => {
@@ -450,14 +463,16 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
-const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+const fridge=n=>`<div class="card f" data-subloc="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
+const roomCard=(n)=>`<div class="card r" data-subloc="${n}"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const subName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
+  if(area === null) return;
+  const cats = ZONES[zone][1];
+  const activeCat = cats[mainCatIndex] || cats[0];
+  const subName = activeCat[1][area];
   
-  if(subName.includes("ตู้") || (isKlangYa && mainCatIndex === 0)) {
+  if(subName.includes("ตู้") || activeCat[0] === "ตู้เย็น") {
     $("#list").innerHTML = fridge(subName);
   } else {
     $("#list").innerHTML = roomCard(subName);
@@ -466,6 +481,15 @@ function build(){
 }
 
 function update(){
+  if(area === null) {
+    $("#prog").textContent = "0/0";
+    $("#arc").style.strokeDashoffset = 213.6;
+    const b = $("#save");
+    b.disabled = true;
+    b.textContent = "เลือกพื้นที่ย่อยก่อน";
+    return;
+  }
+
   const ms=[...document.querySelectorAll(".m")]; let n=0,out=0;
   ms.forEach(c=>{
     let rawVal = c.querySelector("input").value.replace(",", ".").trim();
@@ -624,13 +648,14 @@ function renderHistoryView() {
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(cachedHistory.length) renderHistoryView(); });
 
 $("#save").addEventListener("click", ()=>{
+  if(area === null) return;
   const saveBtn = $("#save");
   saveBtn.disabled = true;
   saveBtn.textContent = "กำลังบันทึก...";
 
-  const cards = document.querySelectorAll(".card");
   let fridgeTemp = "", roomTemp = "", humidity = "";
-
+  const cards = document.querySelectorAll(".card");
+  
   cards.forEach(card => {
     card.querySelectorAll("input").forEach(inp => {
       let val = inp.value.trim().replace(",", ".");
@@ -652,8 +677,9 @@ $("#save").addEventListener("click", ()=>{
     });
   });
 
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  const subLocName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
+  const cats = ZONES[zone][1];
+  const activeCat = cats[mainCatIndex] || cats[0];
+  const subLocName = activeCat[1][area];
 
   const payload = {
     date: $("#date").value,
@@ -674,7 +700,11 @@ $("#save").addEventListener("click", ()=>{
     body: JSON.stringify(payload)
   }).catch(err => console.error(err));
 
-  saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
+  saved[key(zone,mainCatIndex,area)]=true; 
+  area = null;
+  chips(); mainCategories(); areas(); setRound(round);
+  $("#list").innerHTML = `<div class="card" style="text-align:center; padding:30px; color:var(--muted);"><p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p><p style="margin:0; font-size:14px;">กดเลือกพื้นที่ย่อยในข้อ 2 เพื่อกรอกค่า</p></div>`;
+  
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   
   const overlay = $("#successOverlay");
@@ -686,7 +716,7 @@ $("#save").addEventListener("click", ()=>{
 });
 
 // เริ่มต้นโหลดหน้าเว็บ
-chips(); mainCategories(); areas(); setRound(round); showDate(); renderPeople(); build();
+chips(); mainCategories(); areas(); setRound(round); showDate(); renderPeople(); update();
 </script>
 </body>
 </html>
