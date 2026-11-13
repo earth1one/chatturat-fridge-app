@@ -87,10 +87,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 
 .ar{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .ar.on{display:grid}
-.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.ar button small{font-size:12px;font-weight:500;color:var(--muted)}
+.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc)}
-.ar button[aria-pressed=true] small{color:var(--acc)}
 
 .card{margin-bottom:12px;border-radius:22px;padding:14px;border:1.5px solid var(--cl);background:var(--cb);box-shadow:var(--shadow);transition:border-color .2s,background .2s}
 .card.f{--cb:var(--fb);--cl:var(--fl);--ca:var(--fa)}
@@ -213,10 +211,8 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <div class="ar on" id="mainCategories" role="group" aria-label="หมวดหมู่หลัก"></div>
     </div>
 
-    <div id="standardAreaSection">
-      <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
-      <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
-    </div>
+    <p class="cap" id="subAreaTitle">2. พื้นที่ย่อย / จุดวัด</p>
+    <div class="ar on" id="areas" role="group" aria-label="พื้นที่ย่อย"></div>
 
     <!-- 3. รอบเวลา -->
     <p class="cap">3. รอบเวลา</p>
@@ -294,9 +290,6 @@ let round=0, zone=0, mainCatIndex=0, area=0; const saved={};
 let cachedHistory = [];
 let hLoc=0, hDays=30, charts=[];
 let customWho = "";
-
-// สำหรับคลังยา เช็คว่าเลือกหมวดหลักหรือยัง (เริ่มต้นเป็น null สำหรับคลังยา)
-let klangYaAreaSelected = false;
 
 $("#theme").addEventListener("click",()=>{
   const next=root.getAttribute("data-theme")==="dark"?"light":"dark";
@@ -425,29 +418,24 @@ function areas(){
   const listItems = isKlangYa ? ZONES[zone][1][mainCatIndex][1] : ZONES[zone][1];
   const box = $("#areas");
   box.classList.toggle("on", listItems.length > 0);
-  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${!isKlangYa || k===area ? (isKlangYa && k===area) : false}">${n}</button>`).join("");
+  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
 }
 
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   zone = +b.dataset.i; mainCatIndex = 0; area = 0;
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  klangYaAreaSelected = !isKlangYa; // ถ้าไม่ใช่คลังยา ถือว่าเลือกแล้วอัตโนมัติ
   chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
 });
 
 $("#mainCategories").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   mainCatIndex = +b.dataset.mc; area = 0;
-  klangYaAreaSelected = false; // เปลี่ยนหมวดหลักในคลังยา ต้องให้เลือกพื้นที่ย่อยใหม่
   mainCategories(); areas(); renderPeople(); build();
 });
 
 $("#areas").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
-  area = +b.dataset.k; 
-  klangYaAreaSelected = true;
-  areas(); renderPeople(); build();
+  area = +b.dataset.k; areas(); renderPeople(); build();
 });
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
@@ -462,56 +450,23 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-const fridge=n=>`<div class="card f" data-subloc="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
-const roomCard=(n)=>`<div class="card r" data-subloc="${n}"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+// เอาช่องความชื้นออกสำหรับตู้เย็น ให้เหลือแค่ช่องอุณหภูมิช่องเดียว (เพิ่มคลาส one)
+const fridge=n=>`<div class="card f"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(F,"อุณหภูมิ",n)}</div></div>`;
+const roomCard=(n)=>`<div class="card r"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
 
 function build(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const subName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
   
-  if(isKlangYa && !klangYaAreaSelected) {
-    // ถ้าเป็นคลังยาและยังไม่ได้เลือกพื้นที่ย่อย ให้แสดงข้อความแจ้งเตือน
-    $("#list").innerHTML = `<div class="card" style="text-align:center; padding:30px; color:var(--muted);"><p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p><p style="margin:0; font-size:14px;">กดเลือก "ตู้เย็น" หรือ "อุณหภูมิห้อง" และเลือกจุดวัดในข้อ 2 เพื่อกรอกค่า</p></div>`;
-    update();
-    return;
-  }
-
-  if(isKlangYa) {
-    if(mainCatIndex === 0) {
-      // คลังยา หมวดตู้เย็น: แสดงตู้ทั้งหมดพร้อมกัน
-      const fridges = ZONES[zone][1][0][1];
-      let html = "";
-      fridges.forEach(fName => { html += fridge(fName); });
-      $("#list").innerHTML = html;
-    } else {
-      // คลังยา หมวดอุณหภูมิห้อง: แสดงห้องทั้งหมดพร้อมกัน
-      const rooms = ZONES[zone][1][1][1];
-      let html = "";
-      rooms.forEach(rName => { html += roomCard(rName); });
-      $("#list").innerHTML = html;
-    }
+  if(subName.includes("ตู้") || (isKlangYa && mainCatIndex === 0)) {
+    $("#list").innerHTML = fridge(subName);
   } else {
-    // สถานที่อื่นๆ แสดงตามปกติจุดเดียวที่เลือก
-    const subName = ZONES[zone][1][area];
-    if(subName.includes("ตู้")) {
-      $("#list").innerHTML = fridge(subName);
-    } else {
-      $("#list").innerHTML = roomCard(subName);
-    }
+    $("#list").innerHTML = roomCard(subName);
   }
   $("#note").value=""; update();
 }
 
 function update(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  if(isKlangYa && !klangYaAreaSelected) {
-    $("#prog").textContent = "0/0";
-    $("#arc").style.strokeDashoffset = 213.6;
-    const b = $("#save");
-    b.disabled = true;
-    b.textContent = "เลือกพื้นที่ย่อยก่อน";
-    return;
-  }
-
   const ms=[...document.querySelectorAll(".m")]; let n=0,out=0;
   ms.forEach(c=>{
     let rawVal = c.querySelector("input").value.replace(",", ".").trim();
@@ -670,117 +625,57 @@ function renderHistoryView() {
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(cachedHistory.length) renderHistoryView(); });
 
 $("#save").addEventListener("click", ()=>{
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  if(isKlangYa && !klangYaAreaSelected) return;
-
   const saveBtn = $("#save");
   saveBtn.disabled = true;
   saveBtn.textContent = "กำลังบันทึก...";
 
   const cards = document.querySelectorAll(".card");
+  let fridgeTemp = "", roomTemp = "", humidity = "";
 
-  if(isKlangYa) {
-    // คลังยา บันทึกทุกตู้หรือทุกห้องในหมวดที่เลือกพร้อมกันทีเดียว
-    cards.forEach(card => {
-      let subLocName = card.getAttribute("data-subloc");
-      let fridgeTemp = "", roomTemp = "", humidity = "";
-
-      card.querySelectorAll("input").forEach(inp => {
-        let val = inp.value.trim().replace(",", ".");
-        let label = inp.getAttribute("aria-label") || "";
-        if(label.includes("อุณหภูมิ")) {
-          let num = parseFloat(val);
-          if(!isNaN(num)) {
-            if(card.classList.contains("f")) {
-              if(num > 12 && num <= 100) num = num / 10;
-              fridgeTemp = num.toFixed(1);
-            } else {
-              roomTemp = num.toFixed(1);
-            }
+  cards.forEach(card => {
+    card.querySelectorAll("input").forEach(inp => {
+      let val = inp.value.trim().replace(",", ".");
+      let label = inp.getAttribute("aria-label") || "";
+      if(label.includes("อุณหภูมิ")) {
+        let num = parseFloat(val);
+        if(!isNaN(num)) {
+          if(card.classList.contains("f")) {
+            if(num > 12 && num <= 100) num = num / 10;
+            fridgeTemp = num.toFixed(1);
+          } else {
+            roomTemp = num.toFixed(1);
           }
-        } else if(label.includes("ความชื้น")) {
-          let num = parseFloat(val);
-          if(!isNaN(num)) humidity = num.toFixed(1);
         }
-      });
-
-      const payload = {
-        date: $("#date").value,
-        location: ZONES[zone][0],
-        subLocation: subLocName,
-        shift: getRounds()[round][0],
-        fridgeTemp: fridgeTemp,
-        roomTemp: roomTemp,
-        humidity: humidity,
-        who: customWho,
-        note: $("#note").value
-      };
-
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => console.error(err));
+      } else if(label.includes("ความชื้น")) {
+        let num = parseFloat(val);
+        if(!isNaN(num)) humidity = num.toFixed(1);
+      }
     });
+  });
 
-  } else {
-    // สถานที่อื่นๆ บันทึกจุดที่เลือกตามปกติ
-    let fridgeTemp = "", roomTemp = "", humidity = "";
-    cards.forEach(card => {
-      card.querySelectorAll("input").forEach(inp => {
-        let val = inp.value.trim().replace(",", ".");
-        let label = inp.getAttribute("aria-label") || "";
-        if(label.includes("อุณหภูมิ")) {
-          let num = parseFloat(val);
-          if(!isNaN(num)) {
-            if(card.classList.contains("f")) {
-              if(num > 12 && num <= 100) num = num / 10;
-              fridgeTemp = num.toFixed(1);
-            } else {
-              roomTemp = num.toFixed(1);
-            }
-          }
-        } else if(label.includes("ความชื้น")) {
-          let num = parseFloat(val);
-          if(!isNaN(num)) humidity = num.toFixed(1);
-        }
-      });
-    });
+  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const subLocName = isKlangYa ? ZONES[zone][1][mainCatIndex][1][area] : ZONES[zone][1][area];
 
-    const subLocName = ZONES[zone][1][area];
-    const payload = {
-      date: $("#date").value,
-      location: ZONES[zone][0],
-      subLocation: subLocName,
-      shift: getRounds()[round][0],
-      fridgeTemp: fridgeTemp,
-      roomTemp: roomTemp,
-      humidity: humidity,
-      who: customWho,
-      note: $("#note").value
-    };
+  const payload = {
+    date: $("#date").value,
+    location: ZONES[zone][0],
+    subLocation: subLocName,
+    shift: getRounds()[round][0],
+    fridgeTemp: fridgeTemp,
+    roomTemp: roomTemp,
+    humidity: humidity,
+    who: customWho,
+    note: $("#note").value
+  };
 
-    fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).catch(err => console.error(err));
-  }
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(err => console.error(err));
 
-  saved[key(zone,mainCatIndex,area)]=true; 
-  if(isKlangYa) {
-    klangYaAreaSelected = false;
-    area = 0;
-  }
-  chips(); mainCategories(); areas(); setRound(round); 
-  if(isKlangYa) {
-    $("#list").innerHTML = `<div class="card" style="text-align:center; padding:30px; color:var(--muted);"><p style="margin:0 0 6px; font-weight:700; font-size:17px;">เลือกพื้นที่ย่อยก่อน</p><p style="margin:0; font-size:14px;">กดเลือก "ตู้เย็น" หรือ "อุณหภูมิห้อง" และเลือกจุดวัดในข้อ 2 เพื่อกรอกค่า</p></div>`;
-  } else {
-    build();
-  }
-  
+  saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   
   const overlay = $("#successOverlay");
@@ -791,11 +686,7 @@ $("#save").addEventListener("click", ()=>{
   update();
 });
 
-// เริ่มต้นโหลดหน้าเว็บ (เลือกสถานที่แรกและตั้งค่าเริ่มต้น)
-zone = 0;
-mainCatIndex = 0;
-area = 0;
-klangYaAreaSelected = true; // สถานที่แรกไม่ใช่คลังยา ให้แสดงผลปกติทันที
+// เริ่มต้นโหลดหน้าเว็บ
 chips(); mainCategories(); areas(); setRound(round); showDate(); renderPeople(); build();
 </script>
 </body>
