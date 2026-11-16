@@ -138,7 +138,6 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
 .success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease}
-.success-overlay.on{opacity:1;pointer-events:auto}
 .success-modal{background:var(--surface);border:1.5px solid var(--line);padding:30px 24px;border-radius:24px;text-align:center;box-shadow:var(--shadow);max-width:320px;width:90%;transform:scale(0.8);transition:transform .3s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 .success-overlay.on .success-modal{transform:scale(1)}
 .success-modal h2{margin:0 0 10px;font-size:22px;color:var(--acc)}
@@ -160,11 +159,17 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .s small{color:var(--muted);font-size:12px;display:block}
 .s .v{font-size:20px;font-weight:700;margin:2px 0}
 .s .m{font-size:11px;color:var(--muted)}
-.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;margin-top:4px}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:9px;margin-top:4px}
 .tag.ok{background:var(--surface2);color:var(--acc)}
 .tag.bad{background:var(--badbg);color:var(--bad)}
 
-.h-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px 10px;margin-bottom:12px}
+/* แถบเลือกสลับกราฟ 3 ช่องตามคำขอ */
+.chart-switch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.chart-switch-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 4px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+.chart-switch-btn[aria-pressed=true]{background:var(--acc);color:var(--accInk);border-color:var(--acc)}
+
+.h-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 12px 10px;margin-bottom:12px;display:none}
+.h-card.active{display:block}
 .h-card h2{font-size:16px;margin:0 0 2px}
 .h-card p{margin:0 0 8px;font-size:12px;color:var(--muted)}
 .h-card p i{display:inline-block;width:12px;height:10px;background:rgba(26,86,219,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
@@ -172,10 +177,10 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .cv{position:relative;height:200px}
 
 .alerts h2{font-size:16px;margin:0 0 8px}
-.row{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
 .row:first-of-type{border-top:0}
-.row span{color:var(--muted);font-size:12px;display:block}
-.row b{color:var(--bad);white-space:nowrap}
+.row span{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+.row b{color:var(--bad);white-space:nowrap;font-size:18px}
 .note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -253,10 +258,22 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <div class="h-seg" id="h-seg"></div>
     <div class="sum" id="h-sum"></div>
     
-    <div class="h-card"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ 2–8 °C และ -25 ถึง -15 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
-    <div class="h-card"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
-    <div class="h-card"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
-    <div class="h-card alerts"><h2>⚠️ รายการที่ควรตรวจสอบ</h2><div id="h-alerts"><p style="color:var(--muted)">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p></div></div>
+    <!-- ปุ่มสลับเลือกแสดงกราฟ 3 ช่อง -->
+    <div class="chart-switch-grid">
+      <button class="chart-switch-btn" type="button" id="btn-chart-1" onclick="switchChartTab(0)" aria-pressed="true">🧊 ตู้เย็น</button>
+      <button class="chart-switch-btn" type="button" id="btn-chart-2" onclick="switchChartTab(1)" aria-pressed="false">🌡️ อุณหภูมิห้อง</button>
+      <button class="chart-switch-btn" type="button" id="btn-chart-3" onclick="switchChartTab(2)" aria-pressed="false">💧 ความชื้น</button>
+    </div>
+
+    <div class="h-card active" id="card-chart-1"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ 2–8 °C และ -25 ถึง -15 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
+    <div class="h-card" id="card-chart-2"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
+    <div class="h-card" id="card-chart-3"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
+    
+    <!-- ส่วนแสดงข้อมูลประวัติและผู้บันทึกด้านล่างกราฟตามคำขอ -->
+    <div class="h-card alerts active" style="display:block">
+      <h2>📋 ข้อมูลที่บันทึก</h2>
+      <div id="h-alerts"><p style="color:var(--muted)">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p></div>
+    </div>
     <p class="note">● เช้า ■ บ่าย ◆ เย็น · แตะที่กราฟเพื่อดูรายละเอียด</p>
   </div>
 </div>
@@ -295,7 +312,17 @@ const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new 
 let round=0, zone=0, mainCatIndex=-1, area=-1; const saved={};
 let cachedHistory = [];
 let hLoc=0, hDays=30, charts=[];
+let activeChartTab = 0;
 let customWho = "";
+
+function switchChartTab(idx) {
+  activeChartTab = idx;
+  for(let i=0; i<3; i++) {
+    document.getElementById(`btn-chart-${i+1}`).setAttribute("aria-pressed", i === idx ? "true" : "false");
+    document.getElementById(`card-chart-${i+1}`).classList.toggle("active", i === idx);
+  }
+  setTimeout(() => { charts.forEach(c => { if(c) c.resize(); }); }, 50);
+}
 
 function getSubName(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
@@ -589,7 +616,8 @@ function formatDateShort(dateStr) {
   try {
     let d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(-2)}`;
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${yy}`;
   } catch (e) { return dateStr; }
 }
 
@@ -659,7 +687,6 @@ function renderHistoryView() {
     return `<div class="s"><small>${n} ล่าสุด</small><div class="v">${cur !== undefined && cur !== "" ? cur : "-"}<small style="display:inline"> ${u}</small></div><div class="m">ต่ำสุด ${minV} · สูงสุด ${maxV}</div><span class="tag ${nb?"bad":"ok"}">${nb?"เกินช่วง "+nb+" ครั้ง":"ปกติทั้งหมด"}</span></div>`
   }).join("");
 
-  // ทำลายกราฟเก่าทั้งหมดก่อนสร้างใหม่ ป้องกัน Error "Canvas is already in use"
   if(charts.length) {
     charts.forEach(c => { if(c) c.destroy(); });
     charts = [];
@@ -669,15 +696,31 @@ function renderHistoryView() {
   charts=[mk("c1","f",-30,12,"#1a56db","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
-  filtered.forEach(r=>{
+  // เรียงลำดับจากใหม่ไปเก่าสำหรับรายการด้านล่าง
+  let sortedForList = [...filtered].reverse();
+  sortedForList.forEach(r=>{
     [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
       let num = val !== "" && val != null ? parseFloat(val) : null;
-      if(num !== null && badHist(k, num, r.subLocation)) {
-        A.push(`<div class="row"><div>${n=="ชื้น"?"ความชื้น":"อุณหภูมิ"+n} (${r.subLocation || ""})<span>${formatDateShort(r.date)} ${r.shift || ''} · ${r.who || "-"}</span></div><b>${num} ${u}</b></div>`);
+      if(num !== null) {
+        let isBad = badHist(k, num, r.subLocation);
+        let dateFormatted = formatDateShort(r.date);
+        let timeStr = r.shift === "รอบเช้า" ? "09:00" : r.shift === "รอบบ่าย" ? "14:30" : r.shift === "รอบเย็น" ? "20:30" : "";
+        let subLocText = r.subLocation ? ` > ${r.subLocation}` : "";
+        
+        A.push(`
+          <div class="row" style="background:${isBad ? 'var(--badbg)' : 'var(--surface2)'}; padding:12px; margin-bottom:8px; border-radius:14px; border:1.5px solid ${isBad ? 'var(--bad)' : 'var(--line)'};">
+            <div>
+              <b style="font-size:15px; color:var(--ink);">${dateFormatted} · ${r.shift || ''} ${timeStr}</b>
+              <span>สถานที่: ${r.location}${subLocText}</span>
+              <span style="color:var(--acc); font-weight:600;">ผู้บันทึก: ${r.who || '-'}</span>
+            </div>
+            <b style="${isBad ? 'color:var(--bad);' : 'color:var(--acc);'}">${num} ${u}</b>
+          </div>
+        `);
       }
     });
   });
-  document.getElementById("h-alerts").innerHTML=A.length?A.reverse().join(""):'<p style="color:var(--muted)">ไม่พบค่าที่ผิดปกติ ✅</p>';
+  document.getElementById("h-alerts").innerHTML=A.length?A.join(""):'<p style="color:var(--muted)">ไม่พบข้อมูลการบันทึก</p>';
 }
 
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(cachedHistory.length) renderHistoryView(); });
