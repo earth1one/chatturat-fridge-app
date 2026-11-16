@@ -570,7 +570,6 @@ function selectHistoryZone(idx) {
   renderHistoryView();
 }
 
-// [แก้ไขจุดตรวจสอบประวัติ] รองรับเกณฑ์เฉพาะของตู้ TH1 (บน) เป็น -25 ถึง -15 °C
 const badHist = (k, v, subLoc) => {
   if (k === 'f') {
     if (subLoc && subLoc.includes("TH1 (บน)")) {
@@ -584,7 +583,6 @@ const badHist = (k, v, subLoc) => {
 };
 
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const band={id:"band",beforeDatasetsDraw(c,a,o){const{ctx,chartArea:A,scales:{y}}=c;const y1=y.getPixelForValue(Math.min(o.hi,y.max)),y2=y.getPixelForValue(Math.max(o.lo,y.min));ctx.save();ctx.fillStyle=css("--surface2");ctx.fillRect(A.left,y1,A.right-A.left,y2-y1);ctx.restore()}};
 
 function formatDateShort(dateStr) {
   if (!dateStr) return "";
@@ -613,12 +611,12 @@ function mk(id,key,min,max,color,unit,R){
     pointBackgroundColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex], R[c.dataIndex].subLocation)?css("--bad"):color,pointBorderColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex], R[c.dataIndex].subLocation)?css("--bad"):color},
    {data:raw.map((v,i)=>out[i]?(v>max?max:min):null),showLine:false,pointStyle:"triangle",pointRadius:8,pointHoverRadius:9,pointBackgroundColor:css("--bad"),pointBorderColor:css("--bad"),rotation:raw.map(v=>v<min?180:0)}]},
   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false,axis:"x"},
-   plugins:{legend:{display:false},band:{lo:2,hi:8},
+   plugins:{legend:{display:false},
     tooltip:{callbacks:{title:i=>lab[i[0].dataIndex]+" · "+(R[i[0].dataIndex].who||"-")+" ("+(R[i[0].dataIndex].subLocation||"")+")",
      label:c=>{const v=raw[c.dataIndex];return v!==null?((out[c.dataIndex]?"⚠️ ตรวจสอบ: ":"")+v+" "+unit+(badHist(key,v,R[c.dataIndex].subLocation)?" (ผิดปกติ)":"")):"ไม่มีข้อมูล"}}}},
    scales:{y:{min,max,grid:{color:css("--line")},ticks:{color:css("--muted")}},
-    x:{grid:{display:false},ticks:{color:css("--muted"),maxRotation:0,autoSkip:true,maxTicksLimit:6,callback(v){return lab[v] ? lab[v].split(" ")[0] : ""}}}}},
-  plugins:[band]})}
+    x:{grid:{display:false},ticks:{color:css("--muted"),maxRotation:0,autoSkip:true,maxTicksLimit:6,callback(v){return lab[v] ? lab[v].split(" ")[0] : ""}}}}}
+ })}
 
 function renderHistoryView() {
   document.querySelectorAll(".history-btn").forEach((btn, i) => {
@@ -648,7 +646,6 @@ function renderHistoryView() {
       return null;
     }).filter(x => x !== null);
     
-    // ตรวจสอบค่าผิดปกติอิงตาม subLocation ของแต่ละแถวข้อมูล
     const nb = filtered.filter(r => {
       let val = k=='f' ? r.fridgeTemp : k=='r' ? r.roomTemp : r.humidity;
       let num = val !== "" && val != null ? parseFloat(val) : null;
@@ -662,9 +659,14 @@ function renderHistoryView() {
     return `<div class="s"><small>${n} ล่าสุด</small><div class="v">${cur !== undefined && cur !== "" ? cur : "-"}<small style="display:inline"> ${u}</small></div><div class="m">ต่ำสุด ${minV} · สูงสุด ${maxV}</div><span class="tag ${nb?"bad":"ok"}">${nb?"เกินช่วง "+nb+" ครั้ง":"ปกติทั้งหมด"}</span></div>`
   }).join("");
 
-  if(charts.length) charts.forEach(c=>c.destroy());
+  // ทำลายกราฟเก่าทั้งหมดก่อนสร้างใหม่ ป้องกัน Error "Canvas is already in use"
+  if(charts.length) {
+    charts.forEach(c => { if(c) c.destroy(); });
+    charts = [];
+  }
+
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
-  charts=[mk("c1","f",-30,12,"#1a56db","°C",filtered),mk("c2","r",15,30,"#d97706","°C",filtered),mk("c3","h",20,80,"#0284c7","%RH",filtered)];
+  charts=[mk("c1","f",-30,12,"#1a56db","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
   filtered.forEach(r=>{
