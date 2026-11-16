@@ -253,7 +253,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <div class="h-seg" id="h-seg"></div>
     <div class="sum" id="h-sum"></div>
     
-    <div class="h-card"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ 2–8 °C และ -25 ถึง -15 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
+    <div class="h-card"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ 2–8 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
     <div class="h-card"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
     <div class="h-card"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
     <div class="h-card alerts"><h2>⚠️ รายการที่ควรตรวจสอบ</h2><div id="h-alerts"><p style="color:var(--muted)">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p></div></div>
@@ -439,7 +439,7 @@ function mainCategories(){
   sec.style.display = isKlangYa ? "block" : "none";
   if(isKlangYa){
     const cats = ZONES[zone][1];
-    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${c[0]}<small>${c[0]==="ตู้เย็น"?"2–8 / -25 ถึง -15 °C":"15–30 °C"}</small></button>`).join("");
+    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${c[0]}<small>${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
     $("#subAreaTitle").textContent = "เลือกตู้ / ห้อง";
   } else {
     $("#subAreaTitle").textContent = "2. พื้นที่ย่อย / จุดวัด";
@@ -473,7 +473,7 @@ $("#areas").addEventListener("click", e => {
   area = +b.dataset.k; areas(); renderPeople(); build();
 });
 
-const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, FZ={lo:-25,hi:-15,min:-30,max:-10,u:"°C",r:"-25 ถึง -15",neg:true}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
+const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, FZ={lo:-25,hi:-15,min:-30,max:-10,u:"°C",r:"-15 ถึง -25",neg:true}, R={lo:15,hi:30,min:15,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
 const ICR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
 
@@ -482,7 +482,7 @@ function metric(t,label,whoLabel){
   return `<div class="m" data-lo="${t.lo}" data-hi="${t.hi}" data-min="${t.min}" data-max="${t.max}">
   <span class="ml">${label}<small>${t.r} ${t.u}</small></span>
   <div class="v">${t.neg?'<button type="button" class="sg" aria-label="สลับค่าบวก/ลบ">±</button>':''}<input type="text" inputmode="decimal" autocomplete="off" placeholder="0.0" aria-label="${whoLabel} ${label}"><span class="u">${t.u}</span></div>
-  <div class="gauge"><b style="left:${p(Math.max(t.min, Math.min(t.max, t.lo)))}%;width:${Math.max(0, p(t.hi)-p(t.lo))}%"></b><u></u></div><p class="st"></p></div>`;
+  <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
 const fridge=n=>{const t=n.includes("TH1 (บน)")?FZ:F;return `<div class="card f${t.neg?" fz":""}" data-sub="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(t,"อุณหภูมิ",n)}</div></div>`};
@@ -511,19 +511,11 @@ function update(){
     let v = parseFloat(rawVal);
     const has=!isNaN(v) && rawVal !== ""; 
     const lo=+c.dataset.lo, hi=+c.dataset.hi, mn=+c.dataset.min, mx=+c.dataset.max;
-    const low = has && v < lo;
-    const high = has && v > hi;
-    const bad = low || high;
+    const low=has&&v<lo&&lo>mn, high=has&&v>hi, bad=low||high;
     c.classList.toggle("has",has); c.classList.toggle("out",bad); c.classList.toggle("ok",has&&!bad);
     const st=c.querySelector(".st");
-    if(has){
-      n++;
-      if(bad) out++;
-      c.querySelector("u").style.left = Math.max(0, Math.min(100, (v - mn) / (mx - mn) * 100)) + "%";
-      st.textContent = bad ? (low ? "ต่ำกว่าเกณฑ์" : "สูงกว่าเกณฑ์") : "ปกติ";
-    } else {
-      st.textContent="";
-    }
+    if(has){n++;if(bad)out++;c.querySelector("u").style.left=Math.max(0,Math.min(100,(v-mn)/(mx-mn)*100))+"%";
+      st.textContent=bad?(low?"ต่ำกว่าเกณฑ์":"สูงกว่าเกณฑ์"):"ปกติ"}else st.textContent="";
   });
   document.querySelectorAll(".card").forEach(c=>c.classList.toggle("out",!!c.querySelector(".m.out")));
   const sel=getTargets().length>0;
@@ -578,20 +570,9 @@ function selectHistoryZone(idx) {
   renderHistoryView();
 }
 
-// [แก้ไข] รองรับการเช็คค่าผิดปกติในประวัติ แยกตู้ TH1 (บน) เป็น -25 ถึง -15 และตู้เย็นอื่นเป็น 2 ถึง 8
+const RANGES_HIST={f:[2,8],r:[15,30],h:[30,70]};
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const badHist = (k, v, subLoc) => {
-  if (k === 'f') {
-    if (subLoc && subLoc.includes("TH1 (บน)")) {
-      return v < -25 || v > -15; // เกณฑ์ OPV
-    }
-    return v < 2 || v > 8;     // เกณฑ์ตู้เย็นปกติ
-  }
-  if (k === 'r') return v < 15 || v > 30;
-  if (k === 'h') return v < 30 || v > 70;
-  return false;
-};
-
+const badHist=(k,v)=>v<RANGES_HIST[k][0]||v>RANGES_HIST[k][1];
 const band={id:"band",beforeDatasetsDraw(c,a,o){const{ctx,chartArea:A,scales:{y}}=c;const y1=y.getPixelForValue(Math.min(o.hi,y.max)),y2=y.getPixelForValue(Math.max(o.lo,y.min));ctx.save();ctx.fillStyle=css("--surface2");ctx.fillRect(A.left,y1,A.right-A.left,y2-y1);ctx.restore()}};
 
 function formatDateShort(dateStr) {
@@ -603,31 +584,30 @@ function formatDateShort(dateStr) {
   } catch (e) { return dateStr; }
 }
 
-function mk(id,key,min,max,color,unit,R, zoneName){
+function mk(id,key,min,max,color,unit,R){
  const raw=R.map(r => {
    if(key=='f') return r.fridgeTemp !== "" && r.fridgeTemp != null ? parseFloat(r.fridgeTemp) : null;
    if(key=='r') return r.roomTemp !== "" && r.roomTemp != null ? parseFloat(r.roomTemp) : null;
    if(key=='h') return r.humidity !== "" && r.humidity != null ? parseFloat(r.humidity) : null;
    return null;
  });
- const out=raw.map((v, i) => v !== null && (v<min||v>max));
+ const out=raw.map(v => v !== null && (v<min||v>max));
  const sh=R.map(r => r.shift=="รอบเช้า"?"circle":r.shift=="รอบบ่าย"?"rect":"rectRot");
  const lab=R.map(r => `${formatDateShort(r.date)} ${r.shift || ''}`);
  
  return new Chart(document.getElementById(id),{type:"line",
   data:{labels:lab,datasets:[
    {data:raw.map((v,i)=>out[i]?null:v),borderColor:color,borderWidth:2,tension:.25,spanGaps:true,
-    pointStyle:sh,pointRadius:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex], R[c.dataIndex].subLocation)&&!out[c.dataIndex]?5:(R.length<=16?3:0),pointHoverRadius:6,
-    pointBackgroundColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex], R[c.dataIndex].subLocation)?css("--bad"):color,pointBorderColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex], R[c.dataIndex].subLocation)?css("--bad"):color},
+    pointStyle:sh,pointRadius:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex])&&!out[c.dataIndex]?5:(R.length<=16?3:0),pointHoverRadius:6,
+    pointBackgroundColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex])?css("--bad"):color,pointBorderColor:c=>raw[c.dataIndex] !== null && badHist(key,raw[c.dataIndex])?css("--bad"):color},
    {data:raw.map((v,i)=>out[i]?(v>max?max:min):null),showLine:false,pointStyle:"triangle",pointRadius:8,pointHoverRadius:9,pointBackgroundColor:css("--bad"),pointBorderColor:css("--bad"),rotation:raw.map(v=>v<min?180:0)}]},
   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false,axis:"x"},
-   plugins:{legend:{display:false},
-    tooltip:{callbacks:{title:i=>lab[i[0].dataIndex]+" · "+(R[i[0].dataIndex].who||"-")+" ("+(R[i[0].dataIndex].subLocation||"")+")",
-     label:c=>{const v=raw[c.dataIndex];return v!==null?((out[c.dataIndex]?"⚠️ ตรวจสอบ: ":"")+v+" "+unit+(badHist(key,v,R[c.dataIndex].subLocation)?" (ผิดปกติ)":"")):"ไม่มีข้อมูล"}}}},
+   plugins:{legend:{display:false},band:{lo:RANGES_HIST[key][0],hi:RANGES_HIST[key][1]},
+    tooltip:{callbacks:{title:i=>lab[i[0].dataIndex]+" · "+(R[i[0].dataIndex].who||"-"),
+     label:c=>{const v=raw[c.dataIndex];return v!==null?((out[c.dataIndex]?"⚠️ ตรวจสอบ: ":"")+v+" "+unit+(badHist(key,v)?" (ผิดปกติ)":"")):"ไม่มีข้อมูล"}}}},
    scales:{y:{min,max,grid:{color:css("--line")},ticks:{color:css("--muted")}},
     x:{grid:{display:false},ticks:{color:css("--muted"),maxRotation:0,autoSkip:true,maxTicksLimit:6,callback(v){return lab[v] ? lab[v].split(" ")[0] : ""}}}}},
-  plugins:[]}
-}
+  plugins:[band]})}
 
 function renderHistoryView() {
   document.querySelectorAll(".history-btn").forEach((btn, i) => {
@@ -657,13 +637,7 @@ function renderHistoryView() {
       return null;
     }).filter(x => x !== null);
     
-    // ตรวจสอบค่าผิดปกติโดยอิงตาม subLocation ของแต่ละรายการ
-    const nb = filtered.filter(r => {
-      let val = k=='f' ? r.fridgeTemp : k=='r' ? r.roomTemp : r.humidity;
-      let num = val !== "" && val != null ? parseFloat(val) : null;
-      return num !== null && badHist(k, num, r.subLocation);
-    }).length;
-
+    const nb=v.filter(x=>badHist(k,x)).length;
     const cur = k=='f' ? last.fridgeTemp : k=='r' ? last.roomTemp : last.humidity;
     const minV = v.length ? Math.min(...v) : "-";
     const maxV = v.length ? Math.max(...v) : "-";
@@ -673,14 +647,14 @@ function renderHistoryView() {
 
   if(charts.length) charts.forEach(c=>c.destroy());
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
-  charts=[mk("c1","f",-30,12,"#1a56db","°C",filtered, zoneName), mk("c2","r",15,30,"#d97706","°C",filtered, zoneName), mk("c3","h",20,80,"#0284c7","%RH",filtered, zoneName)];
+  charts=[mk("c1","f",0,12,"#1a56db","°C",filtered),mk("c2","r",15,30,"#d97706","°C",filtered),mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
   filtered.forEach(r=>{
     [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
       let num = val !== "" && val != null ? parseFloat(val) : null;
-      if(num !== null && badHist(k, num, r.subLocation)) {
-        A.push(`<div class="row"><div>${n=="ชื้น"?"ความชื้น":"อุณหภูมิ"+n} (${r.subLocation || ""})<span>${formatDateShort(r.date)} ${r.shift || ''} · ${r.who || "-"}</span></div><b>${num} ${u}</b></div>`);
+      if(num !== null && badHist(k,num)) {
+        A.push(`<div class="row"><div>${n=="ชื้น"?"ความชื้น":"อุณหภูมิ"+n}<span>${formatDateShort(r.date)} ${r.shift || ''} · ${r.who || "-"}</span></div><b>${num} ${u}</b></div>`);
       }
     });
   });
@@ -728,6 +702,7 @@ $("#save").addEventListener("click", async ()=>{
     return {...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity};
   });
 
+  // ใช้ Promise.all ส่งข้อมูลพร้อมกันทุกตู้/ทุกจุดทันที (เร็วขึ้นหลายเท่า)
   try {
     await Promise.all(rows.map(row => 
       fetch(APPS_SCRIPT_URL, {
