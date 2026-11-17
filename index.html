@@ -101,11 +101,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 .chip{flex:none;min-height:46px;padding:0 18px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
 
-/* ดีไซน์พื้นที่ย่อยแบบการ์ดไอคอนใหญ่ตามภาพตัวอย่างเป๊ะๆ */
+/* ดีไซน์พื้นที่ย่อยแบบการ์ดไอคอนตรงตามรูปต้นฉบับเป๊ะๆ */
 .ar{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .ar.on{display:grid}
-.ar button{display:flex;flex-direction:column;align-items:flex-start;padding:16px;min-height:80px;border:1.5px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer;position:relative;transition:all .2s}
-.ar button svg{margin-bottom:8px;color:var(--acc)}
+.ar button{display:flex;flex-direction:column;align-items:flex-start;padding:16px;min-height:88px;border:1.5px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer;position:relative;transition:all .2s}
+.ar button .icon-box{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e6fffa;color:#047857;margin-bottom:8px}
+[data-theme="dark"] .ar button .icon-box{background:#064e3b;color:#34d399}
 .ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc);box-shadow:0 4px 12px rgba(6,78,59,.1)}
 
 /* สถานะยังไม่ได้เลือกตู้ / จุดวัด */
@@ -485,14 +486,14 @@ function chips(){
   $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}</button>`).join("");
 }
 
-// อัปเดตไอคอนในช่องพื้นที่ย่อยให้ตรงกับภาพต้นฉบับเป๊ะๆ
+// ไอคอนเกล็ดหิมะ, กล่อง และห้องยา ตรงตามรูปต้นฉบับเป๊ะๆ
 function getIconForSub(name) {
-  if (name.includes("ตู้เย็น") || name.includes("ตู้")) {
-    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
-  } else if (name.includes("Substock") || name.includes("คลัง")) {
-    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`;
+  if (name.includes("ตู้")) {
+    return `<span class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>`;
+  } else if (name.includes("Sub") || name.includes("คลัง")) {
+    return `<span class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>`;
   }
-  return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
+  return `<span class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>`;
 }
 
 function mainCategories(){
