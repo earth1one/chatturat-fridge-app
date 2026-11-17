@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="./pharmatemp.PNG">
 
 <!-- ตั้งค่าสำหรับ Android (PWA Manifest) -->
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f4f9%22%2C%22theme_color%22%3A%22%231a56db%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2Fpharmatemp.PNG%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f4f9%22%2C%22theme_color%22%3A%22%23064e3b%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2Fpharmatemp.PNG%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,21 +27,21 @@ document.documentElement.setAttribute("data-theme",t)})();
 <style>
 :root{
   --bg:#f0f4f9; --surface:#fff; --surface2:#f4f7fb; --line:#d8e2ec; --ink:#102a43; --muted:#486581;
-  --acc:#1a56db; --accInk:#fff; --h1:#1e429f; --h2:#111827; --bad:#d1383b; --badbg:#fdeaea;
-  --fb:#e1effe; --fl:#c3ddfd; --fa:#1a56db; --rb:#fef08a; --rl:#fef08a; --ra:#854d0e;
-  --shadow:0 8px 24px rgba(26,86,219,.08); --glass:rgba(240,244,249,.82);
+  --acc:#064e3b; --accInk:#fff; --h1:#064e3b; --h2:#022c22; --bad:#d1383b; --badbg:#fdeaea;
+  --fb:#e6fffa; --fl:#b2f5ea; --fa:#047857; --rb:#fef08a; --rl:#fef08a; --ra:#854d0e;
+  --shadow:0 8px 24px rgba(6,78,59,.08); --glass:rgba(240,244,249,.82);
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light; box-sizing:border-box; padding-top:var(--safe-t);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
-  --acc:#3b82f6; --accInk:#0f172a; --h1:#1d4ed8; --h2:#1e3a8a; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --fb:#172554; --fl:#1e40af; --fa:#60a5fa; --rb:#422006; --rl:#713f12; --ra:#fde047;
+  --acc:#10b981; --accInk:#0f172a; --h1:#047857; --h2:#064e3b; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --fb:#064e3b; --fl:#047857; --fa:#34d399; --rb:#422006; --rl:#713f12; --ra:#fde047;
   --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
-  --acc:#3b82f6; --accInk:#0f172a; --h1:#1d4ed8; --h2:#1e3a8a; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --acc:#10b981; --accInk:#0f172a; --h1:#047857; --h2:#064e3b; --bad:#ff7b7b; --badbg:#3a1a1a;
   --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
 }
 :root[data-theme="light"]{color-scheme:light}
@@ -49,29 +49,45 @@ html{scroll-padding-top:var(--safe-t)}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan",system-ui,sans-serif;transition:background .25s,color .25s}
 .app{max-width:480px;margin:0 auto;padding:14px 16px calc(120px + var(--safe-b))}
-.top{display:flex;align-items:center;gap:10px}
-.mark{flex:none;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--h1),var(--h2));display:grid;place-items:center}
-.top h1{margin:0;font-size:18px;font-weight:700;line-height:1.2}
-.top small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
+
+/* ส่วนหัวสไตล์เขียวน้ำทะเลเข้ม */
+.top-header {
+  background: linear-gradient(135deg, var(--h1), var(--h2));
+  border-radius: 24px;
+  padding: 18px;
+  color: #fff;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.top-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mark{flex:none;width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.15);display:grid;place-items:center}
+.top-header h1{margin:0;font-size:18px;font-weight:700;line-height:1.2}
+.top-header small{display:block;font-size:13px;font-weight:500;opacity:.85}
 .sp{flex:1}
-.ib{flex:none;min-width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;font:inherit;font-size:15px;font-weight:600;padding:0 12px;cursor:pointer}
+.ib{flex:none;min-width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;font:inherit;cursor:pointer}
 .ico-sun{display:none}
 [data-theme="dark"] .ico-sun{display:block}
 [data-theme="dark"] .ico-moon{display:none}
 
-.nav-tabs{display:flex;gap:8px;margin-top:16px}
-.nav-tab{flex:1;height:46px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--muted);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
-.nav-tab.active{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
+/* แท็บสลับหน้าด้านบนการ์ด */
+.main-tabs{display:flex;background:rgba(255,255,255,.15);border-radius:14px;padding:4px;margin-top:16px}
+.main-tab{flex:1;height:40px;border:0;border-radius:11px;background:transparent;color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.main-tab.active{background:#fff;color:var(--h1);box-shadow:0 2px 8px rgba(0,0,0,.15)}
 
-.hero{position:relative;overflow:hidden;margin-top:16px;padding:18px;border-radius:26px;color:#fff;background:linear-gradient(135deg,var(--h1),var(--h2));box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.hero::after{content:"";position:absolute;right:-40px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.10)}
-.hero small{display:block;font-size:14px;opacity:.85}
+/* Hero Date Card */
+.hero{position:relative;overflow:hidden;margin-top:16px;padding:18px;border-radius:22px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hero small{display:block;font-size:14px;color:var(--muted)}
 .hero b{display:block;font-size:22px;font-weight:700;line-height:1.25;margin-top:2px}
-.hero .chg{position:relative;display:inline-block;margin-top:10px;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.18);font-size:14px;font-weight:600;cursor:pointer}
+.hero .chg{position:relative;display:inline-block;margin-top:10px;padding:6px 14px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);color:var(--acc);font-size:14px;font-weight:600;cursor:pointer}
 .hero .chg input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
-.ring{position:relative;z-index:1;flex:none;width:84px;height:84px}
+.ring{position:relative;z-index:1;flex:none;width:76px;height:76px}
 .ring svg{transform:rotate(-90deg)}
-.ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:18px;font-weight:700}
+.ring span{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--acc);line-height:1.1}
+.ring span small{font-size:10px;font-weight:500;color:var(--muted)}
 
 .cap{margin:24px 2px 10px;font-size:15px;font-weight:600;color:var(--muted)}
 .seg{position:relative;display:grid;grid-template-columns:repeat(var(--n,3),1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:4px}
@@ -82,19 +98,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 
 .chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:46px;padding:0 16px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.chip{flex:none;min-height:46px;padding:0 18px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
 
-.ar{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+/* ดีไซน์พื้นที่ย่อยแบบการ์ดไอคอนใหญ่ตามภาพ */
+.ar{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .ar.on{display:grid}
-.ar button{min-height:50px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
-.ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc)}
+.ar button{display:flex;flex-direction:column;align-items:flex-start;padding:16px;min-height:80px;border:1.5px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer;position:relative;transition:all .2s}
+.ar button svg{margin-bottom:8px;color:var(--acc)}
+.ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc);box-shadow:0 4px 12px rgba(6,78,59,.1)}
 
 /* สถานะยังไม่ได้เลือกตู้ / จุดวัด */
 .empty{border:2px dashed var(--line);border-radius:22px;padding:28px 18px;text-align:center;color:var(--muted);font-size:15px;font-weight:600;line-height:1.5}
 .empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:2px}
 
-.gcap{margin:6px 2px 10px;font-size:14px;font-weight:700;color:var(--muted)}
 .card{margin-bottom:12px;border-radius:22px;padding:14px;border:1.5px solid var(--cl);background:var(--cb);box-shadow:var(--shadow);transition:border-color .2s,background .2s}
 .card.f{--cb:var(--fb);--cl:var(--fl);--ca:var(--fa)}
 .card.r{--cb:var(--rb);--cl:var(--rl);--ca:var(--ra)}
@@ -133,11 +150,12 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + var(--safe-b));background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
 .save{display:block;width:100%;max-width:448px;margin:0 auto;height:58px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--h1),var(--h2));color:#fff;font:inherit;font-size:18px;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
 .save:active{transform:scale(.985)}
-.save:disabled{background:var(--acc);color:var(--accInk);box-shadow:var(--shadow);opacity:0.85;cursor:not-allowed}
+.save:disabled{background:var(--surface2);color:var(--muted);box-shadow:none;opacity:0.85;cursor:not-allowed}
 .save.warn{background:var(--bad)}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
 .success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.success-overlay.on{opacity:1;pointer-events:auto}
 .success-modal{background:var(--surface);border:1.5px solid var(--line);padding:30px 24px;border-radius:24px;text-align:center;box-shadow:var(--shadow);max-width:320px;width:90%;transform:scale(0.8);transition:transform .3s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 .success-overlay.on .success-modal{transform:scale(1)}
 .success-modal h2{margin:0 0 10px;font-size:22px;color:var(--acc)}
@@ -163,7 +181,6 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .tag.ok{background:var(--surface2);color:var(--acc)}
 .tag.bad{background:var(--badbg);color:var(--bad)}
 
-/* แถบเลือกสลับกราฟ 3 ช่องตามคำขอ */
 .chart-switch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .chart-switch-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 4px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
 .chart-switch-btn[aria-pressed=true]{background:var(--acc);color:var(--accInk);border-color:var(--acc)}
@@ -172,7 +189,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .h-card.active{display:block}
 .h-card h2{font-size:16px;margin:0 0 2px}
 .h-card p{margin:0 0 8px;font-size:12px;color:var(--muted)}
-.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(26,86,219,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
+.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(6,78,59,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
 .h-card p em{font-style:normal;color:var(--bad)}
 .cv{position:relative;height:200px}
 
@@ -188,28 +205,37 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 </head>
 <body>
 <div class="app">
-  <div class="top">
-    <div class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
-    <div><h1>โรงพยาบาลจัตุรัส</h1><small>บันทึกอุณหภูมิและความชื้น</small></div>
-    <span class="sp"></span>
-    <button class="ib" type="button" id="theme" aria-label="สลับโหมดกลางวัน/กลางคืน">
-      <svg class="ico-moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      <svg class="ico-sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
-  </div>
-
-  <div class="nav-tabs">
-    <button class="nav-tab active" type="button" id="tab-record" onclick="switchTab('record')">บันทึกข้อมูล</button>
-    <button class="nav-tab" type="button" id="tab-history" onclick="switchTab('history')">ดูข้อมูลย้อนหลัง</button>
+  <!-- ส่วนหัวดีไซน์เขียวน้ำทะเลเข้ม -->
+  <div class="top-header">
+    <div class="top-header-row">
+      <div class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
+      <div><h1>โรงพยาบาลจัตุรัส</h1><small>ระบบบันทึกอุณหภูมิและความชื้น</small></div>
+      <span class="sp"></span>
+      <button class="ib" type="button" id="theme" aria-label="สลับโหมดกลางวัน/กลางคืน">
+        <svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+    <!-- แท็บเลือกหน้าด้านบน -->
+    <div class="main-tabs">
+      <button class="main-tab active" type="button" id="tab-record" onclick="switchTab('record')">บันทึกข้อมูล</button>
+      <button class="main-tab" type="button" id="tab-history" onclick="switchTab('history')">ดูข้อมูลย้อนหลัง</button>
+    </div>
   </div>
 
   <div id="section-record">
     <section class="hero">
-      <div style="position:relative;z-index:1">
+      <div>
         <small id="rl"></small><b id="dv"></b>
         <label class="chg">เปลี่ยนวัน<input type="date" id="date" aria-label="เปลี่ยนวันที่"></label>
       </div>
-      <div class="ring"><svg width="84" height="84" viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"/><circle id="arc" cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset .35s"/></svg><span id="prog">0/0</span></div>
+      <div class="ring">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle cx="38" cy="38" r="30" fill="none" stroke="var(--line)" stroke-width="7"/>
+          <circle id="arc" cx="38" cy="38" r="30" fill="none" stroke="var(--acc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="188.4" stroke-dashoffset="188.4" style="transition:stroke-dashoffset .35s"/>
+        </svg>
+        <span><b id="prog" style="font-size:15px; font-weight:700">0/0</b><small style="font-size:10px; font-weight:500; color:var(--muted)">รายการ</small></span>
+      </div>
     </section>
 
     <!-- 1. เลือกสถานที่ -->
@@ -269,7 +295,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
     <div class="h-card" id="card-chart-2"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
     <div class="h-card" id="card-chart-3"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
     
-    <!-- ส่วนแสดงข้อมูลประวัติและผู้บันทึกด้านล่างกราฟตามคำขอ -->
+    <!-- ส่วนแสดงข้อมูลประวัติและผู้บันทึกด้านล่างกราฟ -->
     <div class="h-card alerts active" style="display:block">
       <h2>📋 ข้อมูลที่บันทึก</h2>
       <div id="h-alerts"><p style="color:var(--muted)">กรุณาเลือกสถานที่ด้านบนเพื่อแสดงข้อมูล</p></div>
@@ -460,13 +486,22 @@ function chips(){
   $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}</button>`).join("");
 }
 
+function getIconForSub(name) {
+  if (name.includes("ตู้")) {
+    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2h14a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M12 2v20"/><path d="M3 10h18"/></svg>`;
+  } else if (name.includes("Sub")) {
+    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`;
+  }
+  return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+}
+
 function mainCategories(){
   const isKlangYa = ZONES[zone][0] === "คลังยา";
   const sec = $("#subCategorySection");
   sec.style.display = isKlangYa ? "block" : "none";
   if(isKlangYa){
     const cats = ZONES[zone][1];
-    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${c[0]}<small>${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
+    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${getIconForSub(c[0])}${c[0]}<small style="color:var(--muted); font-size:12px; font-weight:500; margin-top:2px;">${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
     $("#subAreaTitle").textContent = "เลือกตู้ / ห้อง";
   } else {
     $("#subAreaTitle").textContent = "2. พื้นที่ย่อย / จุดวัด";
@@ -480,7 +515,7 @@ function areas(){
   const box = $("#areas");
   box.classList.toggle("on", listItems.length > 0);
   $("#subAreaTitle").style.display = listItems.length > 0 ? "block" : "none";
-  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${n}</button>`).join("");
+  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${getIconForSub(n)}${n}</button>`).join("");
 }
 
 $("#zones").addEventListener("click", e => {
@@ -548,7 +583,7 @@ function update(){
   const sel=getTargets().length>0;
   const miss=ms.length-n, w=customWho;
   $("#prog").textContent=n+"/"+ms.length;
-  $("#arc").style.strokeDashoffset=ms.length ? 213.6*(1-n/ms.length) : 213.6;
+  document.getElementById("arc").style.strokeDashoffset=ms.length ? 188.4*(1-n/ms.length) : 188.4;
   $("#hint").classList.toggle("on",out>0);
   const b=$("#save"); 
   b.disabled = !sel || miss>0 || !w; 
@@ -600,9 +635,9 @@ function selectHistoryZone(idx) {
 const badHist = (k, v, subLoc) => {
   if (k === 'f') {
     if (subLoc && subLoc.includes("TH1 (บน)")) {
-      return v < -25 || v > -15; // เกณฑ์ OPV
+      return v < -25 || v > -15; 
     }
-    return v < 2 || v > 8;     // เกณฑ์ตู้เย็นปกติ
+    return v < 2 || v > 8;     
   }
   if (k === 'r') return v < 15 || v > 30;
   if (k === 'h') return v < 30 || v > 70;
@@ -693,10 +728,9 @@ function renderHistoryView() {
   }
 
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
-  charts=[mk("c1","f",-30,12,"#1a56db","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
+  charts=[mk("c1","f",-30,12,"#047857","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
-  // เรียงลำดับจากใหม่ไปเก่าสำหรับรายการด้านล่าง
   let sortedForList = [...filtered].reverse();
   sortedForList.forEach(r=>{
     [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
@@ -725,6 +759,7 @@ function renderHistoryView() {
 
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(cachedHistory.length) renderHistoryView(); });
 
+// ระบบบันทึกแบบรวดเร็ว (Fire and forget + ตอบสนองไวทันที)
 $("#save").addEventListener("click", async ()=>{
   const cards = [...document.querySelectorAll(".card")];
   if(!cards.length) return;
@@ -764,26 +799,26 @@ $("#save").addEventListener("click", async ()=>{
     return {...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity};
   });
 
-  try {
-    await Promise.all(rows.map(row => 
-      fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(row)
-      })
-    ));
-  } catch(err){ console.error(err); }
-
-  saved[key(zone,mainCatIndex,area)]=true; chips(); mainCategories(); areas(); build();
+  saved[key(zone,mainCatIndex,area)]=true; 
+  chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
 
   const overlay = $("#successOverlay");
   overlay.classList.add("on");
-  setTimeout(() => { overlay.classList.remove("on"); }, 2000);
+  setTimeout(() => { overlay.classList.remove("on"); }, 1500);
 
   scrollTo({top:0,behavior:"smooth"});
   update();
+
+  // ส่งข้อมูลไปเบื้องหลังทันทีเพื่อความเร็วสูง
+  rows.forEach(row => {
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(row)
+    }).catch(err => console.error(err));
+  });
 });
 
 // เริ่มต้นโหลดหน้าเว็บ
