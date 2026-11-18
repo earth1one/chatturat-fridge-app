@@ -8,11 +8,13 @@
 <!-- ตั้งค่าสำหรับ iOS (iPhone / iPad) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CTRH PharmaTemp">
-<link rel="apple-touch-icon" href="./pharmatemp.PNG">
+<meta name="apple-mobile-web-app-title" content="PharmaTemp">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<meta name="theme-color" content="#14275e">
 
 <!-- ตั้งค่าสำหรับ Android (PWA Manifest) -->
-<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22CTRH%20PharmaTemp%22%2C%22short_name%22%3A%22PharmaTemp%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f4f9%22%2C%22theme_color%22%3A%22%23064e3b%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22.%2Fpharmatemp.PNG%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+<link rel="manifest" href="./manifest.json">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,23 +29,23 @@ document.documentElement.setAttribute("data-theme",t)})();
 <style>
 :root{
   --bg:#f0f4f9; --surface:#fff; --surface2:#f4f7fb; --line:#d8e2ec; --ink:#102a43; --muted:#486581;
-  --acc:#064e3b; --accInk:#fff; --h1:#064e3b; --h2:#022c22; --bad:#d1383b; --badbg:#fdeaea;
-  --fb:#e6fffa; --fl:#b2f5ea; --fa:#047857; --rb:#fef08a; --rl:#fef08a; --ra:#854d0e;
-  --shadow:0 8px 24px rgba(6,78,59,.08); --glass:rgba(240,244,249,.82);
+  --acc:#1e3a8a; --accInk:#fff; --h1:#1e3a8a; --h2:#0b1a45; --bad:#d1383b; --badbg:#fdeaea;
+  --fb:#e8efff; --fl:#c3d4f7; --fa:#1e3a8a; --rb:#fef08a; --rl:#fef08a; --ra:#854d0e;
+  --shadow:0 8px 24px rgba(20,39,94,.10); --glass:rgba(240,244,249,.82);
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light; box-sizing:border-box; padding-top:var(--safe-t);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
-  --acc:#10b981; --accInk:#0f172a; --h1:#047857; --h2:#064e3b; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --fb:#064e3b; --fl:#047857; --fa:#34d399; --rb:#422006; --rl:#713f12; --ra:#fde047;
-  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
+  --bg:#0b1226; --surface:#151f3d; --surface2:#22305a; --line:#2a3a68; --ink:#f8fafc; --muted:#94a3b8;
+  --acc:#7aa2ff; --accInk:#0b1226; --h1:#1e3a8a; --h2:#0b1a45; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --fb:#14224d; --fl:#2a4596; --fa:#9dbbff; --rb:#422006; --rl:#713f12; --ra:#fde047;
+  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(11,18,38,.82); color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0f172a; --surface:#1e293b; --surface2:#334155; --line:#334155; --ink:#f8fafc; --muted:#94a3b8;
-  --acc:#10b981; --accInk:#0f172a; --h1:#047857; --h2:#064e3b; --bad:#ff7b7b; --badbg:#3a1a1a;
-  --fb:#064e3b; --fl:#047857; --fa:#34d399; --rb:#422006; --rl:#713f12; --ra:#fde047;
-  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(15,23,42,.82); color-scheme:dark;
+  --bg:#0b1226; --surface:#151f3d; --surface2:#22305a; --line:#2a3a68; --ink:#f8fafc; --muted:#94a3b8;
+  --acc:#7aa2ff; --accInk:#0b1226; --h1:#1e3a8a; --h2:#0b1a45; --bad:#ff7b7b; --badbg:#3a1a1a;
+  --fb:#14224d; --fl:#2a4596; --fa:#9dbbff; --rb:#422006; --rl:#713f12; --ra:#fde047;
+  --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(11,18,38,.82); color-scheme:dark;
 }
 :root[data-theme="light"]{color-scheme:light}
 html{scroll-padding-top:var(--safe-t)}
@@ -51,7 +53,7 @@ html{scroll-padding-top:var(--safe-t)}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan",system-ui,sans-serif;transition:background .25s,color .25s}
 .app{max-width:480px;margin:0 auto;padding:14px 16px calc(120px + var(--safe-b))}
 
-/* ส่วนหัวสไตล์เขียวน้ำทะเลเข้ม */
+/* ส่วนหัวสไตล์น้ำเงินกรมท่า */
 .top-header {
   background: linear-gradient(135deg, var(--h1), var(--h2));
   border-radius: 24px;
@@ -106,9 +108,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:500 17px/1.45 "Anuphan"
 .ar{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
 .ar.on{display:grid}
 .ar button{display:flex;flex-direction:column;align-items:flex-start;padding:16px;min-height:88px;border:1.5px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;font-weight:700;cursor:pointer;position:relative;transition:all .2s}
-.ar button .icon-box{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e6fffa;color:#047857;margin-bottom:8px}
-[data-theme="dark"] .ar button .icon-box{background:#064e3b;color:#34d399}
-.ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc);box-shadow:0 4px 12px rgba(6,78,59,.1)}
+.ar button .icon-box{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e8efff;color:#1e3a8a;margin-bottom:8px}
+[data-theme="dark"] .ar button .icon-box{background:#1e3a8a;color:#bcd0ff}
+.ar button[aria-pressed=true]{border-color:var(--acc);background:var(--surface2);color:var(--acc);box-shadow:0 4px 12px rgba(20,39,94,.12)}
 
 /* สถานะยังไม่ได้เลือกตู้ / จุดวัด */
 .empty{border:2px dashed var(--line);border-radius:22px;padding:28px 18px;text-align:center;color:var(--muted);font-size:15px;font-weight:600;line-height:1.5}
@@ -191,7 +193,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .h-card.active{display:block}
 .h-card h2{font-size:16px;margin:0 0 2px}
 .h-card p{margin:0 0 8px;font-size:12px;color:var(--muted)}
-.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(6,78,59,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
+.h-card p i{display:inline-block;width:12px;height:10px;background:rgba(30,58,138,.12);border:1px solid var(--acc);vertical-align:middle;margin-right:4px}
 .h-card p em{font-style:normal;color:var(--bad)}
 .cv{position:relative;height:200px}
 
@@ -207,7 +209,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 </head>
 <body>
 <div class="app">
-  <!-- ส่วนหัวดีไซน์เขียวน้ำทะเลเข้ม -->
+  <!-- ส่วนหัวดีไซน์น้ำเงินกรมท่า -->
   <div class="top-header">
     <div class="top-header-row">
       <div class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
@@ -735,7 +737,7 @@ function renderHistoryView() {
   }
 
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
-  charts=[mk("c1","f",-30,12,"#047857","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
+  charts=[mk("c1","f",-30,12,"#1e40af","°C",filtered), mk("c2","r",15,30,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
 
   const A=[];
   let sortedForList = [...filtered].reverse();
