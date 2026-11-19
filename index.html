@@ -158,6 +158,11 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .save.warn{background:var(--bad)}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
+.sync{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translate(-50%,12px);z-index:50;max-width:calc(100% - 32px);padding:9px 16px;border-radius:99px;font-size:14px;font-weight:600;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.sync.wait{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+.sync.ok{background:var(--acc);color:var(--accInk)}
+.sync.err{background:var(--badbg);color:var(--bad);border:1.5px solid var(--bad);cursor:pointer}
 .success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .success-modal{background:var(--surface);border:1.5px solid var(--line);padding:30px 24px;border-radius:24px;text-align:center;box-shadow:var(--shadow);max-width:320px;width:90%;transform:scale(0.8);transition:transform .3s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 .success-overlay.on{opacity:1}
@@ -308,6 +313,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
   </div>
 </div>
 
+<div class="sync" id="sync" role="status" aria-live="polite"></div>
 <div class="bar" id="bar-save"><button class="save" type="button" id="save" disabled></button></div>
 
 <div class="success-overlay" id="successOverlay">
@@ -769,11 +775,54 @@ function renderHistoryView() {
 
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",() => { if(cachedHistory.length) renderHistoryView(); });
 
-// ระบบบันทึก: ส่งทุกแถวใน request เดียว และรอผลจริงจากเซิร์ฟเวอร์
-let saving = false;
-$("#save").addEventListener("click", async ()=>{
+// ระบบบันทึกแบบเร็ว: กดแล้วสำเร็จทันที ข้อมูลเข้าคิวในเครื่อง แล้วส่งเบื้องหลังจนกว่าชีตจะยืนยัน
+const OUTBOX_KEY = "pt-outbox";
+let outboxMem = [];
+const loadOutbox = () => { try { return JSON.parse(localStorage.getItem(OUTBOX_KEY) || "[]"); } catch(e) { return outboxMem; } };
+const saveOutbox = q => { outboxMem = q; try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(q)); } catch(e) {} };
+let flushing = false, retryTimer = null, pillTimer = null;
+
+function showSync(state, n) {
+  const el = $("#sync"); if (!el) return;
+  clearTimeout(pillTimer);
+  el.className = "sync on " + state;
+  el.textContent = state === "wait" ? `⏳ กำลังส่งเข้าชีต ${n} รายการ...`
+                 : state === "err"  ? `⚠️ ยังส่งไม่สำเร็จ ${n} รายการ · แตะเพื่อลองใหม่`
+                 : "✓ บันทึกเข้าชีตเรียบร้อย";
+  if (state === "ok") pillTimer = setTimeout(() => el.classList.remove("on"), 2500);
+}
+
+async function flushOutbox() {
+  if (flushing) return;
+  let q = loadOutbox();
+  if (!q.length) return;
+  flushing = true; clearTimeout(retryTimer);
+  showSync("wait", q.reduce((s, it) => s + it.rows.length, 0));
+  let failed = false;
+  while (q.length) {
+    const item = q[0];
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ id: item.id, rows: item.rows }) });
+      const j = await res.json();
+      if (j.status !== "success") throw new Error(j.message || "server");
+      q = loadOutbox().filter(it => it.id !== item.id); saveOutbox(q);
+    } catch (err) { failed = true; break; }
+  }
+  flushing = false;
+  if (failed) {
+    showSync("err", loadOutbox().reduce((s, it) => s + it.rows.length, 0));
+    retryTimer = setTimeout(flushOutbox, 20000);   // ลองใหม่อัตโนมัติทุก 20 วินาที
+  } else {
+    showSync("ok");
+    cachedHistory = [];                             // ให้หน้าประวัติโหลดข้อมูลใหม่
+  }
+}
+window.addEventListener("online", flushOutbox);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") flushOutbox(); });
+
+$("#save").addEventListener("click", () => {
   const cards = [...document.querySelectorAll("#list .card")];
-  if(!cards.length || saving) return;
+  if(!cards.length) return;
 
   // เตือนถ้ารอบนี้ / จุดนี้ บันทึกไปแล้วในเครื่องนี้
   const k = key(zone,mainCatIndex,area);
@@ -813,39 +862,26 @@ $("#save").addEventListener("click", async ()=>{
     rows.push({...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity});
   }
 
-  const saveBtn = $("#save");
-  saving = true;
-  saveBtn.disabled = true;
-  saveBtn.textContent = "กำลังบันทึก...";
+  // เข้าคิวในเครื่องก่อน แล้วแสดงผลสำเร็จทันที
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  saveOutbox([...loadOutbox(), { id, rows }]);
 
-  try {
-    // ไม่ใส่ Content-Type / no-cors เพื่อให้อ่านคำตอบจาก Apps Script ได้
-    const res = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ rows }) });
-    const j = await res.json();
-    if (j.status !== "success") throw new Error(j.message || "เซิร์ฟเวอร์ตอบกลับผิดพลาด");
-  } catch (err) {
-    saving = false;
-    alert("บันทึกไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่\n(" + err.message + ")");
-    update();               // ค่าที่กรอกยังอยู่ครบ
-    return;
-  }
-
-  saving = false;
   saved[k] = true;
-  cachedHistory = [];       // ให้หน้าประวัติโหลดข้อมูลใหม่
   chips(); mainCategories(); areas(); build();
   confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-
   const overlay = $("#successOverlay");
   overlay.classList.add("on");
-  setTimeout(() => { overlay.classList.remove("on"); }, 1500);
-
+  setTimeout(() => { overlay.classList.remove("on"); }, 1200);
   scrollTo({top:0,behavior:"smooth"});
   update();
+
+  flushOutbox();   // ส่งเบื้องหลัง
 });
 
 // เริ่มต้นโหลดหน้าเว็บ
 chips(); mainCategories(); areas(); setRound(round); showDate(); renderPeople(); build();
+$("#sync").addEventListener("click", flushOutbox);
+flushOutbox();   // ส่งรายการที่ค้างจากครั้งก่อน (ถ้ามี)
 </script>
 </body>
 </html>
