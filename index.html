@@ -674,6 +674,16 @@ const FIELD = {f:"fridgeTemp", r:"roomTemp", h:"humidity"};
 const SHIFT_ORDER = {"รอบเช้า":0,"รอบบ่าย":1,"รอบเย็น":2};
 const numOf = v => (v === "" || v == null || isNaN(parseFloat(v))) ? null : parseFloat(v);
 
+// ชื่อจุดวัดที่รู้จัก (จาก ZONES) ใช้จัดกลุ่มข้อมูลเก่าที่บันทึกชื่อคนไว้ในช่อง SubLocation
+const KNOWN_SUBS = new Set(ZONES.flatMap(z => z[1].flatMap(x => Array.isArray(x) ? x[1] : [x])));
+function subLabel(r, key) {
+  const s = String(r.subLocation || "").trim();
+  const isFridgeName = s.includes("ตู้");
+  if (s && KNOWN_SUBS.has(s) && (key === "f") === isFridgeName) return s;
+  if (key === "f") return (r.location === "คลังยา") ? "ไม่ระบุตู้ (ข้อมูลเก่า)" : "ตู้เย็น";
+  return "ห้อง (ข้อมูลเก่า)";
+}
+
 function mk(id,key,min,max,color,unit,R){
   const fld = FIELD[key];
   const rows = R.filter(r => numOf(r[fld]) !== null);
@@ -691,12 +701,12 @@ function mk(id,key,min,max,color,unit,R){
   const shapeOf = s => s === "รอบเช้า" ? "circle" : s === "รอบบ่าย" ? "rect" : "rectRot";
 
   // แยกชุดข้อมูลตาม subLocation
-  const names = [...new Set(rows.map(r => String(r.subLocation || "ไม่ระบุ")))];
+  const names = [...new Set(rows.map(r => subLabel(r, key)))];
   const bad = css("--bad");
   const datasets = names.map((name, si) => {
     const col = names.length === 1 ? color : SERIES_COLORS[si % SERIES_COLORS.length];
     const pts = new Array(slots.length).fill(null);   // แถวข้อมูลของแต่ละช่วงเวลา
-    rows.filter(r => String(r.subLocation || "ไม่ระบุ") === name).forEach(r => { pts[idx.get(slotKey(r))] = r; });
+    rows.filter(r => subLabel(r, key) === name).forEach(r => { pts[idx.get(slotKey(r))] = r; });
     const raw = pts.map(r => r ? numOf(r[fld]) : null);
     const isBad = i => raw[i] !== null && badHist(key, raw[i], name);
     return {
@@ -772,7 +782,7 @@ function renderHistoryView() {
     const nb = filtered.filter(r => {
       let val = k=='f' ? r.fridgeTemp : k=='r' ? r.roomTemp : r.humidity;
       let num = val !== "" && val != null ? parseFloat(val) : null;
-      return num !== null && badHist(k, num, r.subLocation);
+      return num !== null && badHist(k, num, subLabel(r, k));
     }).length;
 
     const fld = k=='f' ? "fridgeTemp" : k=='r' ? "roomTemp" : "humidity";
@@ -798,10 +808,10 @@ function renderHistoryView() {
     [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
       let num = val !== "" && val != null ? parseFloat(val) : null;
       if(num !== null) {
-        let isBad = badHist(k, num, r.subLocation);
+        let isBad = badHist(k, num, subLabel(r, k));
         let dateFormatted = formatDateShort(r.date);
         let timeStr = r.shift === "รอบเช้า" ? "09:00" : r.shift === "รอบบ่าย" ? "14:30" : r.shift === "รอบเย็น" ? "20:30" : "";
-        let subLocText = r.subLocation ? ` > ${esc(r.subLocation)}` : "";
+        let subLocText = ` > ${esc(subLabel(r, k))}`;
         let noteText = r.note ? `<span>หมายเหตุ: ${esc(r.note)}</span>` : "";
         
         A.push(`
