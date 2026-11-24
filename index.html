@@ -8,12 +8,11 @@
 <!-- ตั้งค่าสำหรับ iOS (iPhone / iPad) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PharmaTemp">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<meta name="theme-color" content="#eef2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0b1226" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#14275e">
 
 <!-- ตั้งค่าสำหรับ Android (PWA Manifest) -->
 <link rel="manifest" href="./manifest.json">
@@ -30,7 +29,7 @@ document.documentElement.setAttribute("data-theme",t)})();
 </script>
 <style>
 :root{
-  --bg:#eef2f7; --surface:#fff; --surface2:#f4f7fb; --line:#d8e2ec; --ink:#102a43; --muted:#486581;
+  --bg:#f0f4f9; --surface:#fff; --surface2:#f4f7fb; --line:#d8e2ec; --ink:#102a43; --muted:#486581;
   --acc:#1e3a8a; --accInk:#fff; --h1:#1e3a8a; --h2:#0b1a45; --track:#e3e9f2;
   --bad:#c62828; --badInk:#b71c1c; --badbg:#fdecec; --warn:#9a3412; --warnbg:#fff1e6;
   --okbg:#eaf0fb; --okline:#c3d4f7; --focus:rgba(30,58,138,.14);
@@ -47,13 +46,14 @@ document.documentElement.setAttribute("data-theme",t)})();
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--h1)}
+.sbar{position:fixed;top:0;left:0;right:0;height:var(--safe-t);background:var(--h1);z-index:40;pointer-events:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.45 "Anuphan",system-ui,sans-serif;transition:background .25s,color .25s}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 a{color:var(--acc)}
 .app{max-width:480px;margin:0 auto;min-height:100vh}
-.view{display:none;padding-bottom:calc(120px + var(--safe-b))}
+.view{display:none;padding-bottom:calc(110px + var(--safe-b))}
 .view.on{display:block}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .cap{margin:20px 2px 10px;font-size:15px;font-weight:700;color:var(--muted)}
@@ -105,61 +105,8 @@ a{color:var(--acc)}
 .idlebtn{border:0;background:none;padding:4px 2px;color:var(--acc);font-size:13px;font-weight:600;text-decoration:underline}
 .refresh{display:block;margin:6px auto 0;border:0;background:none;color:var(--muted);font-size:13px;padding:10px}
 
-
-/* ---------- หัวแอป ---------- */
-.ahead{display:flex;align-items:center;gap:8px;padding:calc(14px + var(--safe-t)) 14px 6px 16px}
-.ah-t{flex:1;display:flex;flex-direction:column;min-width:0}
-.ah-t b{font-size:23px;line-height:1.2;color:var(--h2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-[data-theme="dark"] .ah-t b{color:var(--ink)}
-.ah-t small{font-size:14px;color:var(--muted)}
-.locpill{flex:none;display:flex;align-items:center;gap:6px;height:44px;max-width:46vw;padding:0 12px 0 15px;border:0;border-radius:99px;background:var(--h2);color:#fff;font-size:15px;font-weight:700;box-shadow:0 6px 16px rgba(11,26,69,.18)}
-[data-theme="dark"] .locpill{background:var(--acc);color:var(--accInk)}
-.locpill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cbtn{flex:none;width:42px;height:42px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center}
-.ico-sun{display:none}
-[data-theme="dark"] .ico-sun{display:block}
-[data-theme="dark"] .ico-moon{display:none}
-.card{margin:12px 12px 0;background:var(--surface);border-radius:28px;padding:20px 20px 18px;box-shadow:0 6px 22px rgba(20,39,94,.06)}
-.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
-.card-h h2{margin:0;font-size:19px;line-height:1.3}
-.badge{flex:none;font-size:14px;font-weight:700;padding:7px 14px;border-radius:99px;background:var(--warnbg);color:var(--warn)}
-.badge.ok{background:var(--okbg);color:var(--acc)}
-.donut{display:grid;place-items:center;margin:8px 0 6px}
-.donut svg{width:200px;height:200px}
-.donut .c1{font-size:36px;font-weight:700;fill:var(--ink);font-family:"Anuphan",system-ui,sans-serif}
-.donut .c2{font-size:14px;fill:var(--muted);font-family:"Anuphan",system-ui,sans-serif}
-.legend{display:flex;flex-direction:column;gap:2px;margin-top:4px}
-.lg{display:grid;grid-template-columns:16px 1fr auto 56px;align-items:center;gap:10px;padding:8px 2px;font-size:16px}
-.lg i{width:14px;height:14px;border-radius:4px}
-.lg b{font-size:17px;text-align:right}
-.lg span:last-child{text-align:right;color:var(--muted);font-size:15px}
-.shifts{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:4px;padding:4px;margin-top:12px;background:var(--surface2);border:1px solid var(--line);border-radius:14px}
-.shifts button{height:38px;border:0;border-radius:11px;background:none;color:var(--muted);font-size:14px;font-weight:600}
-.shifts button[aria-pressed=true]{background:var(--h2);color:#fff;font-weight:700}
-[data-theme="dark"] .shifts button[aria-pressed=true]{background:var(--acc);color:var(--accInk)}
-.cta{display:block;width:100%;height:56px;margin-top:12px;border:0;border-radius:18px;background:var(--h2);color:#fff;font-size:17px;font-weight:700}
-[data-theme="dark"] .cta{background:var(--acc);color:var(--accInk)}
-.cta.done{background:var(--surface2);color:var(--acc);border:1.5px solid var(--line)}
-.ghost{flex:none;height:40px;padding:0 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px;font-weight:700}
-.orow{display:flex;align-items:center;gap:10px;width:100%;padding:12px 2px;border:0;border-top:1px solid var(--line);background:none;text-align:left;font-size:16px}
-.orow:first-child{border-top:0}
-.orow b{flex:1;font-weight:600}
-.orow .n{font-weight:700;color:var(--warn)}
-.orow .n.ok{color:var(--acc)}
-.sheet{position:fixed;inset:0;z-index:60;background:rgba(10,18,40,.45);display:flex;align-items:flex-end;justify-content:center}
-.sheet[hidden]{display:none}
-.sheet-in{width:100%;max-width:480px;background:var(--surface);border-radius:28px 28px 0 0;padding:22px 16px calc(18px + var(--safe-b));display:flex;flex-direction:column;gap:10px}
-.sheet-t{font-size:20px}
-.sheet-s{font-size:14px;color:var(--muted);margin-top:-6px}
-.lbtn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:60px;padding:0 18px;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);font-size:18px;font-weight:700}
-.lbtn small{font-size:14px;font-weight:500;color:var(--muted)}
-.lbtn[aria-pressed=true]{background:var(--h2);border-color:var(--h2);color:#fff}
-.lbtn[aria-pressed=true] small{color:rgba(255,255,255,.8)}
-#r-zones,#hz{display:none!important}
-.hh-cap{font-size:14px;color:var(--muted)}
-
 /* ---------- หน้าบันทึก ---------- */
-.topbar{margin:12px 12px 0;background:var(--surface);border-radius:28px;padding:12px 12px 12px;box-shadow:0 6px 22px rgba(20,39,94,.06)}
+.topbar{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(22px + var(--safe-t)) 12px 12px}
 .tb-row{display:flex;align-items:center;gap:8px}
 .back{flex:none;width:44px;height:44px;border-radius:12px;border:0;background:none;display:grid;place-items:center}
 .tb-t{flex:1;display:flex;flex-direction:column;min-width:0}
@@ -220,11 +167,10 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 .notelab.req+textarea{border-color:var(--bad)}
 
 /* ---------- แถบล่าง ---------- */
-.tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + var(--safe-b));z-index:20;background:var(--h2);border-radius:99px;padding:8px;box-shadow:0 10px 30px rgba(11,26,69,.28);max-width:456px;margin:0 auto}
-[data-theme="dark"] .tabbar{background:#16234d}
-.tabbar .in{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
-.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;border-radius:99px;color:rgba(255,255,255,.72);font-size:13px;font-weight:600}
-.tabbar button[aria-current=page]{background:#fff;color:var(--h2);font-weight:700}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:6px 12px calc(8px + var(--safe-b))}
+.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;min-height:52px;color:var(--muted);font-size:12px;font-weight:600}
+.tabbar button[aria-current=page]{color:var(--acc);font-weight:700}
 .savebar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:none;background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 16px calc(12px + var(--safe-b))}
 .savebar.on{display:block}
 .savebar .in{max-width:448px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
@@ -238,7 +184,7 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
 /* ---------- หน้าประวัติ ---------- */
-.hhead{padding:4px 16px 0}
+.hhead{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(22px + var(--safe-t)) 16px 12px}
 .hh-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hh-row b{font-size:24px}
 .sheetlink{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:600;text-decoration:none}
@@ -289,38 +235,39 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 </style>
 </head>
 <body>
+<div class="sbar" aria-hidden="true"></div>
 <div class="app">
 
-<!-- หัวแอป (ใช้ร่วมทุกหน้า) -->
-<header class="ahead">
-  <div class="ah-t"><b id="ah-title">PharmaTemp</b><small id="ah-sub"></small></div>
-  <button class="locpill" id="locpill" type="button" aria-haspopup="dialog" aria-label="เลือกสถานที่"><span id="loc-name"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-  <button class="cbtn" type="button" id="theme" aria-label="สลับโหมดกลางวัน/กลางคืน">
-    <svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-    <svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-  </button>
-</header>
+<!-- ================= หน้าแรก: ภาพรวมวันนี้ ================= -->
+<section class="view on" id="v-home" aria-label="ภาพรวมวันนี้">
+  <div class="home-head">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
+      <div class="brand-t"><small>โรงพยาบาลจัตุรัส</small><b>PharmaTemp</b></div>
+      <button class="ib" type="button" id="theme" aria-label="สลับโหมดกลางวัน/กลางคืน">
+        <svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+    <div class="today"><small id="h-weekday"></small><b id="h-date"></b></div>
+  </div>
 
-<!-- ================= หน้าแรก: ภาพรวม ================= -->
-<section class="view on" id="v-home" aria-label="ภาพรวม">
-  <div class="card">
-    <div class="card-h"><h2 id="h-title"></h2><span class="badge" id="h-badge"></span></div>
-    <div class="donut" id="h-donut"></div>
-    <div class="legend" id="h-legend"></div>
+  <div class="pcard">
+    <div class="pcard-top">
+      <div><small>รอบตอนนี้</small><b id="h-shift"></b></div>
+      <span class="badge" id="h-badge"></span>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="h-bar" style="width:0"></i></div>
+    <span class="ptext" id="h-ptext"></span>
     <div class="shifts" id="h-shifts" role="group" aria-label="เลือกรอบเวลา"></div>
-    <button class="cta" type="button" id="h-go"></button>
   </div>
-  <div class="card">
-    <div class="card-h"><h2 id="w-title"></h2><button class="ghost" type="button" id="w-more">ดูประวัติ</button></div>
-    <div class="donut" id="w-donut"></div>
-    <div class="legend" id="w-legend"></div>
-    <div id="w-bad"></div>
+
+  <div class="wrap">
+    <div id="h-alerts"></div>
+    <p class="cap">จุดที่ต้องบันทึกรอบนี้</p>
+    <div id="h-list"></div>
+    <button class="refresh" type="button" id="h-refresh"></button>
   </div>
-  <div class="card" id="o-card">
-    <div class="card-h"><h2 id="o-title"></h2></div>
-    <div id="h-others"></div>
-  </div>
-  <button class="refresh" type="button" id="h-refresh"></button>
 </section>
 
 <!-- ================= หน้าบันทึก ================= -->
@@ -355,7 +302,7 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 <section class="view" id="v-history" aria-label="ประวัติ">
   <div class="hhead">
     <div class="hh-row">
-      <span class="hh-cap">ข้อมูลย้อนหลังของสถานที่นี้</span>
+      <b>ประวัติ</b>
       <a class="sheetlink" id="sheetlink" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>เปิดชีต</a>
     </div>
     <div class="hchips" id="hz" role="group" aria-label="สถานที่"></div>
@@ -375,16 +322,6 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
     <button class="morebtn" type="button" id="hmore"></button>
   </div>
 </section>
-</div>
-
-<!-- เลือกสถานที่ -->
-<div class="sheet" id="locsheet" role="dialog" aria-modal="true" aria-label="เลือกสถานที่" hidden>
-  <div class="sheet-in">
-    <b class="sheet-t">เลือกสถานที่ของคุณ</b>
-    <small class="sheet-s">เลือกครั้งเดียว แอปจะจำไว้</small>
-    <div id="loclist"></div>
-    <button class="morebtn" type="button" id="locclose">ปิด</button>
-  </div>
 </div>
 
 <!-- แถบเมนูล่าง -->
@@ -469,7 +406,7 @@ const sessionRows = [];          // แถวที่บันทึกใน�
 const drafts = {};               // ค่าที่กรอกค้างไว้ ไม่หายเวลาสลับแท็บ
 const reopened = new Set();      // จุดที่บันทึกแล้วแต่ผู้ใช้กด "แก้ไข" เพื่อบันทึกใหม่
 let who = "";
-let hLoc = zone, hDays = 7, hMetric = null, showAll = false, chart = null;
+let hLoc = 0, hDays = 7, hMetric = null, showAll = false, chart = null;
 
 // ---------- คิวส่งข้อมูล (บันทึกเร็ว ไม่หาย ไม่ซ้ำ) ----------
 const OUTBOX_KEY = "pt-outbox";
@@ -588,74 +525,50 @@ function firstPendingZone() {
   if (zs.includes(zone) && pointsOf(zone).some(s => !dm.has(zname(zone) + "|" + s))) return zone;
   return zs.find(i => pointsOf(i).some(s => !dm.has(zname(i) + "|" + s))) ?? null;
 }
-const C_OK = "#2e9e6a", C_BAD = "#dd5a1e", C_WAIT = "#b8c4d4";
-function donutSvg(segs, big, small) {
-  const R = 78, W = 26, L = 2 * Math.PI * R, tot = segs.reduce((a, x) => a + x.v, 0);
-  let off = 0, arcs = "";
-  if (!tot) arcs = `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${C_WAIT}" stroke-width="${W}"/>`;
-  else segs.forEach(x => {
-    if (!x.v) return;
-    const len = x.v / tot * L, gap = segs.filter(y => y.v).length > 1 ? 3 : 0;
-    arcs += `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${x.c}" stroke-width="${W}" stroke-dasharray="${Math.max(0, len - gap)} ${L}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;
-    off += len;
-  });
-  return `<svg viewBox="0 0 200 200" role="img" aria-label="${esc(big + " " + small)}">${arcs}<text class="c1" x="100" y="104" text-anchor="middle">${esc(big)}</text><text class="c2" x="100" y="130" text-anchor="middle">${esc(small)}</text></svg>`;
-}
-function legendHtml(segs) {
-  const tot = segs.reduce((a, x) => a + x.v, 0) || 1;
-  return segs.map(x => `<div class="lg"><i style="background:${x.c}"></i><span>${esc(x.l)}</span><b>${x.v}</b><span>${Math.round(x.v / tot * 100)}%</span></div>`).join("");
-}
-function rowBad(r) { return ["f", "r", "h"].some(k => { const v = numOf(r[FIELD[k]]); return v !== null && badVal(k, v, subLabel(r, k)); }); }
-function homeShiftFor(z) { const rs = roundsOf(z); return rs.includes(homeShift) ? homeShift : rs[rs.length - 1]; }
-function renderHeader() {
-  $("#loc-name").textContent = zname(zone);
-  const T = { home: "PharmaTemp", record: "บันทึกค่า", history: "ประวัติ" };
-  $("#ah-title").textContent = T[view] || "PharmaTemp";
-  $("#ah-sub").textContent = view === "record" ? `${fmtThaiShort(recDate)} · ${recShift}` : view === "history" ? (hDays < 999 ? `ย้อนหลัง ${hDays} วัน` : "ข้อมูลทั้งหมด") : `ข้อมูล ณ ${fmtThaiShort(todayStr())}`;
-}
 function renderHome() {
-  renderHeader();
-  const t = todayStr(), hs = homeShiftFor(zone), zn = zname(zone);
-  const rs = roundsOf(zone);
-  $("#h-shifts").style.setProperty("--n", rs.length);
-  $("#h-shifts").innerHTML = rs.map(s => `<button type="button" data-s="${s}" aria-pressed="${s === hs}">${s.replace("รอบ", "")} ${SHIFT_TIME[s]}</button>`).join("");
-  const dm = doneMap(t, hs), pts = pointsOf(zone);
-  let ok = 0, bad = 0;
-  pts.forEach(sb => { const d = dm.get(zn + "|" + sb); if (d) { if (rowBad(d.row)) bad++; else ok++; } });
-  const done = ok + bad, total = pts.length, left = total - done;
-  $("#h-title").textContent = `สถานะ${hs}`;
-  $("#h-badge").textContent = left ? `เหลือ ${left} จุด` : "ครบแล้ว";
+  const t = todayStr(), now = new Date();
+  $("#h-weekday").textContent = now.toLocaleDateString("th-TH", { weekday: "long" });
+  $("#h-date").textContent = fmtThai(t);
+  $("#h-shift").textContent = `${homeShift} · ${SHIFT_TIME[homeShift]} น.`;
+  $("#h-shifts").innerHTML = ALL_SHIFTS.map(s => `<button type="button" data-s="${s}" aria-pressed="${s === homeShift}">${s.replace("รอบ", "")} ${SHIFT_TIME[s]}</button>`).join("");
+
+  const dm = doneMap(t, homeShift);
+  let total = 0, done = 0;
+  const items = zonesForShift(homeShift).map(i => {
+    const pts = pointsOf(i), d = pts.filter(s => dm.has(zname(i) + "|" + s));
+    total += pts.length; done += d.length;
+    const last = d.map(s => dm.get(zname(i) + "|" + s)).sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0];
+    return { i, n: pts.length, d: d.length, last };
+  });
+  items.sort((a, b) => (a.d === a.n) - (b.d === b.n));
+  const idle = idleZonesForShift(homeShift);
+  const idleHtml = idle.length ? `<p class="idle">ไม่ได้บันทึกมา 14 วัน (ไม่นับรวม): ${idle.map(i => `<button type="button" class="idlebtn" data-z="${i}">${esc(zname(i))}</button>`).join(" · ")}</p>` : "";
+  $("#h-list").innerHTML = items.map(it => {
+    if (it.d === it.n) {
+      const info = it.last ? `ครบแล้ว · ${esc(it.last.who || "")}${it.last.ts ? " " + timeOf(it.last.ts) + " น." : ""}` : "ครบแล้ว";
+      return `<button type="button" class="loc done" data-z="${it.i}"><span class="lt"><b>${esc(zname(it.i))}</b><small>${info}</small></span><span class="tick" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></button>`;
+    }
+    return `<button type="button" class="loc" data-z="${it.i}"><span class="lt"><b>${esc(zname(it.i))}</b><span class="bar" aria-hidden="true"><i style="width:${Math.round(it.d / it.n * 100)}%"></i></span></span><span class="cnt">${it.d}/${it.n}</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>`;
+  }).join("") + idleHtml;
+
+  const left = total - done;
+  $("#h-badge").textContent = left ? `เหลือ ${left} จุด` : "ครบทุกจุด";
   $("#h-badge").classList.toggle("ok", !left);
-  const segs = [{ l: "บันทึกแล้ว · ปกติ", v: ok, c: C_OK }, { l: "ค่าเกินเกณฑ์", v: bad, c: C_BAD }, { l: "ยังไม่บันทึก", v: left, c: C_WAIT }];
-  $("#h-donut").innerHTML = donutSvg(segs, `${done}/${total}`, "จุดที่บันทึก");
-  $("#h-legend").innerHTML = legendHtml(segs);
-  const go = $("#h-go");
-  go.textContent = left ? `บันทึก${hs} (${left} จุด)` : `ดู/แก้ไข${hs}`;
-  go.classList.toggle("done", !left);
-  go.dataset.s = hs;
+  $("#h-bar").style.width = (total ? done / total * 100 : 0) + "%";
+  $("#h-ptext").innerHTML = `บันทึกแล้ว <b>${done}</b> จาก ${total} จุด`;
 
-  // 7 วันล่าสุดของสถานที่นี้
-  const from = toDate(t).getTime() - 6 * 864e5;
-  const rows = knownRows().filter(r => String(r.location || "").trim() === zn && toDate(r.date).getTime() >= from);
-  let wOk = 0, wBad = 0; const bads = [];
-  rows.forEach(r => ["f", "r", "h"].forEach(k => { const v = numOf(r[FIELD[k]]); if (v === null) return; if (badVal(k, v, subLabel(r, k))) { wBad++; bads.push({ r, k, v }); } else wOk++; }));
-  $("#w-title").textContent = "7 วันล่าสุด";
-  const wsegs = [{ l: "อยู่ในเกณฑ์", v: wOk, c: C_OK }, { l: "เกินเกณฑ์", v: wBad, c: C_BAD }];
-  const wt = wOk + wBad;
-  $("#w-donut").innerHTML = wt ? donutSvg(wsegs, wt ? Math.round(wOk / wt * 100) + "%" : "–", "อยู่ในเกณฑ์") : "";
-  $("#w-legend").innerHTML = wt ? legendHtml(wsegs) : `<div class="empty">${loading && !cachedHistory.length ? "กำลังโหลดข้อมูล..." : "ยังไม่มีข้อมูลใน 7 วันนี้"}</div>`;
-  bads.sort((a, b) => (toDate(b.r.date) - toDate(a.r.date)) || ((SHIFT_ORDER[b.r.shift] ?? 9) - (SHIFT_ORDER[a.r.shift] ?? 9)));
-  $("#w-bad").innerHTML = bads.slice(0, 3).map(({ r, k, v }) => `<div class="hrow bad"><div class="ht"><b>${esc(subLabel(r, k))}</b><span>${fmtShort(r.date)} ${esc(r.shift || "")} · ${esc(r.who || "-")}</span></div><span class="hv bad">${v} ${k === "h" ? "%" : "°C"}</span></div>`).join("");
-
-  // สถานที่อื่นในรอบนี้
-  const others = zonesForShift(homeShift).filter(i => i !== zone);
-  const dmo = doneMap(t, homeShift);
-  $("#o-card").style.display = others.length ? "block" : "none";
-  $("#o-title").textContent = `สถานที่อื่น · ${homeShift}`;
-  $("#h-others").innerHTML = others.map(i => {
-    const p = pointsOf(i), d = p.filter(sb => dmo.has(zname(i) + "|" + sb)).length;
-    return `<button type="button" class="orow" data-z="${i}"><b>${esc(zname(i))}</b><span class="n${d === p.length ? " ok" : ""}">${d === p.length ? "ครบ ✓" : d + "/" + p.length}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>`;
-  }).join("");
+  // ค่านอกเกณฑ์วันนี้
+  const bads = [];
+  knownRows().filter(r => dayOf(r.date) === t).forEach(r => ["f", "r", "h"].forEach(k => {
+    const v = numOf(r[FIELD[k]]);
+    if (v !== null && badVal(k, v, subLabel(r, k))) bads.push({ r, k, v });
+  }));
+  if (bads.length) {
+    const b = bads[bads.length - 1];
+    const more = bads.length > 1 ? ` และอีก ${bads.length - 1} รายการ` : "";
+    $("#h-alerts").innerHTML = `<button type="button" class="alert" id="h-alert"><span class="ai" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><span class="at"><b>ค่านอกเกณฑ์วันนี้ ${bads.length} รายการ</b><span>${esc(b.r.location)} · ${esc(subLabel(b.r, b.k))} ${b.v} ${UNIT[b.k]} · ${esc(b.r.shift)}${more}</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>`;
+    $("#h-alert").onclick = () => { hLoc = ZONES.findIndex(z => z[0] === b.r.location); if (hLoc < 0) hLoc = 0; hDays = 7; showView("history"); };
+  } else $("#h-alerts").innerHTML = "";
   renderRefresh();
 }
 function renderRefresh() {
@@ -664,39 +577,7 @@ function renderRefresh() {
 }
 $("#h-refresh").addEventListener("click", () => loadData(true));
 $("#h-shifts").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; homeShift = b.dataset.s; renderHome(); });
-$("#h-go").addEventListener("click", e => { homeShift = e.currentTarget.dataset.s || homeShift; openRecord(zone); });
-$("#w-more").addEventListener("click", () => { hDays = 7; showView("history"); });
-$("#h-others").addEventListener("click", e => { const b = e.target.closest("button[data-z]"); if (b) { setZone(+b.dataset.z); scrollTo({ top: 0, behavior: "smooth" }); } });
-
-// ---------- เลือกสถานที่ ----------
-function setZone(z) {
-  if (z === zone) return;
-  zone = z; ls.set("pt-zone", z); hLoc = z; showAll = false; hMetric = null;
-  if (view === "record") {
-    const rs = roundsOf(z); if (!rs.includes(recShift)) recShift = rs[rs.length - 1];
-    const dm = doneMap(recDate, recShift), tabs = tabsOf(z);
-    tab = Math.max(0, tabs.findIndex(t => t.subs.some(s => !dm.has(zname(z) + "|" + s))));
-    $("#r-note").value = "";
-    renderRecord();
-  } else if (view === "history") renderHistory();
-  else renderHome();
-  renderHeader();
-}
-function openLocSheet() {
-  const t = todayStr();
-  $("#loclist").innerHTML = ZONES.map((z, i) => {
-    const s = homeShiftFor(i), dm = doneMap(t, s), p = pointsOf(i), d = p.filter(sb => dm.has(zname(i) + "|" + sb)).length;
-    return `<button type="button" class="lbtn" data-z="${i}" aria-pressed="${i === zone}"><span>${esc(z[0])}</span><small>${d === p.length ? "ครบ ✓" : d + "/" + p.length + " จุด"}</small></button>`;
-  }).join("");
-  $("#locsheet").hidden = false;
-}
-$("#locpill").addEventListener("click", openLocSheet);
-$("#locclose").addEventListener("click", () => { $("#locsheet").hidden = true; });
-$("#locsheet").addEventListener("click", e => {
-  if (e.target === e.currentTarget) { e.currentTarget.hidden = true; return; }
-  const b = e.target.closest("button[data-z]"); if (!b) return;
-  $("#locsheet").hidden = true; setZone(+b.dataset.z);
-});
+$("#h-list").addEventListener("click", e => { const b = e.target.closest("button[data-z]"); if (b) openRecord(+b.dataset.z); });
 $("#theme").addEventListener("click", () => {
   const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
   root.setAttribute("data-theme", next); ls.set("pt-theme", next);
@@ -717,9 +598,8 @@ function openRecord(z) {
   renderRecord();
 }
 function renderRecord() {
-  renderHeader();
-  $("#r-title").textContent = `${recShift} · ${SHIFT_TIME[recShift]} น.`;
-  $("#r-sub").textContent = `${zname(zone)} · ${fmtThaiShort(recDate)}`;
+  $("#r-title").textContent = zname(zone);
+  $("#r-sub").textContent = `${fmtThaiShort(recDate)} · ${recShift} ${SHIFT_TIME[recShift]} น.`;
   const dmz = doneMap(recDate, recShift);
   $("#r-zones").innerHTML = ZONES.map((z, i) => {
     const full = roundsOf(i).includes(recShift) && pointsOf(i).every(s => dmz.has(zname(i) + "|" + s));
@@ -954,7 +834,6 @@ function historyRows() {
   return rows;
 }
 function renderHistory() {
-  hLoc = zone; renderHeader();
   $("#hz").innerHTML = ZONES.map((z, i) => `<button type="button" class="chip" data-z="${i}" aria-pressed="${i === hLoc}">${esc(z[0])}</button>`).join("");
   $("#hr").innerHTML = [[7, "7 วัน"], [30, "30 วัน"], [999, "ทั้งหมด"]].map(([d, l]) => `<button type="button" data-d="${d}" aria-pressed="${d === hDays}">${l}</button>`).join("");
   const rows = historyRows();
