@@ -59,20 +59,20 @@ a{color:var(--acc)}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 
 /* ---------- หน้าแรก ---------- */
-.home-head{background:linear-gradient(160deg,var(--h1),var(--h2));color:#fff;padding:calc(18px + var(--safe-t)) 20px 64px}
+.home-head{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:calc(16px + var(--safe-t)) 16px 16px}
 .brand{display:flex;align-items:center;gap:12px}
-.mark{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.mark{flex:none;width:40px;height:40px;border-radius:12px;background:var(--acc);color:var(--accInk);display:grid;place-items:center}
 .brand-t{flex:1;display:flex;flex-direction:column;line-height:1.25}
-.brand-t small{font-size:13px;opacity:.85}
+.brand-t small{font-size:13px;color:var(--muted)}
 .brand-t b{font-size:18px}
-.ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center}
+.ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);display:grid;place-items:center}
 .ico-sun{display:none}
 [data-theme="dark"] .ico-sun{display:block}
 [data-theme="dark"] .ico-moon{display:none}
-.today{margin-top:14px;display:flex;flex-direction:column}
-.today small{font-size:14px;opacity:.85}
-.today b{font-size:26px;line-height:1.2}
-.pcard{margin:-44px 16px 0;background:var(--surface);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;position:relative}
+.today{margin-top:12px;display:flex;flex-direction:column}
+.today small{font-size:14px;color:var(--muted)}
+.today b{font-size:24px;line-height:1.2}
+.pcard{margin:16px 16px 0;background:var(--surface);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;position:relative}
 .pcard-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pcard-top small{display:block;font-size:13px;color:var(--muted);font-weight:600}
 .pcard-top b{font-size:20px}
@@ -240,7 +240,7 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 <section class="view on" id="v-home" aria-label="ภาพรวมวันนี้">
   <div class="home-head">
     <div class="brand">
-      <div class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
+      <div class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg></div>
       <div class="brand-t"><small>โรงพยาบาลจัตุรัส</small><b>PharmaTemp</b></div>
       <button class="ib" type="button" id="theme" aria-label="สลับโหมดกลางวัน/กลางคืน">
         <svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
