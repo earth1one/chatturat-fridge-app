@@ -8,7 +8,7 @@
 <!-- ตั้งค่าสำหรับ iOS (iPhone / iPad) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PharmaTemp">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
@@ -46,7 +46,8 @@ document.documentElement.setAttribute("data-theme",t)})();
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--h1)}
+.sbar{position:fixed;top:0;left:0;right:0;height:var(--safe-t);background:var(--h1);z-index:40;pointer-events:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.45 "Anuphan",system-ui,sans-serif;transition:background .25s,color .25s}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -59,20 +60,20 @@ a{color:var(--acc)}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 
 /* ---------- หน้าแรก ---------- */
-.home-head{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:calc(16px + var(--safe-t)) 16px 16px}
+.home-head{background:linear-gradient(160deg,var(--h1),var(--h2));color:#fff;padding:calc(18px + var(--safe-t)) 20px 64px}
 .brand{display:flex;align-items:center;gap:12px}
-.mark{flex:none;width:40px;height:40px;border-radius:12px;background:var(--acc);color:var(--accInk);display:grid;place-items:center}
+.mark{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;display:grid;place-items:center}
 .brand-t{flex:1;display:flex;flex-direction:column;line-height:1.25}
-.brand-t small{font-size:13px;color:var(--muted)}
+.brand-t small{font-size:13px;opacity:.85}
 .brand-t b{font-size:18px}
-.ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);display:grid;place-items:center}
+.ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center}
 .ico-sun{display:none}
 [data-theme="dark"] .ico-sun{display:block}
 [data-theme="dark"] .ico-moon{display:none}
-.today{margin-top:12px;display:flex;flex-direction:column}
-.today small{font-size:14px;color:var(--muted)}
-.today b{font-size:24px;line-height:1.2}
-.pcard{margin:16px 16px 0;background:var(--surface);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;position:relative}
+.today{margin-top:14px;display:flex;flex-direction:column}
+.today small{font-size:14px;opacity:.85}
+.today b{font-size:26px;line-height:1.2}
+.pcard{margin:-44px 16px 0;background:var(--surface);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;position:relative}
 .pcard-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .pcard-top small{display:block;font-size:13px;color:var(--muted);font-weight:600}
 .pcard-top b{font-size:20px}
@@ -105,7 +106,7 @@ a{color:var(--acc)}
 .refresh{display:block;margin:6px auto 0;border:0;background:none;color:var(--muted);font-size:13px;padding:10px}
 
 /* ---------- หน้าบันทึก ---------- */
-.topbar{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(16px + var(--safe-t)) 12px 12px}
+.topbar{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(22px + var(--safe-t)) 12px 12px}
 .tb-row{display:flex;align-items:center;gap:8px}
 .back{flex:none;width:44px;height:44px;border-radius:12px;border:0;background:none;display:grid;place-items:center}
 .tb-t{flex:1;display:flex;flex-direction:column;min-width:0}
@@ -183,7 +184,7 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 [data-theme="dark"] .save.warn{color:#2a0707}
 
 /* ---------- หน้าประวัติ ---------- */
-.hhead{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(18px + var(--safe-t)) 16px 12px}
+.hhead{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(22px + var(--safe-t)) 16px 12px}
 .hh-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hh-row b{font-size:24px}
 .sheetlink{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:600;text-decoration:none}
@@ -234,6 +235,7 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
 </style>
 </head>
 <body>
+<div class="sbar" aria-hidden="true"></div>
 <div class="app">
 
 <!-- ================= หน้าแรก: ภาพรวมวันนี้ ================= -->
