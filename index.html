@@ -112,6 +112,12 @@ a{color:var(--acc)}
 .tb-t b{font-size:20px;line-height:1.25}
 .tb-t small{font-size:13px;color:var(--muted)}
 .pill{flex:none;height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface2);color:var(--acc);font-size:13px;font-weight:600}
+.zchips{display:flex;gap:8px;overflow-x:auto;margin:12px -12px 0;padding:2px 12px 4px;scrollbar-width:none}
+.zchips::-webkit-scrollbar{display:none}
+.zchip{flex:none;min-height:46px;padding:0 16px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+.zchip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--accInk);font-weight:700}
+.zchip .ok{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:99px;background:var(--okbg);color:var(--acc);font-size:12px;font-weight:700}
+.zchip[aria-pressed=true] .ok{background:rgba(255,255,255,.25);color:inherit}
 .opts{display:none;margin-top:12px;padding:12px;border-radius:16px;background:var(--surface2);border:1px solid var(--line);flex-direction:column;gap:10px}
 .opts.on{display:flex}
 .opts label{font-size:13px;font-weight:600;color:var(--muted)}
@@ -268,11 +274,10 @@ textarea.field{height:auto;min-height:56px;padding:12px 14px;resize:vertical}
     <div class="tb-row">
       <button class="back" type="button" id="r-back" aria-label="กลับหน้าภาพรวม"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="tb-t"><b id="r-title"></b><small id="r-sub"></small></div>
-      <button class="pill" type="button" id="r-change" aria-expanded="false" aria-controls="r-opts">เปลี่ยน</button>
+      <button class="pill" type="button" id="r-change" aria-expanded="false" aria-controls="r-opts">เปลี่ยนวัน/รอบ</button>
     </div>
+    <div class="zchips" id="r-zones" role="group" aria-label="เลือกสถานที่"></div>
     <div class="opts" id="r-opts">
-      <label>สถานที่</label>
-      <div class="chips" id="r-zones" role="group" aria-label="สถานที่"></div>
       <label for="r-date">วันที่</label>
       <input class="field" type="date" id="r-date">
       <label>รอบเวลา</label>
@@ -461,7 +466,7 @@ async function loadData(force) {
   loading = false;
   if (view === "home") renderHome();
   else if (view === "history") renderHistory();
-  else if (view === "record") { renderTabs(); refreshDoneTags(); }
+  else if (view === "record") { renderTabs(); refreshDoneTags(); renderZoneChecks(); }
   renderRefresh();
 }
 
@@ -498,7 +503,7 @@ function showView(v) {
 }
 $("#tabbar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.go === "record") openRecord(firstPendingZone() ?? zone);
+  if (b.dataset.go === "record") openRecord(zone);
   else showView(b.dataset.go);
 });
 
@@ -593,13 +598,27 @@ function openRecord(z) {
 function renderRecord() {
   $("#r-title").textContent = zname(zone);
   $("#r-sub").textContent = `${fmtThaiShort(recDate)} · ${recShift} ${SHIFT_TIME[recShift]} น.`;
-  $("#r-zones").innerHTML = ZONES.map((z, i) => `<button type="button" class="chip" data-z="${i}" aria-pressed="${i === zone}">${esc(z[0])}</button>`).join("");
+  const dmz = doneMap(recDate, recShift);
+  $("#r-zones").innerHTML = ZONES.map((z, i) => {
+    const full = roundsOf(i).includes(recShift) && pointsOf(i).every(s => dmz.has(zname(i) + "|" + s));
+    return `<button type="button" class="zchip" data-z="${i}" aria-pressed="${i === zone}">${esc(z[0])}${full ? `<span class="ok" aria-label="บันทึกครบแล้ว">✓</span>` : ""}</button>`;
+  }).join("");
+  const cur = $("#r-zones .zchip[aria-pressed=true]"); if (cur) cur.scrollIntoView({ block: "nearest", inline: "center" });
   $("#r-date").value = recDate; $("#r-date").max = todayStr();
   $("#r-shifts").innerHTML = roundsOf(zone).map(s => `<button type="button" class="chip" data-s="${s}" aria-pressed="${s === recShift}">${s} ${SHIFT_TIME[s]}</button>`).join("");
   renderTabs();
   renderRows();
   renderWho();
   update();
+}
+function renderZoneChecks() {
+  const dmz = doneMap(recDate, recShift);
+  document.querySelectorAll("#r-zones .zchip").forEach(b => {
+    const i = +b.dataset.z, full = roundsOf(i).includes(recShift) && pointsOf(i).every(s => dmz.has(zname(i) + "|" + s));
+    const has = b.querySelector(".ok");
+    if (full && !has) b.insertAdjacentHTML("beforeend", `<span class="ok" aria-label="บันทึกครบแล้ว">✓</span>`);
+    if (!full && has) has.remove();
+  });
 }
 function renderTabs() {
   const tabs = tabsOf(zone), el = $("#r-tabs");
@@ -675,7 +694,16 @@ $("#r-who").addEventListener("click", e => {
 $("#r-who-other").addEventListener("input", e => { who = e.target.value.trim(); if (who) ls.set("pt-who-z" + zone, who); update(); });
 $("#r-back").addEventListener("click", () => showView("home"));
 $("#r-change").addEventListener("click", () => { const o = $("#r-opts"); o.classList.toggle("on"); $("#r-change").setAttribute("aria-expanded", String(o.classList.contains("on"))); });
-$("#r-zones").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; const keep = recDate, s = recShift; openRecord(+b.dataset.z); recDate = keep; if (roundsOf(zone).includes(s)) recShift = s; $("#r-opts").classList.add("on"); renderRecord(); });
+$("#r-zones").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const z = +b.dataset.z; if (z === zone) return;
+  zone = z; ls.set("pt-zone", z);
+  const rs = roundsOf(z); if (!rs.includes(recShift)) recShift = rs[rs.length - 1];
+  const dm = doneMap(recDate, recShift), tabs = tabsOf(z);
+  tab = Math.max(0, tabs.findIndex(t => t.subs.some(s => !dm.has(zname(z) + "|" + s))));
+  $("#r-note").value = "";
+  renderRecord();
+});
 $("#r-shifts").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; recShift = b.dataset.s; renderRecord(); });
 $("#r-date").addEventListener("change", e => { let v = e.target.value || todayStr(); if (v > todayStr()) v = todayStr(); recDate = v; renderRecord(); });
 $("#r-tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; tab = +b.dataset.t; renderTabs(); renderRows(); update(); });
