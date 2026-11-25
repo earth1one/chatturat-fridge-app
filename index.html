@@ -172,7 +172,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 
 /* ประวัติและกราฟ */
 .history-container{display:none;margin-top:16px}
-.history-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.history-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .history-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:9px 4px;font:inherit;font-size:13px;cursor:pointer;line-height:1.25;text-align:center}
 .history-btn b{display:block;font-size:20px;font-weight:400}
 .history-btn[aria-pressed=true]{background:var(--acc);color:var(--accInk);border-color:var(--acc);font-weight:700}
@@ -214,6 +214,45 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .ch .dn{display:inline-block;margin-left:8px;font-size:12px}
 .m.fmt input{border-color:var(--bad)!important}
 .m.fmt .st{color:var(--bad)}
+
+/* ---------- รายงานประจำเดือน ---------- */
+.rep-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.rep-t b{display:block;font-size:16px}.rep-t small{font-size:12px;color:var(--muted)}
+.rep-f{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.rep-f .field{height:46px;font-size:15px;padding:0 10px}
+.rep-go{width:100%;height:46px;margin-top:8px;border:0;border-radius:14px;background:var(--acc);color:var(--accInk);font:inherit;font-size:16px;font-weight:700}
+.rep{position:fixed;inset:0;z-index:80;background:#e9edf3;overflow:auto;-webkit-overflow-scrolling:touch}
+.rep[hidden]{display:none}
+.rep-bar{position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;padding:calc(10px + var(--safe-t)) 12px 10px;background:#0b1a45}
+.rep-bar .sp{flex:1}
+.rep-bar button{height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:none;color:#fff;font:inherit;font-size:15px;font-weight:600}
+.rep-bar button.pri{background:#fff;color:#0b1a45;border-color:#fff}
+.rep-doc{background:#fff;color:#111;max-width:820px;margin:12px auto 40px;padding:24px 22px;font-size:12px;line-height:1.35;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.rep-doc h1{font-size:18px;margin:0}.rep-doc .rh{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #0b1a45;padding-bottom:8px;margin-bottom:10px}
+.rep-doc .rh small{display:block;color:#444;font-size:12px}
+.rep-doc .sumt,.rep-doc .pt{width:100%;border-collapse:collapse;margin:6px 0 4px}
+.rep-doc th,.rep-doc td{border:1px solid #9aa5b5;padding:2px 4px;text-align:center;vertical-align:middle}
+.rep-doc th{background:#eef2f7;font-weight:700}
+.rep-doc td.w{font-size:10px;color:#555}
+.rep-doc td.x{color:#c62828;font-weight:700}
+.rep-doc td.miss{background:#fff6e5}
+.rep-doc tr.we td.d{background:#f4f4f4}
+.rep-doc .pblk{break-inside:avoid;page-break-inside:avoid;margin-top:14px}
+.rep-doc .pblk h3{font-size:14px;margin:0 0 2px}
+.rep-doc .pblk .crit{font-size:11px;color:#555}
+.rep-doc .notes{margin:4px 0 0;padding-left:16px;font-size:11px}
+.rep-doc .sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;break-inside:avoid}
+.rep-doc .sign div{border-top:1px dotted #333;padding-top:4px;text-align:center;margin-top:30px}
+.rep-doc .leg{font-size:11px;color:#444;margin-top:4px}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body>*:not(#rep){display:none!important}
+  .rep{position:static;background:#fff;overflow:visible}
+  .rep-bar{display:none}
+  .rep-doc{box-shadow:none;margin:0;max-width:none;padding:0}
+  .rep-doc th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rep-doc td.miss,.rep-doc tr.we td.d{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -289,9 +328,16 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <button class="history-btn" type="button" data-loc="ห้องยาตึกใหม่" onclick="selectHistoryZone(0)"><b>🏢</b>ห้องยาตึกใหม่</button>
       <button class="history-btn" type="button" data-loc="ห้องยาตึกเก่า" onclick="selectHistoryZone(1)"><b>🏥</b>ห้องยาตึกเก่า</button>
       <button class="history-btn" type="button" data-loc="คลังยา" onclick="selectHistoryZone(2)"><b>📦</b>คลังยา</button>
-      <button class="history-btn" type="button" data-loc="ห้องผลิตชั้นบน" onclick="selectHistoryZone(3)"><b>⬆️</b>ห้องผลิตชั้นบน</button>
-      <button class="history-btn" type="button" data-loc="ห้องผลิตชั้นล่าง" onclick="selectHistoryZone(4)"><b>⬇️</b>ห้องผลิตชั้นล่าง</button>
-      <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone(5)"><b>🗂️</b>ดูทั้งหมด</button>
+      <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone(3)"><b>🗂️</b>เปิดชีต</button>
+    </div>
+
+    <div class="rep-card">
+      <div class="rep-t"><b>📄 รายงานประจำเดือน</b><small>สำหรับพิมพ์ / บันทึก PDF แนบตรวจประเมิน</small></div>
+      <div class="rep-f">
+        <select class="field" id="rep-loc" aria-label="สถานที่ของรายงาน"></select>
+        <input class="field" type="month" id="rep-month" aria-label="เดือนของรายงาน">
+      </div>
+      <button class="rep-go" type="button" id="rep-go">สร้างรายงาน</button>
     </div>
 
     <div class="h-seg" id="h-seg"></div>
@@ -317,6 +363,11 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
   </div>
 </div>
 
+<div class="rep" id="rep" hidden>
+  <div class="rep-bar"><button type="button" id="rep-close">✕ ปิด</button><span class="sp"></span><button type="button" id="rep-print" class="pri">🖨️ พิมพ์ / บันทึก PDF</button></div>
+  <div class="rep-doc" id="rep-doc"></div>
+</div>
+
 <div class="sync" id="sync" role="status" aria-live="polite"></div>
 <div class="bar" id="bar-save"><button class="save" type="button" id="save" disabled></button></div>
 
@@ -334,18 +385,14 @@ const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1OXD__jfv2o6cM8
 const ZONES = [
   ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
   ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
-  ["คลังยา", [["ตู้เย็น", ["ตู้ T31", "ตู้ T32", "ตู้ TH1 (บน)", "ตู้ TH1 (ล่าง)", "ตู้ TV1"]], ["อุณหภูมิห้อง", ["R1", "R2", "R3", "R4"]]]],
-  ["ห้องผลิตชั้นบน", ["ห้องผลิตชั้นบน"]],
-  ["ห้องผลิตชั้นล่าง", ["ห้องผลิตชั้นล่าง"]]
+  ["คลังยา", [["ตู้เย็น", ["ตู้ T31", "ตู้ T32", "ตู้ TH1 (บน)", "ตู้ TH1 (ล่าง)", "ตู้ TV1"]], ["อุณหภูมิห้อง", ["R1", "R2", "R3", "R4"]]]]
 ];
 
 const LOCS_HIST=[
   ["🏢","ห้องยาตึกใหม่",5,24,52,0],
   ["🏥","ห้องยาตึกเก่า",4.5,23,55,1],
   ["📦","คลังยา",5.5,22,48,2],
-  ["⬆️","ห้องผลิตชั้นบน",4,24,50,3],
-  ["⬇️","ห้องผลิตชั้นล่าง",5,23.5,57,4],
-  ["🗂️","ดูทั้งหมด",5,23.5,52,5]
+  ["🗂️","ดูทั้งหมด",5,23.5,52,3]
 ];
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -658,6 +705,7 @@ function switchTab(tab) {
     $("#tab-history").classList.add("active"); $("#tab-record").classList.remove("active");
     $("#section-record").style.display = "none"; $("#section-history").style.display = "block";
     $("#bar-save").style.display = "none";
+    hLoc = zone; $("#rep-loc").value = zone;
     loadHistory();
   }
 }
@@ -708,11 +756,11 @@ async function loadHistory() {
 }
 
 function selectHistoryZone(idx) {
-  if (idx === 5) {
+  if (idx === 3) {
     window.open(GOOGLE_SHEET_URL, "_blank");
     return;
   }
-  hLoc = idx;
+  hLoc = idx; $("#rep-loc").value = idx;
   document.querySelectorAll(".history-btn").forEach((btn, i) => {
     btn.setAttribute("aria-pressed", i === idx ? "true" : "false");
   });
@@ -1055,6 +1103,93 @@ function restoreArea(){
 }
 try{const z=parseInt(localStorage.getItem("pt-zone"),10); if(z>=0&&z<ZONES.length) zone=z;}catch(e){}
 restoreArea();
+
+// ---------- รายงานประจำเดือน ----------
+(function initReport(){
+  $("#rep-loc").innerHTML = ZONES.map((z,i)=>`<option value="${i}">${esc(z[0])}</option>`).join("");
+  const d=new Date(); d.setDate(1);
+  // ช่วงต้นเดือน (วันที่ 1–5) ตั้งค่าเริ่มต้นเป็นเดือนก่อน เพราะมักพิมพ์รายงานของเดือนที่แล้ว
+  if(new Date().getDate()<=5) d.setMonth(d.getMonth()-1);
+  $("#rep-month").value = d.getFullYear()+"-"+pad(d.getMonth()+1);
+  $("#rep-month").max = todayStr().slice(0,7);
+})();
+const roundsOfName = n => (n==="ห้องยาตึกเก่า"||n==="คลังยา") ? R2 : R3;
+function pointsOfName(n){
+  const z=ZONES.find(x=>x[0]===n); if(!z) return [];
+  return z[1].flatMap(x=>Array.isArray(x)?x[1].map(s=>({name:s,fridge:x[0]==="ตู้เย็น"})):[{name:x,fridge:x.includes("ตู้")}]);
+}
+const nowHM=()=>{const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())};
+const TH_MONTH=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+async function openReport(){
+  const zi=+$("#rep-loc").value, loc=ZONES[zi][0], ym=$("#rep-month").value;
+  if(!/^\d{4}-\d{2}$/.test(ym)) { alert("กรุณาเลือกเดือน"); return; }
+  const btn=$("#rep-go"); btn.disabled=true; btn.textContent="กำลังโหลดข้อมูล...";
+  if(!cachedHistory.length || Date.now()-lastFetch>60*1000) await refreshData();
+  btn.disabled=false; btn.textContent="สร้างรายงาน";
+  if(!cachedHistory.length){ alert("โหลดข้อมูลจากชีตไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่"); return; }
+  const [Y,M]=ym.split("-").map(Number), nDays=new Date(Y,M,0).getDate(), today=todayStr();
+  const rounds=roundsOfName(loc), pts=pointsOfName(loc);
+  const rows=cachedHistory.concat(loadOutbox().flatMap(it=>it.rows||[]))
+    .filter(r=>String(r.location||"").trim()===loc && dayOf(r.date).slice(0,7)===ym);
+  // จุดวัดจากข้อมูลเก่าที่ไม่อยู่ในรายการปัจจุบัน
+  const labelOf=r=>{ const f=numOf(r.fridgeTemp)!==null; return subLabel(r, f?"f":"r"); };
+  const known=new Set(pts.map(p=>p.name));
+  rows.forEach(r=>{ const l=labelOf(r); if(!known.has(l)){ known.add(l); pts.push({name:l,fridge:numOf(r.fridgeTemp)!==null,old:true}); } });
+  // แถวล่าสุดต่อ จุด|วัน|รอบ
+  const cell=new Map();
+  rows.forEach(r=>{ const k=labelOf(r)+"|"+dayOf(r.date)+"|"+r.shift, p=cell.get(k);
+    if(!p || String(r.timestamp||"")>=String(p.timestamp||"")) cell.set(k,r); });
+  const crit=p=>p.fridge?(p.name.includes("TH1 (บน)")?"−25 ถึง −15 °C":"2–8 °C"):"อุณหภูมิ 15–30 °C · ความชื้น 30–70 %RH";
+  const fmt=v=>{const n=numOf(v);return n===null?"":(Math.round(n*10)/10).toFixed(1)};
+  const summary=[];
+  const blocks=pts.map(p=>{
+    let rec=0, exp=0, bad=0; const notes=[];
+    const body=[];
+    for(let d=1; d<=nDays; d++){
+      const ds=`${ym}-${pad(d)}`, wd=new Date(Y,M-1,d).getDay();
+      const future=ds>today;
+      let tds="";
+      rounds.forEach(([sh,tm])=>{
+        const r=cell.get(p.name+"|"+ds+"|"+sh);
+        // วันนี้: นับเฉพาะรอบที่ถึงเวลาแล้ว
+        const notYet = future || (ds===today && nowHM() < tm);
+        if(!notYet && !p.old) exp++;
+        if(!r){ tds+= p.fridge ? `<td class="${notYet||p.old?"":"miss"}"></td><td class="w"></td>` : `<td class="${notYet||p.old?"":"miss"}"></td><td></td><td class="w"></td>`; return; }
+        rec++;
+        if(p.fridge){
+          const v=numOf(r.fridgeTemp), x=v!==null&&badHist("f",v,p.name); if(x) bad++;
+          tds+=`<td class="${x?"x":""}">${fmt(r.fridgeTemp)}</td><td class="w">${esc(r.who||"")}</td>`;
+        } else {
+          const t=numOf(r.roomTemp), h=numOf(r.humidity), xt=t!==null&&badHist("r",t,p.name), xh=h!==null&&badHist("h",h,p.name); if(xt||xh) bad++;
+          tds+=`<td class="${xt?"x":""}">${fmt(r.roomTemp)}</td><td class="${xh?"x":""}">${fmt(r.humidity)}</td><td class="w">${esc(r.who||"")}</td>`;
+        }
+        if(r.note) notes.push(`${d}/${M} ${sh.replace("รอบ","")}: ${esc(r.note)}`);
+      });
+      body.push(`<tr class="${wd===0||wd===6?"we":""}"><td class="d">${d}</td>${tds}</tr>`);
+    }
+    if(p.old && !rec) return "";
+    summary.push(`<tr><td style="text-align:left">${esc(p.name)}</td><td>${rec}${p.old?"":" / "+exp}</td><td>${p.old?"–":Math.max(0,exp-rec)}</td><td class="${bad?"x":""}">${bad}</td></tr>`);
+    const sub = p.fridge ? rounds.map(()=>`<th>°C</th><th>ผู้บันทึก</th>`).join("") : rounds.map(()=>`<th>°C</th><th>%RH</th><th>ผู้บันทึก</th>`).join("");
+    const head = rounds.map(([sh,tm])=>`<th colspan="${p.fridge?2:3}">${sh.replace("รอบ","")} ${tm}</th>`).join("");
+    return `<div class="pblk"><h3>${esc(p.name)}</h3><div class="crit">เกณฑ์ปกติ: ${crit(p)}</div>
+      <table class="pt"><thead><tr><th rowspan="2">วันที่</th>${head}</tr><tr>${sub}</tr></thead><tbody>${body.join("")}</tbody></table>
+      ${notes.length?`<b style="font-size:11px">หมายเหตุ</b><ul class="notes">${notes.map(n=>`<li>${n}</li>`).join("")}</ul>`:""}</div>`;
+  }).join("");
+  const made=new Date().toLocaleString("th-TH",{dateStyle:"medium",timeStyle:"short"});
+  $("#rep-doc").innerHTML = `
+    <div class="rh"><div><h1>บันทึกอุณหภูมิและความชื้น</h1><small>โรงพยาบาลจัตุรัส · ${esc(loc)}</small></div>
+    <div style="text-align:right"><b style="font-size:15px">เดือน${TH_MONTH[M-1]} ${Y+543}</b><small>พิมพ์เมื่อ ${made}</small></div></div>
+    <table class="sumt"><thead><tr><th style="text-align:left">จุดวัด</th><th>บันทึกแล้ว / ที่ต้องบันทึก</th><th>ขาด</th><th>ค่านอกเกณฑ์</th></tr></thead><tbody>${summary.join("")}</tbody></table>
+    <div class="leg">ตัวเลขสีแดง = นอกเกณฑ์ · ช่องสีเหลือง = ไม่มีการบันทึก · แถวสีเทา = วันเสาร์–อาทิตย์ · ถ้ารอบเดียวกันบันทึกซ้ำ แสดงค่าล่าสุด</div>
+    ${blocks}
+    <div class="sign"><div>ผู้ตรวจสอบ ......................................<br>วันที่ ........./........./.........</div><div>เภสัชกรผู้รับผิดชอบ ......................................<br>วันที่ ........./........./.........</div></div>`;
+  document.title = `รายงานอุณหภูมิ ${loc} ${TH_MONTH[M-1]} ${Y+543}`;
+  $("#rep").hidden=false; $("#rep").scrollTop=0;
+}
+$("#rep-go").addEventListener("click", openReport);
+$("#rep-close").addEventListener("click", ()=>{ $("#rep").hidden=true; document.title="CTRH PharmaTemp"; });
+$("#rep-print").addEventListener("click", ()=>window.print());
+
 // เริ่มต้นโหลดหน้าเว็บ
 chips(); mainCategories(); areas(); setRound(roundByClock()); showDate(); renderPeople(); build();
 $("#sync").addEventListener("click", flushOutbox);
