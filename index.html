@@ -488,6 +488,8 @@ function getStaffList() {
   return st.length ? st : ["ไม่ระบุ"];
 }
 
+// จำชื่อผู้บันทึกตามชื่อสถานที่ (ไม่ใช่ลำดับ) เพื่อไม่ให้สลับกันเมื่อแก้รายการสถานที่ในชีต
+const whoKey = () => "pt-who:" + ZONES[zone][0] + "|" + mainCatIndex + "|" + area;
 function renderPeople() {
   const box = $("#peopleContainer");
   const textInput = $("#who");
@@ -495,7 +497,7 @@ function renderPeople() {
   const defaultName = staffList[0];
   
   let last = ""; 
-  try { last = localStorage.getItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area) || defaultName; } catch(e){ last = defaultName; }
+  try { last = localStorage.getItem(whoKey()) || localStorage.getItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area) || defaultName; } catch(e){ last = defaultName; }
 
   box.style.display = "block";
   box.innerHTML = `
@@ -534,7 +536,7 @@ document.addEventListener("change", e => {
     } else {
       textInput.style.display = "none";
       customWho = val;
-      try{localStorage.setItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area, val)}catch(err){}
+      try{localStorage.setItem(whoKey(), val)}catch(err){}
     }
     update();
   }
@@ -552,7 +554,7 @@ document.addEventListener("input", e => {
   if(e.target.matches(".m input")) update();
   if(e.target.id === "who") {
     customWho = e.target.value.trim();
-    try{localStorage.setItem("pt-who-"+zone+"-"+mainCatIndex+"-"+area, customWho)}catch(err){}
+    try{localStorage.setItem(whoKey(), customWho)}catch(err){}
     update();
   }
 });
@@ -656,13 +658,13 @@ $("#mainCategories").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   mainCatIndex = +b.dataset.mc; area = -1;
   mainCategories(); areas(); renderPeople(); build();
-  try{localStorage.setItem("pt-area-"+zone, mainCatIndex)}catch(err){}
+  try{localStorage.setItem("pt-area:"+ZONES[zone][0], mainCatIndex)}catch(err){}
 });
 
 $("#areas").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   area = +b.dataset.k; areas(); renderPeople(); build();
-  try{localStorage.setItem("pt-area-"+zone, area)}catch(err){}
+  try{localStorage.setItem("pt-area:"+ZONES[zone][0], area)}catch(err){}
 });
 
 // ช่วงของเกจ: กว้างกว่าเกณฑ์ออกไปข้างละครึ่งหนึ่ง
@@ -1081,9 +1083,6 @@ $("#save").addEventListener("click", () => {
   const k = key(zone,mainCatIndex,area);
   const done = curDone(), dup = cards.map(c => c.dataset.sub).filter(n => done.has(n));
   if((dup.length || saved[k]) && !confirm(`${getRounds()[round][0]}ของ ${dup.length ? dup.join(", ") : "จุดนี้"} บันทึกไปแล้ว\nต้องการบันทึกซ้ำใช่ไหม?`)) return;
-  // ค่านอกเกณฑ์ ควรมีหมายเหตุ
-  if(document.querySelector("#list .m.out") && !$("#note").value.trim() &&
-     !confirm("มีค่านอกเกณฑ์ แต่ยังไม่ได้เขียนหมายเหตุ (สิ่งที่ทำ / คนที่แจ้ง)\nกด “ยกเลิก” เพื่อกลับไปเขียน หรือ “ตกลง” เพื่อบันทึกเลย")) { $("#note").focus(); return; }
 
   const base = {
     date: $("#date").value,
@@ -1128,6 +1127,10 @@ $("#save").addEventListener("click", () => {
     rows.push({...base, subLocation: card.dataset.sub, fridgeTemp, roomTemp, humidity});
   }
 
+  // ค่านอกเกณฑ์ ควรมีหมายเหตุ
+  if(document.querySelector("#list .m.out") && !$("#note").value.trim() &&
+     !confirm("มีค่านอกเกณฑ์ แต่ยังไม่ได้เขียนหมายเหตุ (สิ่งที่ทำ / คนที่แจ้ง)\nกด “ยกเลิก” เพื่อกลับไปเขียน หรือ “ตกลง” เพื่อบันทึกเลย")) { $("#note").focus(); return; }
+
   // เข้าคิวในเครื่องก่อน แล้วแสดงผลสำเร็จทันที
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   saveOutbox([...loadOutbox(), { id, rows }]);
@@ -1146,7 +1149,7 @@ $("#save").addEventListener("click", () => {
 
 // จำสถานที่ / จุดวัดล่าสุดของเครื่องนี้ (แต่ละคนบันทึกที่ของตัวเอง)
 function restoreArea(){
-  let a=-1; try{a=parseInt(localStorage.getItem("pt-area-"+zone),10)}catch(e){}
+  let a=-1; try{a=parseInt(localStorage.getItem("pt-area:"+ZONES[zone][0]) ?? localStorage.getItem("pt-area-"+zone),10)}catch(e){}
   if(isNaN(a)||a<0) return;
   if(isGrouped(zone)){ if(a<ZONES[zone][1].length) mainCatIndex=a; }
   else if(a<ZONES[zone][1].length) area=a;
