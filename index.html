@@ -172,7 +172,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 
 /* ประวัติและกราฟ */
 .history-container{display:none;margin-top:16px}
-.history-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.history-grid{display:grid;grid-template-columns:repeat(var(--hn,4),minmax(0,1fr));gap:8px;margin-bottom:12px}
 .history-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:9px 4px;font:inherit;font-size:13px;cursor:pointer;line-height:1.25;text-align:center}
 .history-btn b{display:block;font-size:20px;font-weight:400}
 .history-btn[aria-pressed=true]{background:var(--acc);color:var(--accInk);border-color:var(--acc);font-weight:700}
@@ -326,12 +326,7 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 
   <div id="section-history" class="history-container">
     <p class="cap">เลือกสถานที่เพื่อดูประวัติ</p>
-    <div class="history-grid" id="historyZoneButtons">
-      <button class="history-btn" type="button" data-loc="ห้องยาตึกใหม่" onclick="selectHistoryZone(0)"><b>🏢</b>ห้องยาตึกใหม่</button>
-      <button class="history-btn" type="button" data-loc="ห้องยาตึกเก่า" onclick="selectHistoryZone(1)"><b>🏥</b>ห้องยาตึกเก่า</button>
-      <button class="history-btn" type="button" data-loc="คลังยา" onclick="selectHistoryZone(2)"><b>📦</b>คลังยา</button>
-      <button class="history-btn" type="button" data-loc="ทั้งหมด" onclick="selectHistoryZone(3)"><b>🗂️</b>เปิดชีต</button>
-    </div>
+    <div class="history-grid" id="historyZoneButtons"></div>
 
     <div class="rep-card">
       <div class="rep-t"><b>📄 รายงานประจำเดือน</b><small>สำหรับพิมพ์ / บันทึก PDF แนบตรวจประเมิน</small></div>
@@ -352,9 +347,9 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
       <button class="chart-switch-btn" type="button" id="btn-chart-3" onclick="switchChartTab(2)" aria-pressed="false">💧 ความชื้น</button>
     </div>
 
-    <div class="h-card active" id="card-chart-1"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ 2–8 °C และ -25 ถึง -15 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
-    <div class="h-card" id="card-chart-2"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ 15–30 °C · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
-    <div class="h-card" id="card-chart-3"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ 30–70 %RH · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
+    <div class="h-card active" id="card-chart-1"><h2>🧊 อุณหภูมิตู้เย็น (°C)</h2><p><i></i>ช่วงปกติ <span id="crit-f">2–8 °C และ -25 ถึง -15 °C</span> · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c1"></canvas></div></div>
+    <div class="h-card" id="card-chart-2"><h2>🌡️ อุณหภูมิห้อง (°C)</h2><p><i></i>ช่วงปกติ <span id="crit-r">15–30 °C</span> · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c2"></canvas></div></div>
+    <div class="h-card" id="card-chart-3"><h2>💧 ความชื้น (%RH)</h2><p><i></i>ช่วงปกติ <span id="crit-h">30–70 %RH</span> · <em>▲ แดง = ผิดปกติ</em></p><div class="cv"><canvas id="c3"></canvas></div></div>
     
     <!-- ส่วนแสดงข้อมูลประวัติและผู้บันทึกด้านล่างกราฟ -->
     <div class="h-card alerts active" style="display:block">
@@ -384,18 +379,65 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy6-_AJ12huC3Wq-aSXPHeY_JhGJidXIvts7VZj6Fb9XTX18Y0be-ST0u5UALLV2rjTg/exec"; 
 const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1OXD__jfv2o6cM8FyG5DzRFFqV3bajg5LoCEDnmjn1SA/edit?usp=sharing";
 
-const ZONES = [
-  ["ห้องยาตึกใหม่", ["ตู้เย็น", "ห้องยาหลัก", "Substock"]],
-  ["ห้องยาตึกเก่า", ["ตู้เย็น", "ห้องหลัก", "Substock"]],
-  ["คลังยา", [["ตู้เย็น", ["ตู้ T31", "ตู้ T32", "ตู้ TH1 (บน)", "ตู้ TH1 (ล่าง)", "ตู้ TV1"]], ["อุณหภูมิห้อง", ["R1", "R2", "R3", "R4"]]]]
-];
-
-const LOCS_HIST=[
-  ["🏢","ห้องยาตึกใหม่",5,24,52,0],
-  ["🏥","ห้องยาตึกเก่า",4.5,23,55,1],
-  ["📦","คลังยา",5.5,22,48,2],
-  ["🗂️","ดูทั้งหมด",5,23.5,52,3]
-];
+// ---------- การตั้งค่า (สถานที่ / จุดวัด / เกณฑ์ / ผู้บันทึก) ----------
+// ค่าเริ่มต้น ใช้เมื่อยังโหลดจากชีต "ตั้งค่า_สถานที่" และ "ตั้งค่า_จุดวัด" ไม่ได้
+const DEFAULT_CONFIG = {locations:[
+  {name:"ห้องยาตึกใหม่", rounds:3, staff:["ภัทราภรณ์","ณัชชา","เพ็ญลักษณ์"], points:[
+    {group:"",name:"ตู้เย็น",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"",name:"ห้องยาหลัก",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70},
+    {group:"",name:"Substock",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70}]},
+  {name:"ห้องยาตึกเก่า", rounds:2, staff:["ระพีพรรณ","รณชัย"], points:[
+    {group:"",name:"ตู้เย็น",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"",name:"ห้องหลัก",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70},
+    {group:"",name:"Substock",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70}]},
+  {name:"คลังยา", rounds:2, staff:["พงศ์พันธ์","นาวิน"], points:[
+    {group:"ตู้เย็น",name:"ตู้ T31",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"ตู้เย็น",name:"ตู้ T32",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"ตู้เย็น",name:"ตู้ TH1 (บน)",type:"ตู้เย็น",tmin:-25,tmax:-15},
+    {group:"ตู้เย็น",name:"ตู้ TH1 (ล่าง)",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"ตู้เย็น",name:"ตู้ TV1",type:"ตู้เย็น",tmin:2,tmax:8},
+    {group:"อุณหภูมิห้อง",name:"R1",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70},
+    {group:"อุณหภูมิห้อง",name:"R2",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70},
+    {group:"อุณหภูมิห้อง",name:"R3",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70},
+    {group:"อุณหภูมิห้อง",name:"R4",type:"ห้อง",tmin:15,tmax:30,hmin:30,hmax:70}]}
+]};
+const DEF_LIM={f:[2,8],r:[15,30],h:[30,70]};
+let CONFIG=null, ZONES=[], POINTS=new Map(), KNOWN_SUBS=new Set();
+const numOrNull=v=>(v===""||v==null||isNaN(parseFloat(v)))?null:parseFloat(v);
+function validConfig(c){
+  return c && Array.isArray(c.locations) && c.locations.length>0 &&
+    c.locations.every(L=>L && String(L.name||"").trim() && Array.isArray(L.points) && L.points.length>0 && L.points.every(p=>p && String(p.name||"").trim()));
+}
+function applyConfig(c){
+  CONFIG=c;
+  ZONES=c.locations.map(L=>{
+    const grouped=L.points.some(p=>String(p.group||"").trim());
+    if(!grouped) return [L.name, L.points.map(p=>p.name)];
+    const gs=[]; L.points.forEach(p=>{ const gn=String(p.group||"").trim()||"อื่นๆ"; let g=gs.find(x=>x[0]===gn); if(!g){g=[gn,[]];gs.push(g)} g[1].push(p.name); });
+    return [L.name, gs];
+  });
+  POINTS=new Map();
+  c.locations.forEach(L=>L.points.forEach(p=>{
+    const q={...p, fridge:String(p.type||"").includes("ตู้"), tmin:numOrNull(p.tmin), tmax:numOrNull(p.tmax), hmin:numOrNull(p.hmin), hmax:numOrNull(p.hmax)};
+    POINTS.set(L.name+"|"+p.name,q); if(!POINTS.has("|"+p.name)) POINTS.set("|"+p.name,q);
+  }));
+  KNOWN_SUBS=new Set(c.locations.flatMap(L=>L.points.map(p=>p.name)));
+}
+const pointOf=(loc,name)=>POINTS.get(String(loc||"").trim()+"|"+name)||POINTS.get("|"+name)||null;
+const locCfg=i=>CONFIG.locations[i]||CONFIG.locations[0];
+const isGrouped=i=>!!ZONES[i]&&Array.isArray(ZONES[i][1][0]);
+const isGroupedName=n=>{const i=ZONES.findIndex(z=>z[0]===String(n||"").trim());return i>=0&&isGrouped(i)};
+// เกณฑ์ของแต่ละค่า k: f=ตู้เย็น r=อุณหภูมิห้อง h=ความชื้น
+function limOf(k,loc,name){
+  const p=pointOf(loc,name);
+  if(k==="f"&&p&&p.fridge&&p.tmin!==null&&p.tmax!==null) return [p.tmin,p.tmax];
+  if(k==="r"&&p&&!p.fridge&&p.tmin!==null&&p.tmax!==null) return [p.tmin,p.tmax];
+  if(k==="h"&&p&&!p.fridge&&p.hmin!==null&&p.hmax!==null) return [p.hmin,p.hmax];
+  return DEF_LIM[k];
+}
+const rng=(lo,hi)=>lo<0?`${lo} ถึง ${hi}`:`${lo}–${hi}`;
+(function(){ let c=null; try{c=JSON.parse(localStorage.getItem("pt-config")||"null")}catch(e){}
+  applyConfig(validConfig(c)?c:DEFAULT_CONFIG); })();
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const $=s=>document.querySelector(s), pad=n=>String(n).padStart(2,"0"), now=new Date(), root=document.documentElement;
@@ -415,8 +457,7 @@ function switchChartTab(idx) {
 }
 
 function getSubName(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
-  if(isKlangYa){
+  if(isGrouped(zone)){
     if(mainCatIndex < 0 || area < 0) return null;
     return ZONES[zone][1][mainCatIndex][1][area];
   }
@@ -425,12 +466,14 @@ function getSubName(){
 }
 
 function getTargets(){
-  if(ZONES[zone][0] === "คลังยา"){
+  const loc = ZONES[zone][0];
+  const isF = n => { const p = pointOf(loc, n); return p ? p.fridge : n.includes("ตู้"); };
+  if(isGrouped(zone)){
     if(mainCatIndex < 0) return [];
-    return ZONES[zone][1][mainCatIndex][1].map(n=>({name:n, fridge:mainCatIndex===0}));
+    return ZONES[zone][1][mainCatIndex][1].map(n=>({name:n, fridge:isF(n)}));
   }
   const n = getSubName();
-  return n ? [{name:n, fridge:n.includes("ตู้")}] : [];
+  return n ? [{name:n, fridge:isF(n)}] : [];
 }
 
 $("#theme").addEventListener("click",()=>{
@@ -441,13 +484,8 @@ $("#theme").addEventListener("click",()=>{
 });
 
 function getStaffList() {
-  const currentZoneName = ZONES[zone][0];
-  if (currentZoneName === "ห้องยาตึกเก่า") {
-    return ["ระพีพรรณ", "รณชัย"];
-  } else if (currentZoneName === "คลังยา") {
-    return ["พงศ์พันธ์", "นาวิน"];
-  }
-  return ["ภัทราภรณ์", "ณัชชา", "เพ็ญลักษณ์"];
+  const st = (locCfg(zone).staff || []).map(x => String(x).trim()).filter(Boolean);
+  return st.length ? st : ["ไม่ระบุ"];
 }
 
 function renderPeople() {
@@ -555,13 +593,7 @@ document.addEventListener("visibilitychange",()=>{
 
 const R2 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"]];
 const R3 = [["รอบเช้า","09:00"], ["รอบบ่าย","14:30"], ["รอบเย็น","20:30"]];
-const getRounds = () => {
-  const currentZoneName = ZONES[zone][0];
-  if (currentZoneName === "ห้องยาตึกเก่า" || currentZoneName === "คลังยา") {
-    return R2;
-  }
-  return R3;
-};
+const getRounds = () => +locCfg(zone).rounds === 2 ? R2 : R3;
 
 function setRound(i){
   const rs = getRounds();
@@ -576,7 +608,7 @@ function setRound(i){
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
 function chips(){
-  $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${z[0]}</button>`).join("");
+  $("#zones").innerHTML = ZONES.map((z,i)=>`<button class="chip" type="button" data-i="${i}" aria-pressed="${i===zone}">${esc(z[0])}</button>`).join("");
 }
 
 // แก้ไขไอคอนเกล็ดหิมะให้สมบูรณ์และถูกต้องแน่นอน
@@ -590,12 +622,12 @@ function getIconForSub(name) {
 }
 
 function mainCategories(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const isKlangYa = isGrouped(zone);
   const sec = $("#subCategorySection");
   sec.style.display = isKlangYa ? "block" : "none";
   if(isKlangYa){
     const cats = ZONES[zone][1];
-    $("#mainCategories").innerHTML = cats.map((c,k)=>`<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${getIconForSub(c[0])}${c[0]}<small style="color:var(--muted); font-size:12px; font-weight:500; margin-top:2px;">${c[0]==="ตู้เย็น"?"2–8 °C":"15–30 °C"}</small></button>`).join("");
+    $("#mainCategories").innerHTML = cats.map((c,k)=>{ const p0=pointOf(ZONES[zone][0],c[1][0]); const [lo,hi]=p0&&p0.fridge?limOf("f",ZONES[zone][0],c[1][0]):limOf("r",ZONES[zone][0],c[1][0]); return `<button type="button" data-mc="${k}" aria-pressed="${k===mainCatIndex}">${getIconForSub(p0&&p0.fridge?"ตู้":c[0])}${esc(c[0])}<small style="color:var(--muted); font-size:12px; font-weight:500; margin-top:2px;">${c[1].length>1?c[1].length+" จุด · ":""}${rng(lo,hi)} °C</small></button>`; }).join("");
     $("#subAreaTitle").textContent = "เลือกตู้ / ห้อง";
   } else {
     $("#subAreaTitle").textContent = "2. พื้นที่ย่อย / จุดวัด";
@@ -603,19 +635,19 @@ function mainCategories(){
 }
 
 function areas(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const isKlangYa = isGrouped(zone);
   let listItems = [];
   if(!isKlangYa) listItems = ZONES[zone][1];
   const box = $("#areas");
   box.classList.toggle("on", listItems.length > 0);
   $("#subAreaTitle").style.display = listItems.length > 0 ? "block" : "none";
-  box.innerHTML = listItems.map((n,k)=>`<button type="button" data-k="${k}" aria-pressed="${k===area}">${getIconForSub(n)}${n}</button>`).join("");
+  box.innerHTML = listItems.map((n,k)=>{ const p=pointOf(ZONES[zone][0],n); return `<button type="button" data-k="${k}" aria-pressed="${k===area}">${getIconForSub(p&&p.fridge?"ตู้":n)}${esc(n)}</button>`; }).join("");
 }
 
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   zone = +b.dataset.i; mainCatIndex = -1; area = -1;
-  try{localStorage.setItem("pt-zone", zone)}catch(err){}
+  try{localStorage.setItem("pt-zone", zone); localStorage.setItem("pt-zone-name", ZONES[zone][0])}catch(err){}
   restoreArea();
   chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
 });
@@ -633,7 +665,8 @@ $("#areas").addEventListener("click", e => {
   try{localStorage.setItem("pt-area-"+zone, area)}catch(err){}
 });
 
-const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, FZ={lo:-25,hi:-15,min:-30,max:-10,u:"°C",r:"-15 ถึง -25",neg:true}, R={lo:15,hi:30,min:10,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
+// ช่วงของเกจ: กว้างกว่าเกณฑ์ออกไปข้างละครึ่งหนึ่ง
+function mkT(lo,hi,u){ const sp=Math.max(hi-lo,4); let min=Math.floor(lo-sp*.6), max=Math.ceil(hi+sp*.6); if(u==="%RH"){min=Math.max(0,min);max=Math.min(100,max);} return {lo,hi,min,max,u,r:rng(lo,hi)}; }
 const ICF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M5 10h14M9 6v1M9 14v2"/></svg>';
 const ICR='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>';
 
@@ -645,15 +678,15 @@ function metric(t,label,whoLabel){
   <div class="gauge"><b style="left:${p(t.lo)}%;width:${p(t.hi)-p(t.lo)}%"></b><u></u></div><p class="st"></p></div>`;
 }
 
-const fridge=n=>{const t={...(n.includes("TH1 (บน)")?FZ:F),sign:true};return `<div class="card f${t.neg?" fz":""}" data-sub="${n}"><div class="ch">${ICF}${n}</div><div class="ms one">${metric(t,"อุณหภูมิ",n)}</div></div>`};
-const roomCard=(n)=>`<div class="card r" data-sub="${n}"><div class="ch">${ICR}${n}</div><div class="ms">${metric(R,"อุณหภูมิ",n)+metric(H,"ความชื้น",n)}</div></div>`;
+const fridge=n=>{const [lo,hi]=limOf("f",ZONES[zone][0],n), t={...mkT(lo,hi,"°C"),sign:true};return `<div class="card f${lo<0?" fz":""}" data-sub="${esc(n)}"><div class="ch">${ICF}${esc(n)}</div><div class="ms one">${metric(t,"อุณหภูมิ",esc(n))}</div></div>`};
+const roomCard=(n)=>{const [a,b]=limOf("r",ZONES[zone][0],n),[c,d]=limOf("h",ZONES[zone][0],n);return `<div class="card r" data-sub="${esc(n)}"><div class="ch">${ICR}${esc(n)}</div><div class="ms">${metric(mkT(a,b,"°C"),"อุณหภูมิ",esc(n))+metric(mkT(c,d,"%RH"),"ความชื้น",esc(n))}</div></div>`};
 
 function build(){
-  const isKlangYa = ZONES[zone][0] === "คลังยา";
+  const isKlangYa = isGrouped(zone);
   const targets = getTargets();
 
   if(!targets.length){
-    const msg = isKlangYa ? "กด “ตู้เย็น” หรือ “อุณหภูมิห้อง” ในข้อ 2 เพื่อกรอกค่าที่วัดได้" : "กดเลือกตู้ / จุดวัดในข้อ 2 เพื่อกรอกค่าที่วัดได้";
+    const msg = isKlangYa ? `กด ${ZONES[zone][1].map(g=>"“"+esc(g[0])+"”").join(" หรือ ")} ในข้อ 2 เพื่อกรอกค่าที่วัดได้` : "กดเลือกตู้ / จุดวัดในข้อ 2 เพื่อกรอกค่าที่วัดได้";
     $("#list").innerHTML = `<div class="empty"><b>ยังไม่ได้เลือกตู้ / จุดวัด</b>${msg}</div>`;
   } else if(isKlangYa){
     $("#list").innerHTML = targets.map(t=>t.fridge ? fridge(t.name) : roomCard(t.name)).join("");
@@ -725,7 +758,7 @@ function refreshData(){
 }
 // แสดง ✓ ที่จุดวัดที่บันทึกแล้วในวัน/รอบที่เลือก
 function markDone(){
-  const done=curDone(), isK=ZONES[zone][0]==="คลังยา";
+  const done=curDone(), isK=isGrouped(zone);
   document.querySelectorAll("#areas button").forEach(b=>{
     const n=ZONES[zone][1][+b.dataset.k], d=!isK&&done.has(n);
     b.classList.toggle("done",d);
@@ -757,8 +790,24 @@ async function loadHistory() {
   }
 }
 
+let curHistLoc = "";
+const HIST_ICONS = ["🏢","🏥","📦","🏬","🏭","🧪","🏠","🗄️"];
+function renderHistButtons() {
+  const box = $("#historyZoneButtons");
+  box.style.setProperty("--hn", Math.min(4, ZONES.length + 1));
+  box.innerHTML = ZONES.map((z,i)=>`<button class="history-btn" type="button" onclick="selectHistoryZone(${i})" aria-pressed="${i===hLoc}"><b>${HIST_ICONS[i % HIST_ICONS.length]}</b>${esc(z[0])}</button>`).join("")
+    + `<button class="history-btn" type="button" onclick="selectHistoryZone(${ZONES.length})"><b>🗂️</b>เปิดชีต</button>`;
+}
+// ช่วงปกติใต้หัวกราฟ ตามเกณฑ์ของจุดวัดในสถานที่นั้น
+function renderCrit(loc) {
+  const L = CONFIG.locations.find(x => x.name === loc); if (!L) return;
+  const fr = new Map(), rr = new Map(), hr = new Map();
+  L.points.forEach(p => { const q = pointOf(loc, p.name); if (q && q.fridge) { const b = limOf("f", loc, p.name); fr.set(b.join(), b); } else { const b = limOf("r", loc, p.name), c = limOf("h", loc, p.name); rr.set(b.join(), b); hr.set(c.join(), c); } });
+  const t = (m, u) => m.size ? [...m.values()].map(b => rng(b[0], b[1]) + " " + u).join(" และ ") : "–";
+  $("#crit-f").textContent = t(fr, "°C"); $("#crit-r").textContent = t(rr, "°C"); $("#crit-h").textContent = t(hr, "%RH");
+}
 function selectHistoryZone(idx) {
-  if (idx === 3) {
+  if (idx >= ZONES.length) {
     window.open(GOOGLE_SHEET_URL, "_blank");
     return;
   }
@@ -769,16 +818,9 @@ function selectHistoryZone(idx) {
   renderHistoryView();
 }
 
-const badHist = (k, v, subLoc) => {
-  if (k === 'f') {
-    if (subLoc && subLoc.includes("TH1 (บน)")) {
-      return v < -25 || v > -15; 
-    }
-    return v < 2 || v > 8;     
-  }
-  if (k === 'r') return v < 15 || v > 30;
-  if (k === 'h') return v < 30 || v > 70;
-  return false;
+const badHist = (k, v, subLoc, loc) => {
+  const [lo, hi] = limOf(k, loc, subLoc);
+  return v < lo || v > hi;
 };
 
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -800,12 +842,11 @@ const SHIFT_ORDER = {"รอบเช้า":0,"รอบบ่าย":1,"รอ
 const numOf = v => (v === "" || v == null || isNaN(parseFloat(v))) ? null : parseFloat(v);
 
 // ชื่อจุดวัดที่รู้จัก (จาก ZONES) ใช้จัดกลุ่มข้อมูลเก่าที่บันทึกชื่อคนไว้ในช่อง SubLocation
-const KNOWN_SUBS = new Set(ZONES.flatMap(z => z[1].flatMap(x => Array.isArray(x) ? x[1] : [x])));
 function subLabel(r, key) {
   const s = String(r.subLocation || "").trim();
-  const isFridgeName = s.includes("ตู้");
+  const pp = pointOf(r.location, s), isFridgeName = pp ? pp.fridge : s.includes("ตู้");
   if (s && KNOWN_SUBS.has(s) && (key === "f") === isFridgeName) return s;
-  if (key === "f") return (r.location === "คลังยา") ? "ไม่ระบุตู้ (ข้อมูลเก่า)" : "ตู้เย็น";
+  if (key === "f") return isGroupedName(r.location) ? "ไม่ระบุตู้ (ข้อมูลเก่า)" : "ตู้เย็น";
   return "ห้อง (ข้อมูลเก่า)";
 }
 
@@ -829,9 +870,16 @@ function mk(id,key,min,max,color,unit,R){
   const fld = FIELD[key];
   const rows = R.filter(r => numOf(r[fld]) !== null);
   // ช่วงแกน Y: ตู้เย็นปกติ 0–12 ถ้ามีตู้แช่แข็งค่อยขยายลงไป -30
-  const hasFreezer = key === "f" && rows.some(r => numOf(r[fld]) < 0 || subLabel(r, key).includes("TH1 (บน)"));
-  if (key === "f") { min = hasFreezer ? -30 : 0; max = 12; }
-  const bands = key === "f" ? (hasFreezer ? [[2,8],[-25,-15]] : [[2,8]]) : key === "r" ? [[15,30]] : [[30,70]];
+  // แถบช่วงปกติ จากเกณฑ์ของจุดวัดที่มีข้อมูล
+  const bset = new Map();
+  rows.forEach(r => { const b = limOf(key, curHistLoc, subLabel(r, key)); bset.set(b.join(","), b); });
+  if (!bset.size) { const b = DEF_LIM[key]; bset.set(b.join(","), b); }
+  const bands = [...bset.values()];
+  const vals = rows.map(r => numOf(r[fld]));
+  const bLo = Math.min(...bands.map(b => b[0])), bHi = Math.max(...bands.map(b => b[1]));
+  if (key === "f") { const hasFreezer = bLo < 0 || vals.some(v => v < 0); min = hasFreezer ? Math.min(-30, bLo - 5) : 0; max = Math.max(12, bHi + 4); }
+  else if (key === "r") { min = Math.min(10, bLo - 5); max = Math.max(40, bHi + 10); }
+  else { min = Math.max(0, Math.min(20, bLo - 10)); max = Math.min(100, Math.max(80, bHi + 10)); }
 
   // แกน X = ช่วงเวลา (วัน + รอบ) ที่มีข้อมูล เรียงตามเวลา
   const slotKey = r => `${formatDateShort(r.date)}|${r.shift || ""}`;
@@ -851,7 +899,7 @@ function mk(id,key,min,max,color,unit,R){
     const pts = new Array(slots.length).fill(null);   // แถวข้อมูลของแต่ละช่วงเวลา
     rows.filter(r => subLabel(r, key) === name).forEach(r => { pts[idx.get(slotKey(r))] = r; });
     const raw = pts.map(r => r ? numOf(r[fld]) : null);
-    const isBad = i => raw[i] !== null && badHist(key, raw[i], name);
+    const isBad = i => raw[i] !== null && badHist(key, raw[i], name, curHistLoc);
     return {
       label: name, _rows: pts, _raw: raw,
       data: raw.map(v => v === null ? null : Math.max(min, Math.min(max, v))),   // ค่าที่หลุดกรอบ ให้ชิดขอบกราฟ
@@ -881,7 +929,7 @@ function mk(id,key,min,max,color,unit,R){
           label: c => {
             const ds = c.dataset, v = ds._raw[c.dataIndex], r = ds._rows[c.dataIndex];
             if (v === null) return null;
-            const flag = badHist(key, v, ds.label) ? " ⚠️ ผิดปกติ" : "";
+            const flag = badHist(key, v, ds.label, curHistLoc) ? " ⚠️ ผิดปกติ" : "";
             return `${ds.label}: ${v} ${unit}${flag}` + (r && r.who ? ` · ${r.who}` : "");
           }
         } }
@@ -896,13 +944,13 @@ function mk(id,key,min,max,color,unit,R){
 }
 
 function renderHistoryView() {
-  document.querySelectorAll(".history-btn").forEach((btn, i) => {
-    btn.setAttribute("aria-pressed", i === hLoc ? "true" : "false");
-  });
+  renderHistButtons();
   
   document.getElementById("h-seg").innerHTML=[[7,"7 วัน"],[30,"30 วัน"],[99,"ทั้งหมด"]].map(s=>`<button class="${s[0]==hDays?"on":""}" onclick="hDays=${s[0]};renderHistoryView()">${s[1]}</button>`).join("");
 
-  let zoneName = LOCS_HIST[hLoc][1];
+  if (hLoc >= ZONES.length) hLoc = 0;
+  let zoneName = ZONES[hLoc][0]; curHistLoc = zoneName;
+  renderCrit(zoneName);
   let filtered = cachedHistory.filter(item => item.location && item.location.trim() === zoneName);
   
   const SO={"รอบเช้า":0,"รอบบ่าย":1,"รอบเย็น":2};
@@ -927,7 +975,7 @@ function renderHistoryView() {
     const nb = filtered.filter(r => {
       let val = k=='f' ? r.fridgeTemp : k=='r' ? r.roomTemp : r.humidity;
       let num = val !== "" && val != null ? parseFloat(val) : null;
-      return num !== null && badHist(k, num, subLabel(r, k));
+      return num !== null && badHist(k, num, subLabel(r, k), r.location);
     }).length;
 
     const fld = k=='f' ? "fridgeTemp" : k=='r' ? "roomTemp" : "humidity";
@@ -955,7 +1003,7 @@ function renderHistoryView() {
     [['f','ตู้เย็น','°C',r.fridgeTemp],['r','ห้อง','°C',r.roomTemp],['h','ชื้น','%RH',r.humidity]].forEach(([k,n,u,val])=>{
       let num = val !== "" && val != null ? parseFloat(val) : null;
       if(num !== null) {
-        let isBad = badHist(k, num, subLabel(r, k));
+        let isBad = badHist(k, num, subLabel(r, k), r.location);
         let dateFormatted = formatDateShort(r.date);
         let timeStr = r.shift === "รอบเช้า" ? "09:00" : r.shift === "รอบบ่าย" ? "14:30" : r.shift === "รอบเย็น" ? "20:30" : "";
         let subLocText = ` > ${esc(subLabel(r, k))}`;
@@ -1022,7 +1070,7 @@ async function flushOutbox() {
   }
 }
 window.addEventListener("online", flushOutbox);
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { flushOutbox(); if (Date.now() - lastFetch > 2*60*1000) refreshData(); } });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { flushOutbox(); if (Date.now() - lastFetch > 2*60*1000) { refreshData(); loadConfig(); } } });
 
 $("#save").addEventListener("click", () => {
   const doneNow = curDone();
@@ -1064,7 +1112,7 @@ $("#save").addEventListener("click", () => {
         }
         if (card.classList.contains("f")) {
           // ไม่แก้ค่าเอง ถ้าตู้เย็นเกิน 12 °C ให้ผู้ใช้ยืนยันว่าพิมพ์ถูก
-          if (!card.classList.contains("fz") && num > 12 &&
+          if (!card.classList.contains("fz") && num > Math.max(12, limOf("f", ZONES[zone][0], card.dataset.sub)[1] + 4) &&
               !confirm(`${card.dataset.sub}: ${num} °C\nค่านี้สูงผิดปกติ ถูกต้องใช่ไหม?\n(กด "ยกเลิก" เพื่อกลับไปแก้)`)) {
             inp.focus(); return;
           }
@@ -1100,25 +1148,29 @@ $("#save").addEventListener("click", () => {
 function restoreArea(){
   let a=-1; try{a=parseInt(localStorage.getItem("pt-area-"+zone),10)}catch(e){}
   if(isNaN(a)||a<0) return;
-  if(ZONES[zone][0]==="คลังยา"){ if(a<ZONES[zone][1].length) mainCatIndex=a; }
+  if(isGrouped(zone)){ if(a<ZONES[zone][1].length) mainCatIndex=a; }
   else if(a<ZONES[zone][1].length) area=a;
 }
-try{const z=parseInt(localStorage.getItem("pt-zone"),10); if(z>=0&&z<ZONES.length) zone=z;}catch(e){}
+try{
+  const zn=localStorage.getItem("pt-zone-name"), zi=zn?ZONES.findIndex(z=>z[0]===zn):-1;
+  const z=zi>=0?zi:parseInt(localStorage.getItem("pt-zone"),10); if(z>=0&&z<ZONES.length) zone=z;
+}catch(e){}
 restoreArea();
 
 // ---------- รายงานประจำเดือน ----------
 (function initReport(){
-  $("#rep-loc").innerHTML = ZONES.map((z,i)=>`<option value="${i}">${esc(z[0])}</option>`).join("");
+  renderRepLocs();
   const d=new Date(); d.setDate(1);
   // ช่วงต้นเดือน (วันที่ 1–5) ตั้งค่าเริ่มต้นเป็นเดือนก่อน เพราะมักพิมพ์รายงานของเดือนที่แล้ว
   if(new Date().getDate()<=5) d.setMonth(d.getMonth()-1);
   $("#rep-month").value = d.getFullYear()+"-"+pad(d.getMonth()+1);
   $("#rep-month").max = todayStr().slice(0,7);
 })();
-const roundsOfName = n => (n==="ห้องยาตึกเก่า"||n==="คลังยา") ? R2 : R3;
+function renderRepLocs(){ const v=+$("#rep-loc").value||0; $("#rep-loc").innerHTML = ZONES.map((z,i)=>`<option value="${i}">${esc(z[0])}</option>`).join(""); $("#rep-loc").value = Math.min(v, ZONES.length-1); }
+const roundsOfName = n => { const L=CONFIG.locations.find(x=>x.name===n); return L && +L.rounds===2 ? R2 : R3; };
 function pointsOfName(n){
-  const z=ZONES.find(x=>x[0]===n); if(!z) return [];
-  return z[1].flatMap(x=>Array.isArray(x)?x[1].map(s=>({name:s,fridge:x[0]==="ตู้เย็น"})):[{name:x,fridge:x.includes("ตู้")}]);
+  const L=CONFIG.locations.find(x=>x.name===n); if(!L) return [];
+  return L.points.map(p=>({name:p.name, fridge:(pointOf(n,p.name)||{}).fridge}));
 }
 const nowHM=()=>{const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())};
 const TH_MONTH=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
@@ -1141,7 +1193,7 @@ async function openReport(){
   const cell=new Map();
   rows.forEach(r=>{ const k=labelOf(r)+"|"+dayOf(r.date)+"|"+r.shift, p=cell.get(k);
     if(!p || String(r.timestamp||"")>=String(p.timestamp||"")) cell.set(k,r); });
-  const crit=p=>p.fridge?(p.name.includes("TH1 (บน)")?"−25 ถึง −15 °C":"2–8 °C"):"อุณหภูมิ 15–30 °C · ความชื้น 30–70 %RH";
+  const crit=p=>{ if(p.fridge){ const [a,b]=limOf("f",loc,p.name); return rng(a,b)+" °C"; } const [a,b]=limOf("r",loc,p.name),[c,d]=limOf("h",loc,p.name); return `อุณหภูมิ ${rng(a,b)} °C · ความชื้น ${rng(c,d)} %RH`; };
   const fmt=v=>{const n=numOf(v);return n===null?"":(Math.round(n*10)/10).toFixed(1)};
   const summary=[];
   const blocks=pts.map(p=>{
@@ -1159,10 +1211,10 @@ async function openReport(){
         if(!r){ tds+= p.fridge ? `<td class="${notYet||p.old?"":"miss"}"></td><td class="w"></td>` : `<td class="${notYet||p.old?"":"miss"}"></td><td></td><td class="w"></td>`; return; }
         rec++;
         if(p.fridge){
-          const v=numOf(r.fridgeTemp), x=v!==null&&badHist("f",v,p.name); if(x) bad++;
+          const v=numOf(r.fridgeTemp), x=v!==null&&badHist("f",v,p.name,loc); if(x) bad++;
           tds+=`<td class="${x?"x":""}">${fmt(r.fridgeTemp)}</td><td class="w">${esc(r.who||"")}</td>`;
         } else {
-          const t=numOf(r.roomTemp), h=numOf(r.humidity), xt=t!==null&&badHist("r",t,p.name), xh=h!==null&&badHist("h",h,p.name); if(xt||xh) bad++;
+          const t=numOf(r.roomTemp), h=numOf(r.humidity), xt=t!==null&&badHist("r",t,p.name,loc), xh=h!==null&&badHist("h",h,p.name,loc); if(xt||xh) bad++;
           tds+=`<td class="${xt?"x":""}">${fmt(r.roomTemp)}</td><td class="${xh?"x":""}">${fmt(r.humidity)}</td><td class="w">${esc(r.who||"")}</td>`;
         }
         if(r.note) notes.push(`${d}/${M} ${sh.replace("รอบ","")}: ${esc(r.note)}`);
@@ -1197,6 +1249,25 @@ chips(); mainCategories(); areas(); setRound(roundByClock()); showDate(); render
 $("#sync").addEventListener("click", flushOutbox);
 flushOutbox();   // ส่งรายการที่ค้างจากครั้งก่อน (ถ้ามี)
 refreshData();   // โหลดข้อมูลชีตเพื่อแสดงจุดที่บันทึกแล้ว
+renderHistButtons();
+// โหลดการตั้งค่าล่าสุดจากชีต ถ้าเปลี่ยนไปจากที่เครื่องจำไว้ ให้ใช้ของใหม่
+function loadConfig(){
+  fetch(APPS_SCRIPT_URL + "?config=1").then(r => r.json()).then(c => {
+    if (!validConfig(c)) return;
+    const js = JSON.stringify(c);
+    if (js === JSON.stringify(CONFIG)) return;
+    try { localStorage.setItem("pt-config", js); } catch(e) {}
+    // กำลังกรอกค่าอยู่: ใช้ค่าใหม่ครั้งหน้าที่เปิดแอป
+    if ([...document.querySelectorAll("#list input")].some(i => i.value.trim())) return;
+    const zn = ZONES[zone][0];
+    applyConfig(c);
+    zone = Math.max(0, ZONES.findIndex(z => z[0] === zn)); mainCatIndex = -1; area = -1; restoreArea();
+    if (hLoc >= ZONES.length) hLoc = 0;
+    chips(); mainCategories(); areas(); setRound(round); renderPeople(); build(); renderHistButtons(); renderRepLocs();
+    if ($("#section-history").style.display === "block" && cachedHistory.length) renderHistoryView();
+  }).catch(() => {});
+}
+loadConfig();
 </script>
 </body>
 </html>
