@@ -210,6 +210,10 @@ textarea.field{min-height:92px;padding:12px 16px;resize:vertical}
 .note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.dn{display:block;font-size:12px;font-weight:700;color:#1b7f4b;margin-top:2px}
+.ch .dn{display:inline-block;margin-left:8px;font-size:12px}
+.m.fmt input{border-color:var(--bad)!important}
+.m.fmt .st{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -466,12 +470,25 @@ document.addEventListener("input", e => {
   }
 });
 
+// วันที่ของแถวข้อมูลจากชีต -> "yyyy-mm-dd" (ตามเวลาไทยในเครื่อง)
+const dayOf=v=>{const s=String(v||"").trim();if(/^\d{4}-\d{2}-\d{2}/.test(s)&&!/(Z|[+-]\d\d:?\d\d)$/.test(s))return s.slice(0,10);const d=new Date(s);return isNaN(d)?"":d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+// จุดวัดที่บันทึกแล้ว (จากชีต + ที่รอส่งในเครื่อง) ของวัน/รอบ/สถานที่นี้
+function doneSubs(date,shift,loc){
+  const set=new Set();
+  const add=r=>{if(dayOf(r.date)===date&&r.shift===shift&&String(r.location||"").trim()===loc)set.add(String(r.subLocation||"").trim())};
+  (Array.isArray(cachedHistory)?cachedHistory:[]).forEach(add);
+  loadOutbox().forEach(it=>(it.rows||[]).forEach(add));
+  return set;
+}
+const curDone=()=>doneSubs($("#date").value,getRounds()[round][0],ZONES[zone][0]);
+const NUM_RE=/^-?\d+(\.\d+)?$/;
+const cleanNum=v=>String(v||"").replace(",",".").replace(/[−–]/g,"-").replace(/\s+/g,"");
 const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
 let autoDate=todayStr();                // วันที่ที่ระบบตั้งให้อัตโนมัติ (ถ้าผู้ใช้ไม่ได้เปลี่ยนเอง)
 $("#date").value=autoDate; $("#date").max=autoDate;
 const dstr=()=>new Date($("#date").value+"T00:00").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"});
 const key=(z,mc,a)=>$("#date").value+"|"+round+"|"+z+"|"+mc+"|"+a;
-function showDate(){$("#dv").textContent=dstr();chips();mainCategories();areas()}
+function showDate(){$("#dv").textContent=dstr();chips();mainCategories();areas();markDone()}
 $("#date").addEventListener("change",()=>{ if($("#date").value>todayStr()) $("#date").value=todayStr(); showDate(); });
 
 // รอบเวลาตามเวลาปัจจุบัน: ก่อนเที่ยง = เช้า, ก่อน 18:00 = บ่าย, หลังจากนั้น = เย็น (ถ้าจุดนั้นมีรอบเย็น)
@@ -505,6 +522,7 @@ function setRound(i){
   sg.style.setProperty("--r", i);
   sg.innerHTML = "<i></i>" + rs.map((r,k)=>`<button type="button" data-i="${k}" aria-pressed="${k===i}">${r[0]}<small>${r[1]} น.</small></button>`).join("");
   $("#rl").textContent = rs[i][0] + " · " + rs[i][1] + " น.";
+  if (typeof markDone === "function" && $("#areas")) markDone();
 }
 $("#seg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setRound(+b.dataset.i)});
 
@@ -548,6 +566,8 @@ function areas(){
 $("#zones").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   zone = +b.dataset.i; mainCatIndex = -1; area = -1;
+  try{localStorage.setItem("pt-zone", zone)}catch(err){}
+  restoreArea();
   chips(); mainCategories(); areas(); setRound(round); renderPeople(); build();
 });
 
@@ -555,11 +575,13 @@ $("#mainCategories").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   mainCatIndex = +b.dataset.mc; area = -1;
   mainCategories(); areas(); renderPeople(); build();
+  try{localStorage.setItem("pt-area-"+zone, mainCatIndex)}catch(err){}
 });
 
 $("#areas").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b)return;
   area = +b.dataset.k; areas(); renderPeople(); build();
+  try{localStorage.setItem("pt-area-"+zone, area)}catch(err){}
 });
 
 const F={lo:2,hi:8,min:0,max:12,u:"°C",r:"2–8"}, FZ={lo:-25,hi:-15,min:-30,max:-10,u:"°C",r:"-15 ถึง -25",neg:true}, R={lo:15,hi:30,min:10,max:40,u:"°C",r:"15–30"}, H={lo:30,hi:70,min:0,max:100,u:"%RH",r:"30–70"};
@@ -590,24 +612,29 @@ function build(){
     const t = targets[0];
     $("#list").innerHTML = t.fridge ? fridge(t.name) : roomCard(t.name);
   }
-  $("#note").value=""; update();
+  $("#note").value=""; update(); markDone();
 }
 
 function update(){
-  const ms=[...document.querySelectorAll("#list .m")]; let n=0,out=0;
+  // ตู้/จุดที่บันทึกรอบนี้แล้ว ถ้าเว้นว่างไว้ ไม่ต้องกรอกซ้ำ
+  const doneNow=curDone();
+  const skipCard=c=>doneNow.has(c.dataset.sub)&&[...c.querySelectorAll("input")].every(i=>!i.value.trim());
+  const ms=[...document.querySelectorAll("#list .m")].filter(m=>!skipCard(m.closest(".card"))); let n=0,out=0;
   ms.forEach(c=>{
-    let rawVal = c.querySelector("input").value.replace(",", ".").replace(/[−–]/g,"-").trim();
+    let rawVal = cleanNum(c.querySelector("input").value);
+    const badFmt = rawVal !== "" && !NUM_RE.test(rawVal);
     let v = parseFloat(rawVal);
-    const has=!isNaN(v) && rawVal !== ""; 
+    const has=!badFmt && rawVal !== "";
+    c.classList.toggle("fmt", badFmt);
     const lo=+c.dataset.lo, hi=+c.dataset.hi, mn=+c.dataset.min, mx=+c.dataset.max;
     const low=has&&v<lo&&lo>mn, high=has&&v>hi, bad=low||high;
     c.classList.toggle("has",has); c.classList.toggle("out",bad); c.classList.toggle("ok",has&&!bad);
     const st=c.querySelector(".st");
     if(has){n++;if(bad)out++;c.querySelector("u").style.left=Math.max(0,Math.min(100,(v-mn)/(mx-mn)*100))+"%";
-      st.textContent=bad?(low?"ต่ำกว่าเกณฑ์":"สูงกว่าเกณฑ์"):"ปกติ"}else st.textContent="";
+      st.textContent=bad?(low?"ต่ำกว่าเกณฑ์":"สูงกว่าเกณฑ์"):"ปกติ"}else st.textContent=badFmt?"ตัวเลขไม่ถูกต้อง":"";
   });
   document.querySelectorAll(".card").forEach(c=>c.classList.toggle("out",!!c.querySelector(".m.out")));
-  const sel=getTargets().length>0;
+  const sel=getTargets().length>0 && ms.length>0;
   const miss=ms.length-n, w=customWho;
   $("#prog").textContent=n+"/"+ms.length;
   document.getElementById("arc").style.strokeDashoffset=ms.length ? 188.4*(1-n/ms.length) : 188.4;
@@ -615,7 +642,7 @@ function update(){
   const b=$("#save"); 
   b.disabled = !sel || miss>0 || !w; 
   b.classList.toggle("warn", sel && miss===0 && !!w && out>0);
-  b.textContent = !sel ? "เลือกตู้ / จุดวัดก่อน" : miss>0 ? `กรอกอีก ${miss} ช่อง` : !w ? "กรุณาระบุชื่อผู้บันทึก" : out>0 ? `บันทึก (มีค่านอกเกณฑ์ ${out} ช่อง)` : "บันทึกข้อมูล";
+  b.textContent = !sel ? (getTargets().length ? "ทุกจุดบันทึกแล้วรอบนี้" : "เลือกตู้ / จุดวัดก่อน") : miss>0 ? `กรอกอีก ${miss} ช่อง` : !w ? "กรุณาระบุชื่อผู้บันทึก" : out>0 ? `บันทึก (มีค่านอกเกณฑ์ ${out} ช่อง)` : "บันทึกข้อมูล";
 }
 
 document.addEventListener("focusin",e=>{if(e.target.matches(".m input"))setTimeout(()=>e.target.scrollIntoView({block:"center",behavior:"smooth"}),250)});
@@ -635,13 +662,46 @@ function switchTab(tab) {
   }
 }
 
+// โหลดข้อมูลจากชีตเงียบๆ เพื่อใช้เช็คจุดที่บันทึกแล้ว / กันบันทึกซ้ำ
+let lastFetch=0, fetching=null;
+function refreshData(){
+  if(fetching) return fetching;
+  fetching=fetch(APPS_SCRIPT_URL).then(r=>r.json()).then(j=>{
+    if(!Array.isArray(j)) throw new Error((j&&j.message)||"ข้อมูลไม่ถูกต้อง");
+    cachedHistory=j; lastFetch=Date.now(); markDone();
+    if($("#section-history").style.display==="block") renderHistoryView();
+  }).catch(()=>{}).finally(()=>{fetching=null});
+  return fetching;
+}
+// แสดง ✓ ที่จุดวัดที่บันทึกแล้วในวัน/รอบที่เลือก
+function markDone(){
+  const done=curDone(), isK=ZONES[zone][0]==="คลังยา";
+  document.querySelectorAll("#areas button").forEach(b=>{
+    const n=ZONES[zone][1][+b.dataset.k], d=!isK&&done.has(n);
+    b.classList.toggle("done",d);
+    let t=b.querySelector(".dn"); if(d&&!t){b.insertAdjacentHTML("beforeend",'<small class="dn">✓ บันทึกแล้ว</small>')} else if(!d&&t) t.remove();
+  });
+  if(isK) document.querySelectorAll("#mainCategories button").forEach(b=>{
+    const subs=ZONES[zone][1][+b.dataset.mc][1], c=subs.filter(x=>done.has(x)).length;
+    let t=b.querySelector(".dn"); if(t) t.remove();
+    if(c) b.insertAdjacentHTML("beforeend",`<small class="dn">${c===subs.length?"✓ ครบแล้ว":"บันทึกแล้ว "+c+"/"+subs.length}</small>`);
+    b.classList.toggle("done",c===subs.length);
+  });
+  document.querySelectorAll("#list .card").forEach(c=>{
+    const d=done.has(c.dataset.sub); let t=c.querySelector(".ch .dn");
+    if(d&&!t) c.querySelector(".ch").insertAdjacentHTML("beforeend",'<small class="dn">✓ บันทึกแล้วรอบนี้</small>'); else if(!d&&t) t.remove();
+  });  update();
+}
+
 async function loadHistory() {
   const hAlerts = $("#h-alerts");
   hAlerts.innerHTML = `<p style="text-align:center; color:var(--muted); padding:20px 0;">กำลังโหลดข้อมูล...</p>`;
   try {
     let response = await fetch(APPS_SCRIPT_URL);
-    cachedHistory = await response.json();
-    renderHistoryView();
+    const j = await response.json();
+    if (!Array.isArray(j)) throw new Error((j && j.message) || "ข้อมูลไม่ถูกต้อง");
+    cachedHistory = j; lastFetch = Date.now();
+    renderHistoryView(); markDone();
   } catch (err) {
     hAlerts.innerHTML = `<p style="text-align:center; color:var(--bad); padding:20px 0;">โหลดไม่สำเร็จ: ${esc(err.message)}</p>`;
   }
@@ -801,7 +861,7 @@ function renderHistoryView() {
   if(hDays < 99) {
     const t0 = new Date(); t0.setHours(0,0,0,0);
     const from = t0.getTime() - (hDays - 1) * 864e5;
-    filtered = filtered.filter(r => new Date(r.date).getTime() >= from);
+    filtered = filtered.filter(r => { const d = dayOf(r.date); return d && new Date(d + "T00:00").getTime() >= from; });
   }
 
   const M=[["f","ตู้เย็น","°C"],["r","ห้อง","°C"],["h","ชื้น","%"]];
@@ -834,8 +894,10 @@ function renderHistoryView() {
     charts = [];
   }
 
+  if (typeof Chart === "undefined") { charts = []; } else {
   Chart.defaults.font.family='"Anuphan",system-ui,sans-serif';
   charts=[mk("c1","f",-30,12,"#1e40af","°C",filtered), mk("c2","r",10,40,"#d97706","°C",filtered), mk("c3","h",20,80,"#0284c7","%RH",filtered)];
+  }
 
   const A=[];
   let sortedForList = [...filtered].reverse();
@@ -906,19 +968,24 @@ async function flushOutbox() {
     retryTimer = setTimeout(flushOutbox, 20000);   // ลองใหม่อัตโนมัติทุก 20 วินาที
   } else {
     showSync("ok");
-    cachedHistory = [];                             // ให้หน้าประวัติโหลดข้อมูลใหม่
+    refreshData();                                  // โหลดข้อมูลชีตใหม่ (ใช้เช็คจุดที่บันทึกแล้ว)
   }
 }
 window.addEventListener("online", flushOutbox);
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") flushOutbox(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { flushOutbox(); if (Date.now() - lastFetch > 2*60*1000) refreshData(); } });
 
 $("#save").addEventListener("click", () => {
-  const cards = [...document.querySelectorAll("#list .card")];
+  const doneNow = curDone();
+  const cards = [...document.querySelectorAll("#list .card")].filter(c => !(doneNow.has(c.dataset.sub) && [...c.querySelectorAll("input")].every(i => !i.value.trim())));
   if(!cards.length) return;
 
-  // เตือนถ้ารอบนี้ / จุดนี้ บันทึกไปแล้วในเครื่องนี้
+  // เตือนถ้ารอบนี้ / จุดนี้ บันทึกไปแล้ว (เช็คจากชีต + ที่รอส่งในเครื่อง)
   const k = key(zone,mainCatIndex,area);
-  if(saved[k] && !confirm("รอบนี้ของจุดนี้บันทึกไปแล้ว ต้องการบันทึกซ้ำใช่ไหม?")) return;
+  const done = curDone(), dup = cards.map(c => c.dataset.sub).filter(n => done.has(n));
+  if((dup.length || saved[k]) && !confirm(`${getRounds()[round][0]}ของ ${dup.length ? dup.join(", ") : "จุดนี้"} บันทึกไปแล้ว\nต้องการบันทึกซ้ำใช่ไหม?`)) return;
+  // ค่านอกเกณฑ์ ควรมีหมายเหตุ
+  if(document.querySelector("#list .m.out") && !$("#note").value.trim() &&
+     !confirm("มีค่านอกเกณฑ์ แต่ยังไม่ได้เขียนหมายเหตุ (สิ่งที่ทำ / คนที่แจ้ง)\nกด “ยกเลิก” เพื่อกลับไปเขียน หรือ “ตกลง” เพื่อบันทึกเลย")) { $("#note").focus(); return; }
 
   const base = {
     date: $("#date").value,
@@ -932,10 +999,10 @@ $("#save").addEventListener("click", () => {
   for (const card of cards) {
     let fridgeTemp = "", roomTemp = "", humidity = "";
     for (const inp of card.querySelectorAll("input")) {
-      const val = inp.value.trim().replace(",", ".").replace(/[−–]/g,"-");
+      const val = cleanNum(inp.value);
       const label = inp.getAttribute("aria-label") || "";
+      if (!NUM_RE.test(val)) { alert(`${card.dataset.sub}: "${inp.value}" ไม่ใช่ตัวเลขที่ถูกต้อง`); inp.focus(); return; }
       const num = parseFloat(val);
-      if (isNaN(num)) continue;
       if (label.includes("อุณหภูมิ")) {
         if (card.classList.contains("fz") && num > 0 &&
             !confirm(`${card.dataset.sub}: ${num} °C\nตู้แช่แข็งควรติดลบ ลืมกดปุ่ม ± หรือไม่?\n(กด "ยกเลิก" เพื่อกลับไปแก้)`)) {
@@ -979,10 +1046,20 @@ $("#save").addEventListener("click", () => {
   flushOutbox();   // ส่งเบื้องหลัง
 });
 
+// จำสถานที่ / จุดวัดล่าสุดของเครื่องนี้ (แต่ละคนบันทึกที่ของตัวเอง)
+function restoreArea(){
+  let a=-1; try{a=parseInt(localStorage.getItem("pt-area-"+zone),10)}catch(e){}
+  if(isNaN(a)||a<0) return;
+  if(ZONES[zone][0]==="คลังยา"){ if(a<ZONES[zone][1].length) mainCatIndex=a; }
+  else if(a<ZONES[zone][1].length) area=a;
+}
+try{const z=parseInt(localStorage.getItem("pt-zone"),10); if(z>=0&&z<ZONES.length) zone=z;}catch(e){}
+restoreArea();
 // เริ่มต้นโหลดหน้าเว็บ
 chips(); mainCategories(); areas(); setRound(roundByClock()); showDate(); renderPeople(); build();
 $("#sync").addEventListener("click", flushOutbox);
 flushOutbox();   // ส่งรายการที่ค้างจากครั้งก่อน (ถ้ามี)
+refreshData();   // โหลดข้อมูลชีตเพื่อแสดงจุดที่บันทึกแล้ว
 </script>
 </body>
 </html>
